@@ -47,6 +47,34 @@ def test_read_all_notes(mock_get_all, test_app):
     assert response.json() == test_data
 
 
+@mock.patch('app.api.crud.get')
+@mock.patch('app.api.crud.put')
+def test_update_note(mock_put, mock_get, test_app):
+    test_update_data = {"title": "someone", "description": "someone else", "id": 1}
+    mock_get.return_value = True
+    mock_put.return_value = 1
+
+    response = test_app.put("/notes/1/", data=json.dumps(test_update_data))
+
+    assert response.status_code == 200
+    assert response.json() == test_update_data
+
+
+@pytest.mark.parametrize(
+    "id, payload, status_code",
+    [
+        [1, {}, 422],
+        [1, {"description": "bar"}, 422],
+        [999, {"title": "foo", "description": "bar"}, 404],
+    ],
+)
+@mock.patch('app.api.crud.get')
+def test_update_note_invalid(mock_get, test_app, id, payload, status_code):
+    mock_get.return_value = None
+    response = test_app.put(f"/notes/{id}/", data=json.dumps(payload),)
+    assert response.status_code == status_code
+
+
 def test_create_note_invalid_json(test_app):
     response = test_app.post("/notes/", data=json.dumps({"title": "something"}))
     assert response.status_code == 422
