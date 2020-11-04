@@ -34,6 +34,19 @@ def test_read_note_incorrect_id2(mock_get, test_app):
     assert response.json()["detail"] == "Note not found"
 
 
+@mock.patch('app.api.crud.get_all')
+def test_read_all_notes(mock_get_all, test_app):
+    test_data = [
+        {"title": "something", "description": "something else", "id": 1},
+        {"title": "someone", "description": "someone else", "id": 2},
+    ]
+    mock_get_all.return_value = test_data
+
+    response = test_app.get("/notes/")
+    assert response.status_code == 200
+    assert response.json() == test_data
+
+
 def test_create_note_invalid_json(test_app):
     response = test_app.post("/notes/", data=json.dumps({"title": "something"}))
     assert response.status_code == 422
