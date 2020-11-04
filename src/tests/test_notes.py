@@ -17,12 +17,19 @@ def test_create_note(mock_post, test_app):
 
 
 def test_create_note_invalid_json(test_app):
-    response = test_app.post("/notes/", data=json.dumps({"title": "something"}))
+    response = test_app.post("/notes/",
+                             data=json.dumps({"title": "something"}))
+    assert response.status_code == 422
+
+
+def test_create_note_invalid_json_too_short_title(test_app):
+    response = test_app.post("/notes/",
+                             data=json.dumps({"title": "1", "description": "valid"}))
     assert response.status_code == 422
 
 
 @mock.patch('app.api.crud.get')
-def test_read_note2(mock_get, test_app):
+def test_read_note(mock_get, test_app):
     test_data = {"id": 1, "title": "foo", "description": "bar"}
     mock_get.return_value = test_data
 
@@ -32,11 +39,20 @@ def test_read_note2(mock_get, test_app):
 
 
 @mock.patch('app.api.crud.get')
-def test_read_note_incorrect_id2(mock_get, test_app):
+def test_read_note_incorrect_id(mock_get, test_app):
     mock_get.return_value = None
+
     response = test_app.get("/notes/999")
     assert response.status_code == 404
     assert response.json()["detail"] == "Note not found"
+
+
+@mock.patch('app.api.crud.get')
+def test_read_note_incorrect_id_zero(mock_get, test_app):
+    mock_get.return_value = None
+
+    response = test_app.get("/notes/0")
+    assert response.status_code == 422
 
 
 @mock.patch('app.api.crud.get_all')
