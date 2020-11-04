@@ -85,8 +85,11 @@ def test_update_note(mock_put, mock_get, test_app):
     "id, payload, status_code",
     [
         [1, {}, 422],
-        [1, {"description": "bar"}, 422],
-        [999, {"title": "foo", "description": "bar"}, 404],
+        [1, {"description": "title_missing_description_ok"}, 422],
+        [999, {"title": "title_ok", "description": "description_ok_unknown_id"}, 404],
+        [1, {"title": "1", "description": "title_too_short_description_ok"}, 422],
+        [1, {"title": "title_ok_description_too_short", "description": "1"}, 422],
+        [0, {"title": "title_ok", "description": "description_ok_but_id_zero"}, 422],
     ],
 )
 @mock.patch('app.api.crud.get')
@@ -116,3 +119,12 @@ def test_remove_note_incorrect_id(mock_get, test_app):
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Note not found"
+
+
+@mock.patch('app.api.crud.get')
+def test_remove_note_incorrect_id_zero(mock_get, test_app):
+    mock_get.return_value = None
+
+    response = test_app.delete("/notes/0/")
+
+    assert response.status_code == 422
