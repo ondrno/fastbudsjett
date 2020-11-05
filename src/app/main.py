@@ -1,21 +1,15 @@
-from fastapi import FastAPI
-from app.api import ping, notes
-from app.db import engine, metadata, database
+from typing import List
+from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.orm import Session
 
-metadata.create_all(engine)
+from .api import crud, models, schemas, notes, ping, users
+from .database import SessionLocal, engine
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-@app.on_event("startup")
-async def startup():
-    await database.connect()
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
-
-
 app.include_router(ping.router)
 app.include_router(notes.router, prefix="/notes", tags=["notes"])
+app.include_router(users.router, prefix="/users", tags=["users"])
