@@ -1,6 +1,7 @@
 import datetime
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from ..database import Base
 
@@ -22,7 +23,8 @@ class Note(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(50), index=True)
     description = Column(String, index=True)
-    created_date = Column(DateTime, default=datetime.datetime.now(), nullable=False),
+    date_created = Column(DateTime, server_default=func.now(), nullable=False),
+    date_updated = Column(DateTime, onupdate=func.now()),
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="notes")
