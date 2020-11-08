@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr, SecretStr
 
 
 class NoteBase(BaseModel):
@@ -21,17 +21,33 @@ class Note(NoteBase):
 
 
 class UserBase(BaseModel):
-    email: str
+    email: Optional[EmailStr] = None
+    password: Optional[SecretStr] = None
 
 
 class UserCreate(UserBase):
-    password: str
+    email: EmailStr
+    password = SecretStr
 
 
-class User(UserBase):
+class UserUpdate(UserBase):
+    pass
+
+
+class UserDelete(UserBase):
+    id: int
+
+
+# Properties shared by models stored in DB
+class UserInDBBase(UserBase):
     id: int
     is_active: bool
     notes: List[Note] = []
 
     class Config:
         orm_mode = True
+
+
+# Properties to return to client
+class User(UserInDBBase):
+    pass
