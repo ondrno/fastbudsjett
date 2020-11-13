@@ -1,14 +1,15 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, datetime
 
 
 # Shared properties
 class ItemBase(BaseModel):
     description: Optional[str] = None
-    amount: Optional[int] = None
-    date: Optional[str] = None
+    amount: Optional[float] = None
+    date: Optional[datetime] = None
     is_deleted: Optional[bool] = None
+
     category_id: Optional[int] = None
     payment_method_id: Optional[int] = None
 
@@ -16,8 +17,9 @@ class ItemBase(BaseModel):
 # Properties to receive on item creation
 class ItemCreate(ItemBase):
     description: str
-    amount: int
-    date: str
+    amount: float
+    date: datetime.date
+
     category_id: int
     payment_method_id: int
 
@@ -31,15 +33,16 @@ class ItemUpdate(ItemBase):
 class ItemInDBBase(ItemBase):
     id: int
     description: str
-    amount: int
+    amount: float
+    date: datetime.date
     is_deleted: bool = False
-    date_created: str
-    date_modified: str
+
     owner_id: int
     category_id: int
     payment_method_id: int
-    _date_created: str
-    _date_modified: str
+
+    _date_created: datetime
+    _date_modified: datetime
 
     class Config:
         orm_mode = True

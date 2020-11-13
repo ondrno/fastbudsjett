@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Date, Boolean
+from sqlalchemy import Boolean, Column, Integer, ForeignKey, Float, Date, DateTime, String
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class Item(Base):
     id = Column(Integer, primary_key=True, index=True)
     description = Column(String(250), index=True)
-    amount = Column(Integer)
+    amount = Column(Float)
     date = Column(Date)
     is_deleted = Column(Boolean, default=False)
 
@@ -26,5 +26,5 @@ class Item(Base):
 
     payment_method_id = Column(Integer, ForeignKey("paymentMethod.id"))
     payment_method = relationship("PaymentMethod", back_populates="item")
-    _date_created = Column(Date)
-    _date_modified = Column(Date)
+    _date_created = Column(DateTime)
+    _date_modified = Column(DateTime)
