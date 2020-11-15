@@ -1,27 +1,33 @@
 from typing import Optional
+from datetime import datetime
+from pydantic import BaseModel, constr, Field
 
-from pydantic import BaseModel, datetime
+
+# description has to have a minimum length of 10 characters
+description_constr = constr(min_length=10, max_length=300)
+
+# only accept date strings such dd.mm.yyyy, e.g. 05.12.2020
+date_constr = constr(min_length=10, max_length=10, regex=r'\d{2}\.\d{2}\.\d{4}')
 
 
 # Shared properties
 class ItemBase(BaseModel):
     description: Optional[str] = None
-    amount: Optional[float] = None
-    date: Optional[datetime] = None
-    is_deleted: Optional[bool] = None
+    amount: Optional[float] = Field(None, example="9.95")
+    date: Optional[str] = Field(None, example="01.12.2020")
 
     category_id: Optional[int] = None
-    payment_method_id: Optional[int] = None
+    payment_id: Optional[int] = None
 
 
 # Properties to receive on item creation
 class ItemCreate(ItemBase):
-    description: str
+    description: description_constr
     amount: float
-    date: datetime.date
+    date: date_constr
 
     category_id: int
-    payment_method_id: int
+    payment_id: int
 
 
 # Properties to receive on item update
@@ -32,14 +38,13 @@ class ItemUpdate(ItemBase):
 # Properties shared by models stored in DB
 class ItemInDBBase(ItemBase):
     id: int
-    description: str
+    description: description_constr
     amount: float
-    date: datetime.date
-    is_deleted: bool = False
+    date: date_constr
 
     owner_id: int
     category_id: int
-    payment_method_id: int
+    payment_id: int
 
     _date_created: datetime
     _date_modified: datetime

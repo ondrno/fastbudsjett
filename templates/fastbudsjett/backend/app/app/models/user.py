@@ -18,4 +18,3 @@ class User(Base):
     is_active = Column(Boolean(), default=True)
     is_superuser = Column(Boolean(), default=False)
     items = relationship("Item", back_populates="owner")
-    expenses = relationship("Expenses", back_populates="owner")

@@ -1,12 +1,15 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
+if TYPE_CHECKING:
+    from .item import Item  # noqa: F401
+
 
 class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-
-    expense_id = Column(Integer, ForeignKey("user.id"))
-    owner = relationship("User", back_populates="expenses")
+    name = Column(String(30), index=True, unique=True, nullable=False)
+    items = relationship("Item", back_populates="category")

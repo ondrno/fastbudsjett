@@ -1,31 +1,38 @@
 from typing import Optional
-
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 
 # Shared properties
-class PaymentMethodBase(BaseModel):
-    title: Optional[str] = None
+class PaymentBase(BaseModel):
+    """
+    Payment base class, the name describes the payment method, e.g. debit_card, cash, transfer
+    """
+    name: Optional[str] = None
 
 
 # Properties to receive via API on creation
-class PaymentMethodCreate(PaymentMethodBase):
-    title: str
+class PaymentCreate(PaymentBase):
+    name: str
 
 
 # Properties to receive via API on update
-class PaymentMethodUpdate(PaymentMethodBase):
-    title: Optional[str] = None
+class PaymentUpdate(PaymentBase):
+    name: Optional[str] = None
 
 
-class PaymentMethodInDBBase(PaymentMethodBase):
+class PaymentInDBBase(PaymentBase):
     id: int
-    title: int
+    name: int
 
     class Config:
         orm_mode = True
 
 
 # Additional properties to return via API
-class PaymentMethod(PaymentMethodInDBBase):
+class Payment(PaymentInDBBase):
+    pass
+
+
+# Properties properties stored in DB
+class PaymentInDB(PaymentInDBBase):
     pass

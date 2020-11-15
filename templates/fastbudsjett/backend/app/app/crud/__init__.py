@@ -1,6 +1,7 @@
+from .crud_category import category
 from .crud_item import item
 from .crud_user import user
-from .crud_payment import payment_method
+from .crud_payment import payment
 
 # For a new basic set of CRUD operations you could just do
 

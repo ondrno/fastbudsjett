@@ -4,12 +4,12 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
-from app.models.payment import PaymentModel
-from app.schemas.payment import PaymentMethodCreate, PaymentMethodUpdate
+from app.models.payment import Payment
+from app.schemas.payment import PaymentCreate, PaymentUpdate
 
 
-class CRUDPaymentMethod(CRUDBase[Item, ItemCreate, ItemUpdate]):
+class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
     pass
 
 
-payment_method = CRUDPaymentMethod(PaymentModel)
+payment = CRUDPayment(Payment)
