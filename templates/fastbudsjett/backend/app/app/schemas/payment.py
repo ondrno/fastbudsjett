@@ -22,7 +22,7 @@ class PaymentUpdate(PaymentBase):
 
 class PaymentInDBBase(PaymentBase):
     id: int
-    name: int
+    name: str
 
     class Config:
         orm_mode = True

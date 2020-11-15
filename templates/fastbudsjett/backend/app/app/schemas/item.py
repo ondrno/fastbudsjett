@@ -1,13 +1,26 @@
+import datetime
+import re
+
 from typing import Optional
-from datetime import datetime
-from pydantic import BaseModel, constr, Field
+from pydantic import BaseModel, constr, Field, validator
 
 
 # description has to have a minimum length of 10 characters
 description_constr = constr(min_length=10, max_length=300)
 
-# only accept date strings such dd.mm.yyyy, e.g. 05.12.2020
-date_constr = constr(min_length=10, max_length=10, regex=r'\d{2}\.\d{2}\.\d{4}')
+
+def validate_date(v: str) -> str:
+    if not isinstance(v, str):
+        raise ValueError(f'Wrong argument type: {v}')
+
+    m = re.match(r'(?P<day>\d{1,2})\.(?P<month>\d{1,2})\.(?P<year>\d{4})', v)
+    if not m:
+        raise ValueError(f'Wrong date format: {v}')
+
+    year = int(m.group('year'))
+    month = int(m.group('month'))
+    day = int(m.group('day'))
+    return datetime.date(year, month, day).isoformat()
 
 
 # Shared properties
@@ -24,15 +37,22 @@ class ItemBase(BaseModel):
 class ItemCreate(ItemBase):
     description: description_constr
     amount: float
-    date: date_constr
+    date: str
 
     category_id: int
     payment_id: int
 
+    @validator("date", pre=True)
+    def check_date(cls, date: str) -> str:
+        return validate_date(date)
+
 
 # Properties to receive on item update
 class ItemUpdate(ItemBase):
-    pass
+
+    @validator("date", pre=True)
+    def check_date(cls, date: str) -> str:
+        return validate_date(date)
 
 
 # Properties shared by models stored in DB
@@ -40,14 +60,14 @@ class ItemInDBBase(ItemBase):
     id: int
     description: description_constr
     amount: float
-    date: date_constr
+    date: str
 
     owner_id: int
     category_id: int
     payment_id: int
 
-    _date_created: datetime
-    _date_modified: datetime
+    _date_created: datetime.datetime
+    _date_modified: datetime.datetime
 
     class Config:
         orm_mode = True

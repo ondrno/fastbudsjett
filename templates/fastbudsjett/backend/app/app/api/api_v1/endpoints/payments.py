@@ -18,7 +18,7 @@ def read_payments(
     # current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Retrieve payments.
+    Retrieve payment methods.
     """
     payments = crud.payment.get_multi(db, skip=skip, limit=limit)
     return payments
@@ -32,7 +32,7 @@ def create_payment(
     # current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Create new payment.
+    Create new payment method.
     """
     try:
         payment = crud.payment.create(db=db, obj_in=payment_in)
@@ -71,7 +71,7 @@ def read_payment(
     # current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Get payment by ID.
+    Get payment method by ID.
     """
     payment = crud.payment.get(db=db, id=id)
     if not payment:
@@ -87,7 +87,7 @@ def delete_payment(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Delete a payment. Only superusers can do that.
+    Delete a payment method. Only superusers can do that.
     """
     payment = crud.payment.get(db=db, id=id)
     if not payment:
