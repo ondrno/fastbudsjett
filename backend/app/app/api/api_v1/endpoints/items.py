@@ -2,6 +2,7 @@ from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+import sqlalchemy
 
 from app import crud, models, schemas
 from app.api import deps
@@ -38,7 +39,11 @@ def create_item(
     """
     Create new item.
     """
-    item = crud.item.create_with_owner(db=db, obj_in=item_in, owner_id=current_user.id)
+    try:
+        item = crud.item.create_with_owner(db=db, obj_in=item_in, owner_id=current_user.id)
+    except sqlalchemy.exc.IntegrityError as e:
+        raise HTTPException(status_code=400, detail=f"Database integrity error={e}")
+
     return item
 
 

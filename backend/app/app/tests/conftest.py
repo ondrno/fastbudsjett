@@ -4,9 +4,12 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
+from app import models
 from app.core.config import settings
 from app.db.session import SessionLocal
 from app.main import app
+from app.tests.utils.category import create_random_category
+from app.tests.utils.payment import create_random_payment
 from app.tests.utils.user import authentication_token_from_email
 from app.tests.utils.utils import get_superuser_token_headers
 
@@ -32,3 +35,13 @@ def normal_user_token_headers(client: TestClient, db: Session) -> Dict[str, str]
     return authentication_token_from_email(
         client=client, email=settings.EMAIL_TEST_USER, db=db
     )
+
+
+@pytest.fixture(scope="module")
+def payment() -> Generator:
+    yield create_random_payment(db=db)
+
+
+@pytest.fixture(scope="module")
+def category() -> Generator:
+    yield create_random_category(db=db)

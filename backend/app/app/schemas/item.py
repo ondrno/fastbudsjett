@@ -35,6 +35,9 @@ class ItemBase(BaseModel):
 
 # Properties to receive on item creation
 class ItemCreate(ItemBase):
+    """
+    Create an item: mandatory fields are description, amount, date, category_id, payment_id
+    """
     description: description_constr
     amount: float
     date: str

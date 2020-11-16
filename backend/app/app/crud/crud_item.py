@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+import sqlalchemy
 
 from app.crud.base import CRUDBase
 from app.models.item import Item
