@@ -7,8 +7,8 @@ from fastapi.testclient import TestClient
 from app.core.config import settings
 
 
-def random_lower_string() -> str:
-    return "".join(random.choices(string.ascii_lowercase, k=32))
+def random_lower_string(max_chars: int = 32) -> str:
+    return "".join(random.choices(string.ascii_lowercase, k=max_chars))
 
 
 def random_email() -> str:

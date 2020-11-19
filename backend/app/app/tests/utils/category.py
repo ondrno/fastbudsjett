@@ -6,6 +6,6 @@ from app.tests.utils.utils import random_lower_string
 
 
 def create_random_category(db: Session) -> models.Category:
-    name = random_lower_string()
+    name = random_lower_string(max_chars=30)
     category_in = CategoryCreate(name=name)
     return crud.category.create(db=db, obj_in=category_in)

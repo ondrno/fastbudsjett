@@ -38,10 +38,10 @@ def normal_user_token_headers(client: TestClient, db: Session) -> Dict[str, str]
 
 
 @pytest.fixture(scope="module")
-def payment() -> Generator:
+def test_payment(db):
     yield create_random_payment(db=db)
 
 
 @pytest.fixture(scope="module")
-def category() -> Generator:
+def test_category(db):
     yield create_random_category(db=db)
