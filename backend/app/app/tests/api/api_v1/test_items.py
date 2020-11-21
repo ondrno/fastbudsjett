@@ -1,16 +1,16 @@
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app import models
 from app.core.config import settings
 from app.tests.utils.item import create_random_item
 
 
 def test_create_item(
-    client: TestClient, superuser_token_headers: dict, db: Session, payment: models.Payment, category: models.Category
+    client: TestClient, superuser_token_headers: dict, db: Session, test_payment, test_category
 ) -> None:
-    data = {"description": "foobar", "amount": 9.95, "date": "2020-12-01",
-            "payment_id": payment.id, "category_id": category.id}
+    data = {"description": "this_is_a_long_text", "amount": 9.95, "date": "01.01.2020",
+            "payment_id": test_payment.id, "category_id": test_category.id}
     response = client.post(
         f"{settings.API_V1_STR}/items/", headers=superuser_token_headers, json=data,
     )
@@ -21,17 +21,34 @@ def test_create_item(
     assert "id" in content
 
 
+@pytest.mark.parametrize("wrong_date", ["01-01-2020", "1-12-2020"])
+def test_create_item_wrong_date_returns_422(
+        client: TestClient, superuser_token_headers: dict,
+        db: Session, test_payment, test_category, wrong_date
+) -> None:
+    data = {"description": "this_is_a_long_text", "amount": 9.95, "date": wrong_date,
+            "payment_id": test_payment.id, "category_id": test_category.id}
+    response = client.post(
+        f"{settings.API_V1_STR}/items/", headers=superuser_token_headers, json=data,
+    )
+    assert response.status_code == 422
+    content = response.json()['detail'][0]
+    assert "Wrong date format" in str(content["msg"])
+
 
 def test_read_item(
-    client: TestClient, superuser_token_headers: dict, db: Session
+        client: TestClient, superuser_token_headers: dict, db: Session,
+        test_category, test_payment
 ) -> None:
-    item = create_random_item(db)
+    item = create_random_item(db, test_category.id, test_payment.id)
     response = client.get(
         f"{settings.API_V1_STR}/items/{item.id}", headers=superuser_token_headers,
     )
     assert response.status_code == 200
     content = response.json()
-    assert content["title"] == item.title
     assert content["description"] == item.description
+    assert content["amount"] == item.amount
+    assert content["category_id"] == test_category.id
+    assert content["payment_id"] == test_payment.id
     assert content["id"] == item.id
     assert content["owner_id"] == item.owner_id

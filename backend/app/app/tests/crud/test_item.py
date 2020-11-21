@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
 import datetime
+import pytest
 
 from app import crud
+from app.db.exc import DBException
 from app.schemas.item import ItemCreate, ItemUpdate
 from app.tests.utils.user import create_random_user
 from app.tests.utils.utils import random_lower_string, random_float
@@ -42,6 +44,18 @@ def test_create_item(db: Session, test_category, test_payment) -> None:
     assert item.owner_id == user.id
 
 
+def test_create_item_invalid_payment_id_raises_exception(db: Session, test_category) -> None:
+    user = create_random_user(db)
+    with pytest.raises(DBException):
+        _create_item(db, test_category.id, -1, user.id)
+
+
+def test_create_item_invalid_category_id_raises_exception(db: Session, test_payment) -> None:
+    user = create_random_user(db)
+    with pytest.raises(DBException):
+        _create_item(db, -1, test_payment.id, user.id)
+
+
 def test_get_item(db: Session, test_category, test_payment) -> None:
     user = create_random_user(db)
     item = _create_item(db, test_category.id, test_payment.id, user.id)
@@ -49,6 +63,11 @@ def test_get_item(db: Session, test_category, test_payment) -> None:
     stored_item = crud.item.get(db=db, id=item.id)
     assert stored_item
     _compare_items(item, stored_item)
+
+
+def test_get_item_with_invalid_id_returns_none(db: Session, test_category, test_payment) -> None:
+    stored_item = crud.item.get(db=db, id=-1)
+    assert stored_item is None
 
 
 def test_update_item(db: Session, test_category, test_payment) -> None:
@@ -61,6 +80,24 @@ def test_update_item(db: Session, test_category, test_payment) -> None:
     _compare_items(item, item2)
 
 
+def test_update_item_invalid_category_id_raises_exception(db: Session, test_category, test_payment) -> None:
+    user = create_random_user(db)
+    item = _create_item(db, test_category.id, test_payment.id, user.id)
+
+    with pytest.raises(DBException):
+        item_update = ItemUpdate(category_id=-1)
+        crud.item.update(db=db, db_obj=item, obj_in=item_update)
+
+
+def test_update_item_invalid_payment_id_raises_exception(db: Session, test_category, test_payment) -> None:
+    user = create_random_user(db)
+    item = _create_item(db, test_category.id, test_payment.id, user.id)
+
+    with pytest.raises(DBException):
+        item_update = ItemUpdate(payment_id=-1)
+        crud.item.update(db=db, db_obj=item, obj_in=item_update)
+
+
 def test_delete_item(db: Session, test_category, test_payment) -> None:
     user = create_random_user(db)
     item = _create_item(db, test_category.id, test_payment.id, user.id)
@@ -69,3 +106,8 @@ def test_delete_item(db: Session, test_category, test_payment) -> None:
     item3 = crud.item.get(db=db, id=item.id)
     assert item3 is None
     _compare_items(item, item2)
+
+
+def test_delete_item_with_invalid_id_raises_exception(db: Session, test_category, test_payment) -> None:
+    with pytest.raises(DBException):
+        crud.item.remove(db=db, id=-1)

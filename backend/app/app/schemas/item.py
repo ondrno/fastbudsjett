@@ -6,16 +6,25 @@ from pydantic import BaseModel, constr, Field, validator
 
 
 # description has to have a minimum length of 10 characters
-description_constr = constr(min_length=10, max_length=300)
+description_constr = constr(min_length=6, max_length=300)
 
 
 def validate_date(v: str) -> str:
+    """
+    Check if the string matches either the common European date format (DD.MM.YYYY)
+    or the iso format (YYYY-MM-DD)
+    """
     if not isinstance(v, str):
         raise ValueError(f'Wrong argument type: {v}')
 
-    m = re.match(r'(?P<day>\d{1,2})\.(?P<month>\d{1,2})\.(?P<year>\d{4})', v)
-    if not m:
+    m_regular = re.match(r'(?P<day>\d{1,2})\.(?P<month>\d{1,2})\.(?P<year>\d{4})', v)
+    m_iso = re.match(r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})', v)
+    if not m_regular and not m_iso:
         raise ValueError(f'Wrong date format: {v}')
+
+    m = m_regular
+    if not m:
+        m = m_iso
 
     year = int(m.group('year'))
     month = int(m.group('month'))
@@ -27,7 +36,7 @@ def validate_date(v: str) -> str:
 class ItemBase(BaseModel):
     description: Optional[str] = None
     amount: Optional[float] = Field(None, example="9.95")
-    date: Optional[str] = Field(None, example="01.12.2020")
+    date: Optional[str] = Field(None, example="31.12.2020")
 
     category_id: Optional[int] = None
     payment_id: Optional[int] = None
@@ -52,7 +61,6 @@ class ItemCreate(ItemBase):
 
 # Properties to receive on item update
 class ItemUpdate(ItemBase):
-
     @validator("date", pre=True)
     def check_date(cls, date: str) -> str:
         return validate_date(date)
@@ -63,7 +71,7 @@ class ItemInDBBase(ItemBase):
     id: int
     description: description_constr
     amount: float
-    date: str
+    date: datetime.date
 
     owner_id: int
     category_id: int

@@ -1,6 +1,6 @@
+import datetime
 import random
 import string
-import datetime
 from typing import Dict
 
 from fastapi.testclient import TestClient
@@ -19,11 +19,14 @@ def random_float(precision: int = 2) -> float:
     return round(random.uniform(-1000, +1000), precision)
 
 
-def random_date() -> str:
+def random_date(want_iso: bool = False) -> str:
     day = random.randint(1, 28)
     month = random.randint(1, 12)
     year = random.randint(1970, 2020)
-    return datetime.date(year, month, day).isoformat()
+    date_str = f"{day}.{month}.{year}"
+    if want_iso:
+        date_str = datetime.date(year, month, day).isoformat()
+    return date_str
 
 
 def get_superuser_token_headers(client: TestClient) -> Dict[str, str]:

@@ -7,6 +7,7 @@ import sqlalchemy
 from app.crud.base import CRUDBase
 from app.models.item import Item
 from app.schemas.item import ItemCreate, ItemUpdate
+from app.db.exc import DBException
 
 
 class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
@@ -15,9 +16,12 @@ class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
     ) -> Item:
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data, owner_id=owner_id)
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        try:
+            db.add(db_obj)
+            db.commit()
+            db.refresh(db_obj)
+        except sqlalchemy.exc.IntegrityError as e:
+            raise DBException(f"Database integrity error = {e}")
         return db_obj
 
     def get_multi_by_owner(
