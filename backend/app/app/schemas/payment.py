@@ -1,5 +1,8 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
+
+
+name_constr = constr(min_length=2, max_length=30)
 
 
 # Shared properties
@@ -12,12 +15,12 @@ class PaymentBase(BaseModel):
 
 # Properties to receive via API on creation
 class PaymentCreate(PaymentBase):
-    name: str
+    name: name_constr
 
 
 # Properties to receive via API on update
 class PaymentUpdate(PaymentBase):
-    name: Optional[str] = None
+    name: name_constr
 
 
 class PaymentInDBBase(PaymentBase):

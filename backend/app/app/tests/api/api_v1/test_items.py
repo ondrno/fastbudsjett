@@ -52,3 +52,13 @@ def test_read_item(
     assert content["payment_id"] == test_payment.id
     assert content["id"] == item.id
     assert content["owner_id"] == item.owner_id
+
+
+def test_remove_item_with_invalid_id_returns_404(client: TestClient, superuser_token_headers: dict,
+                                                 db: Session) -> None:
+    r = client.delete(
+        f"{settings.API_V1_STR}/items/-1", headers=superuser_token_headers,
+    )
+    assert r.status_code == 404
+    content = r.json()
+    assert "Item not found" in content['detail']

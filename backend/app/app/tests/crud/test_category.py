@@ -73,7 +73,7 @@ def test_update_category(db: Session) -> None:
     _compare_entries(category, category2)
 
 
-def test_delete_item(db: Session, test_category, test_payment) -> None:
+def test_remove_category(db: Session, test_category, test_payment) -> None:
     name = random_string(length=randint(3, 30))
     category = _create_category(db, name=name)
 
@@ -83,6 +83,6 @@ def test_delete_item(db: Session, test_category, test_payment) -> None:
     _compare_entries(category, category2)
 
 
-def test_delete_category_with_invalid_id_raises_exception(db: Session) -> None:
+def test_remove_category_with_invalid_id_raises_exception(db: Session) -> None:
     with pytest.raises(DBException):
         crud.category.remove(db=db, id=-1)
