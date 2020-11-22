@@ -15,7 +15,7 @@ def read_categories(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    # current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve categories.
@@ -29,7 +29,7 @@ def create_category(
     *,
     db: Session = Depends(deps.get_db),
     category_in: schemas.CategoryCreate,
-    # current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create new category.
@@ -48,7 +48,7 @@ def update_category(
     db: Session = Depends(deps.get_db),
     id: int,
     category_in: schemas.CategoryUpdate,
-    # current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update a category.
@@ -68,7 +68,7 @@ def read_category(
     *,
     db: Session = Depends(deps.get_db),
     id: int,
-    # current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get category by ID.
