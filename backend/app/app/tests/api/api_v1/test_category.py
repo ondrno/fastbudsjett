@@ -72,9 +72,17 @@ def test_update_category(client: TestClient, superuser_token_headers: dict, db: 
     category = create_random_category(db)
 
     update_data = {"name": random_string(length=25)}
-    response = client.put(
-        f"{settings.API_V1_STR}/categories/{category.id}", headers=superuser_token_headers, json=update_data,
-    )
+    response = client.put(BASE_URL + f"{category.id}", headers=superuser_token_headers, json=update_data)
+    assert response.status_code == 200
+    content = response.json()
+    assert content["name"] == update_data["name"]
+
+
+def test_update_category_with_same_name(client: TestClient, superuser_token_headers: dict, db: Session) -> None:
+    category = create_random_category(db)
+
+    update_data = {"name": category.name}
+    response = client.put(BASE_URL + f"{category.id}", headers=superuser_token_headers, json=update_data)
     assert response.status_code == 200
     content = response.json()
     assert content["name"] == update_data["name"]
@@ -85,9 +93,7 @@ def test_update_category_with_too_short_name_returns_422(client: TestClient, sup
     category = create_random_category(db)
 
     update_data = {"name": random_string(length=2)}
-    response = client.put(
-        f"{settings.API_V1_STR}/categories/{category.id}", headers=superuser_token_headers, json=update_data,
-    )
+    response = client.put(BASE_URL + f"{category.id}", headers=superuser_token_headers, json=update_data)
     assert response.status_code == 422
     content = response.json()
     assert "at least 3 characters" in content["detail"][0]["msg"]
@@ -102,7 +108,7 @@ def test_update_category_with_invalid_id_returns_404(client: TestClient, superus
     assert "Category not found" in content['detail']
 
 
-def test_remove_category(client: TestClient, superuser_token_headers: dict, db: Session) -> None:
+def test_remove_category_as_superuser_returns_200(client: TestClient, superuser_token_headers: dict, db: Session) -> None:
     category = create_random_category(db)
 
     response = client.delete(BASE_URL + f"{category.id}", headers=superuser_token_headers)
@@ -110,6 +116,14 @@ def test_remove_category(client: TestClient, superuser_token_headers: dict, db: 
     content = response.json()
     assert content["name"] == category.name
     assert content["id"] == category.id
+
+
+def test_remove_category_as_normal_user_returns_400(client: TestClient, normal_user_token_headers: dict,
+                                                    db: Session) -> None:
+    category = create_random_category(db)
+
+    response = client.delete(BASE_URL + f"{category.id}", headers=normal_user_token_headers)
+    _assert_error(response, 400, "Not enough permissions")
 
 
 def test_remove_category_with_invalid_id_returns_404(client: TestClient, superuser_token_headers: dict,
