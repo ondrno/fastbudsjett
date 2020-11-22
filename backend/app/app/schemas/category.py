@@ -10,12 +10,12 @@ class CategoryBase(BaseModel):
     name: Optional[str] = None
 
 
-# Properties to receive on item creation
+# Properties to receive on category creation
 class CategoryCreate(CategoryBase):
     name: name_constr
 
 
-# Properties to receive on item update
+# Properties to receive on category update
 class CategoryUpdate(CategoryBase):
     name: name_constr
 

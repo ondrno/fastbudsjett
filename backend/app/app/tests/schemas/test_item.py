@@ -1,5 +1,9 @@
+from fastapi.exceptions import ValidationError
 import pytest
-from app.schemas.item import validate_date
+
+from sqlalchemy.orm import Session
+from app.schemas.item import validate_date, ItemCreate, ItemUpdate
+from app.tests.utils.utils import random_string
 
 
 @pytest.mark.parametrize("date, iso_expected", [
@@ -25,3 +29,19 @@ def test_validate_date_raises_exception_if_wrong_date_format(wrong_date):
 def test_validate_date_raises_exception_if_wrong_type():
     with pytest.raises(ValueError):
         validate_date(None)
+
+
+@pytest.mark.parametrize("invalid_length", [5, 301])
+def test_create_item_description_with_invalid_contraints(db: Session, test_category, test_payment, invalid_length):
+    description = random_string(length=invalid_length)
+    with pytest.raises(ValidationError):
+        ItemCreate(description=description, amount=4.22, date="01.01.2020", category_id=test_category.id,
+                   payment_id=test_payment.id)
+
+
+@pytest.mark.parametrize("invalid_length", [5, 301])
+def test_update_item_description_with_invalid_contraints(db: Session, test_category, test_payment, invalid_length):
+    description = random_string(length=invalid_length)
+    with pytest.raises(ValidationError):
+        ItemUpdate(description=description)
+

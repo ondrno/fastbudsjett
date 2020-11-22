@@ -61,6 +61,8 @@ class ItemCreate(ItemBase):
 
 # Properties to receive on item update
 class ItemUpdate(ItemBase):
+    description: Optional[description_constr]
+
     @validator("date", pre=True)
     def check_date(cls, date: str) -> str:
         return validate_date(date)

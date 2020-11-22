@@ -30,3 +30,6 @@ def test_update_category_too_short_name_raises_exception(db: Session) -> None:
         CategoryUpdate(name=name)
 
 
+def test_update_category_with_no_data_raises_exception(db: Session) -> None:
+    with pytest.raises(ValidationError):
+        CategoryUpdate()
