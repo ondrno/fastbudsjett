@@ -15,7 +15,7 @@ def read_payments(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    # current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve payment methods.
@@ -29,7 +29,7 @@ def create_payment(
     *,
     db: Session = Depends(deps.get_db),
     payment_in: schemas.PaymentCreate,
-    # current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create new payment method.
@@ -48,7 +48,7 @@ def update_payment(
     db: Session = Depends(deps.get_db),
     id: int,
     payment_in: schemas.PaymentUpdate,
-    # current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update a payment method.
@@ -68,7 +68,7 @@ def read_payment(
     *,
     db: Session = Depends(deps.get_db),
     id: int,
-    # current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get payment method by ID.
