@@ -6,10 +6,10 @@ from app import crud
 from app.db.exc import DBException
 from app.schemas.item import ItemCreate, ItemUpdate
 from app.tests.utils.user import create_random_user
-from app.tests.utils.utils import random_lower_string, random_float
+from app.tests.utils.utils import random_string, random_float
 
 
-DESCRIPTION = random_lower_string()
+DESCRIPTION = random_string()
 AMOUNT = random_float()
 DATE = "01.12.2020"
 
@@ -74,7 +74,7 @@ def test_update_item(db: Session, test_category, test_payment) -> None:
     user = create_random_user(db)
     item = _create_item(db, test_category.id, test_payment.id, user.id)
 
-    description2 = random_lower_string()
+    description2 = random_string()
     item_update = ItemUpdate(description=description2)
     item2 = crud.item.update(db=db, db_obj=item, obj_in=item_update)
     _compare_items(item, item2)

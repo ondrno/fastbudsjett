@@ -17,7 +17,7 @@ class CategoryCreate(CategoryBase):
 
 # Properties to receive on item update
 class CategoryUpdate(CategoryBase):
-    pass
+    name: name_constr
 
 
 # Properties shared by models stored in DB
