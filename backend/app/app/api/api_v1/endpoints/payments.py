@@ -7,6 +7,12 @@ import sqlalchemy
 from app import crud, models, schemas
 from app.api import deps
 
+
+def _defined_or_http_exception_404(var, detail: str = "Payment not found"):
+    if var is None:
+        raise HTTPException(status_code=404, detail=detail)
+
+
 router = APIRouter()
 
 
@@ -54,8 +60,7 @@ def update_payment(
     Update a payment method.
     """
     payment = crud.payment.get(db=db, id=id)
-    if not payment:
-        raise HTTPException(status_code=404, detail="Payment not found")
+    _defined_or_http_exception_404(payment)
     try:
         payment = crud.payment.update(db=db, db_obj=payment, obj_in=payment_in)
     except sqlalchemy.exc.IntegrityError:
@@ -74,8 +79,7 @@ def read_payment(
     Get payment method by ID.
     """
     payment = crud.payment.get(db=db, id=id)
-    if not payment:
-        raise HTTPException(status_code=404, detail="Payment not found")
+    _defined_or_http_exception_404(payment)
     return payment
 
 
@@ -90,8 +94,7 @@ def delete_payment(
     Delete a payment method. Only superusers can do that.
     """
     payment = crud.payment.get(db=db, id=id)
-    if not payment:
-        raise HTTPException(status_code=404, detail="Payment not found")
+    _defined_or_http_exception_404(payment)
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     payment = crud.payment.remove(db=db, id=id)

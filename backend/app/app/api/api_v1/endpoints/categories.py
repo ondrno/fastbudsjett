@@ -10,6 +10,11 @@ from app.api import deps
 router = APIRouter()
 
 
+def _defined_or_http_exception_404(var, detail: str = "Category not found"):
+    if var is None:
+        raise HTTPException(status_code=404, detail=detail)
+
+
 @router.get("/", response_model=List[schemas.Category])
 def read_categories(
     db: Session = Depends(deps.get_db),
@@ -54,8 +59,7 @@ def update_category(
     Update a category.
     """
     category = crud.category.get(db=db, id=id)
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
+    _defined_or_http_exception_404(category)
     try:
         category = crud.category.update(db=db, db_obj=category, obj_in=category_in)
     except sqlalchemy.exc.IntegrityError:
@@ -74,8 +78,7 @@ def read_category(
     Get category by ID.
     """
     category = crud.category.get(db=db, id=id)
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
+    _defined_or_http_exception_404(category)
     return category
 
 
@@ -90,8 +93,7 @@ def delete_category(
     Delete a category. Only superusers can do that.
     """
     category = crud.category.get(db=db, id=id)
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
+    _defined_or_http_exception_404(category)
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     category = crud.category.remove(db=db, id=id)

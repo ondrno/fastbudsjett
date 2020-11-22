@@ -6,6 +6,21 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
 
+
+NOT_ENOUGH_PERMISSIONS = "Not enough permissions"
+ITEM_NOT_FOUND = "Item not found"
+
+
+def _defined_or_http_exception_404(var, detail: str = ITEM_NOT_FOUND) -> None:
+    if var is None:
+        raise HTTPException(status_code=404, detail=detail)
+
+
+def _superuser_or_owner_or_http_exception_400(current_user, owner_id: int) -> None:
+    if not crud.user.is_superuser(current_user) and (owner_id != current_user.id):
+        raise HTTPException(status_code=400, detail=NOT_ENOUGH_PERMISSIONS)
+
+
 router = APIRouter()
 
 
@@ -54,10 +69,8 @@ def update_item(
     Update an item.
     """
     item = crud.item.get(db=db, id=id)
-    if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    _defined_or_http_exception_404(item)
+    _superuser_or_owner_or_http_exception_400(current_user, item.owner_id)
     item = crud.item.update(db=db, db_obj=item, obj_in=item_in)
     return item
 
@@ -73,10 +86,8 @@ def read_item(
     Get item by ID.
     """
     item = crud.item.get(db=db, id=id)
-    if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    _defined_or_http_exception_404(item)
+    _superuser_or_owner_or_http_exception_400(current_user, item.owner_id)
     return item
 
 
@@ -91,9 +102,7 @@ def delete_item(
     Delete an item.
     """
     item = crud.item.get(db=db, id=id)
-    if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    if not crud.user.is_superuser(current_user) and (item.owner_id != current_user.id):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    _defined_or_http_exception_404(item)
+    _superuser_or_owner_or_http_exception_400(current_user, item.owner_id)
     item = crud.item.remove(db=db, id=id)
     return item

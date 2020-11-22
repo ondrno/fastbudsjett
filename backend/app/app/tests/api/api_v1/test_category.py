@@ -9,7 +9,7 @@ from app.tests.utils.utils import random_string
 BASE_URL = f"{settings.API_V1_STR}/categories/"
 
 
-def _generate_valid_data() -> str:
+def _generate_valid_data() -> dict:
     return {"name": random_string(length=25)}
 
 
