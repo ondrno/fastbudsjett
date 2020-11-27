@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 import datetime
 import pytest
 import mock
+from alchemy_mock.mocking import AlchemyMagicMock
 
 from app import crud
 from app.db.exc import DBException
@@ -115,7 +116,70 @@ def test_delete_item_with_invalid_id_raises_exception(db: Session, test_category
 
 
 class TestGetMulti:
-    @mock.patch(Session.query)
-    def test_get_multi_with_owner(self, db: Session, mock_q):
-        crud.item.get_multi(db=db, owner_id=1)
-        mock_q.assert_with(crud.item.model).filter().offset(0).limit(100).all()
+    def test_get_multi_with_owner(self):
+        db_session = AlchemyMagicMock()
+        owner_id = 1
+        crud.item.get_multi(db=db_session, owner_id=owner_id)
+        db_session.query.assert_has_calls([
+            mock.call(f"Item.owner_id == {owner_id}"),
+        ])
+
+    def test_get_multi_with_description(self):
+        db_session = AlchemyMagicMock()
+        description = "Spar:"
+        crud.item.get_multi(db=db_session, description=description)
+        db_session.query.assert_has_calls([
+            mock.call(f"Item.description like '%{description}%'"),
+        ])
+
+    def test_get_multi_with_description_and_owner(self):
+        db_session = AlchemyMagicMock()
+        description = "Spar:"
+        owner_id = 1
+        crud.item.get_multi(db=db_session, description=description, owner_id=owner_id)
+        db_session.query.assert_has_calls([
+            mock.call(f"Item.description like '%{description}%',Item.owner_id == {owner_id}"),
+        ])
+
+    def test_get_multi_with_min_val(self):
+        db_session = AlchemyMagicMock()
+        min_val = -3.45
+        crud.item.get_multi(db=db_session, min_val=min_val)
+        db_session.query.assert_has_calls([
+            mock.call(f"Item.amount >= {min_val}"),
+        ])
+
+    def test_get_multi_with_max_val(self):
+        db_session = AlchemyMagicMock()
+        max_val = 60.00
+        crud.item.get_multi(db=db_session, max_val=max_val)
+        db_session.query.assert_has_calls([
+            mock.call(f"Item.amount <= {max_val}"),
+        ])
+
+    def test_get_multi_with_min_and_max_val(self):
+        db_session = AlchemyMagicMock()
+        max_val = 60.00
+        min_val = -3.45
+        crud.item.get_multi(db=db_session, min_val=min_val, max_val=max_val)
+        db_session.query.assert_has_calls([
+            mock.call(f"Item.amount >= {min_val},Item.amount <= {max_val}"),
+        ])
+
+    def test_get_multi_with_start_and_end_date(self):
+        db_session = AlchemyMagicMock()
+        start_date = "2020-01-20"
+        end_date = "2020-01-27"
+        crud.item.get_multi(db=db_session, start_date=start_date, end_date=end_date)
+        db_session.query.assert_has_calls([
+            mock.call(f"Item.date >= '{start_date}',Item.date <= '{end_date}'"),
+        ])
+
+    def test_get_multi_with_category_and_payment(self):
+        db_session = AlchemyMagicMock()
+        category = [1]
+        payment = [3, 4]
+        crud.item.get_multi(db=db_session, category=category, payment=payment)
+        db_session.query.assert_has_calls([
+            mock.call(f"Item.category_id in (1),Item.payment_id in (3,4)"),
+        ])
