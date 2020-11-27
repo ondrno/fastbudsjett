@@ -132,6 +132,19 @@ def read_user_by_id(
     return user
 
 
+@router.get("/{user_email}", response_model=schemas.User)
+def read_user_by_email(
+    user_email: str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    """
+    Get a specific user by id.
+    """
+    user = crud.user.get_by_email(db, email=user_email)
+    return user
+
+
 @router.put("/{user_id}", response_model=schemas.User)
 def update_user(
     *,

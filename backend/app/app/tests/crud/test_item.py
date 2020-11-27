@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 import datetime
 import pytest
+import mock
 
 from app import crud
 from app.db.exc import DBException
@@ -111,3 +112,10 @@ def test_delete_item(db: Session, test_category, test_payment) -> None:
 def test_delete_item_with_invalid_id_raises_exception(db: Session, test_category, test_payment) -> None:
     with pytest.raises(DBException):
         crud.item.remove(db=db, id=-1)
+
+
+class TestGetMulti:
+    @mock.patch(Session.query)
+    def test_get_multi_with_owner(self, db: Session, mock_q):
+        crud.item.get_multi(db=db, owner_id=1)
+        mock_q.assert_with(crud.item.model).filter().offset(0).limit(100).all()

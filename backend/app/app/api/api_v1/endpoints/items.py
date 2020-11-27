@@ -1,6 +1,6 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -27,6 +27,14 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.Item])
 def read_items(
     db: Session = Depends(deps.get_db),
+    owner_id: Optional[int] = None,
+    description: Optional[str] = None,
+    min_val: Optional[float] = None,
+    max_val: Optional[float] = None,
+    start_date: Optional[str] = Query(None, regex=r'^\d{4}-\d{2}-\d{2}$'),
+    end_date: Optional[str] = Query(None, regex=r'^\d{4}-\d{2}-\d{2}$'),
+    category: Optional[List[int]] = None,
+    payment: Optional[List[int]] = None,
     skip: int = 0,
     limit: int = 100,
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -34,12 +42,11 @@ def read_items(
     """
     Retrieve items.
     """
-    if crud.user.is_superuser(current_user):
-        items = crud.item.get_multi(db, skip=skip, limit=limit)
-    else:
-        items = crud.item.get_multi_by_owner(
-            db=db, owner_id=current_user.id, skip=skip, limit=limit
-        )
+    items = crud.item.get_multi(db, owner_id=owner_id, description=description,
+                                min_val=min_val, max_val=max_val,
+                                start_date=start_date, end_date=end_date,
+                                category=category, payment=payment,
+                                skip=skip, limit=limit)
     return items
 
 
