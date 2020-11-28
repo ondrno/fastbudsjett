@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 import sqlalchemy
 
 from app.crud.base import CRUDBase
@@ -35,46 +36,56 @@ class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
             end_date: Optional[str] = None,
             category: Optional[List[int]] = None,
             payment: Optional[List[int]] = None,
+            order_by: Optional[str] = None,
     ) -> List[Item]:
         filter_expr = ''
         if description:
             if filter_expr:
-                filter_expr += ","
+                filter_expr += " AND "
             filter_expr = f"Item.description like '%{description}%'"
         if owner_id:
             if filter_expr:
-                filter_expr += ","
+                filter_expr += " AND "
             filter_expr += f"Item.owner_id == {owner_id}"
         if min_val:
             if filter_expr:
-                filter_expr += ","
+                filter_expr += " AND "
             filter_expr += f"Item.amount >= {min_val}"
         if max_val:
             if filter_expr:
-                filter_expr += ","
+                filter_expr += " AND "
             filter_expr += f"Item.amount <= {max_val}"
         if start_date:
             if filter_expr:
-                filter_expr += ","
+                filter_expr += " AND "
             filter_expr += f"Item.date >= '{start_date}'"
         if end_date:
             if filter_expr:
-                filter_expr += ","
+                filter_expr += " AND "
             filter_expr += f"Item.date <= '{end_date}'"
         if category:
             if filter_expr:
-                filter_expr += ","
+                filter_expr += " AND "
             q = ','.join([str(x) for x in category])
             filter_expr += f"Item.category_id in ({q})"
         if payment:
             if filter_expr:
-                filter_expr += ","
+                filter_expr += " AND "
             q = ','.join([str(x) for x in payment])
             filter_expr += f"Item.payment_id in ({q})"
+
+        filter_expr = text(filter_expr)
+
+        order_expr = 'Item.id'
+        if order_by in ['id', 'description', 'date', 'created_at', 'modified_at',
+                        'amount', 'owner_id', 'category_id', 'payment_id']:
+            order_expr = f"Item.{order_by}"
+        order_expr = text(order_expr)
 
         return (
             db.query(self.model)
             .filter(filter_expr)
+            .order_by(order_expr)
             .offset(skip)
             .limit(limit)
             .all()

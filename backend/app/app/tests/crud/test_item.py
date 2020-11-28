@@ -16,7 +16,7 @@ AMOUNT = random_float()
 DATE = "01.12.2020"
 
 
-def _compare_items(a: ItemCreate, b: ItemCreate):
+def _compare_items(a, b):
     assert a.description == b.description
     assert a.amount == b.amount
     assert a.date == b.date
@@ -116,70 +116,110 @@ def test_delete_item_with_invalid_id_raises_exception(db: Session, test_category
 
 
 class TestGetMulti:
-    def test_get_multi_with_owner(self):
+    @mock.patch('app.crud.crud_item.text')
+    def test_get_multi_with_owner(self, mock_text):
         db_session = AlchemyMagicMock()
         owner_id = 1
         crud.item.get_multi(db=db_session, owner_id=owner_id)
-        db_session.query.assert_has_calls([
-            mock.call(f"Item.owner_id == {owner_id}"),
+        mock_text.assert_has_calls([
+            mock.call(f"Item.owner_id == {owner_id}")
         ])
+        db_session.query.assert_called()
 
-    def test_get_multi_with_description(self):
+    @mock.patch('app.crud.crud_item.text')
+    def test_get_multi_with_description(self, mock_text):
         db_session = AlchemyMagicMock()
         description = "Spar:"
         crud.item.get_multi(db=db_session, description=description)
-        db_session.query.assert_has_calls([
+        mock_text.assert_has_calls([
             mock.call(f"Item.description like '%{description}%'"),
         ])
+        db_session.query.assert_called()
 
-    def test_get_multi_with_description_and_owner(self):
+    @mock.patch('app.crud.crud_item.text')
+    def test_get_multi_with_description_and_owner(self, mock_text):
         db_session = AlchemyMagicMock()
         description = "Spar:"
         owner_id = 1
         crud.item.get_multi(db=db_session, description=description, owner_id=owner_id)
-        db_session.query.assert_has_calls([
-            mock.call(f"Item.description like '%{description}%',Item.owner_id == {owner_id}"),
+        mock_text.assert_has_calls([
+            mock.call(f"Item.description like '%{description}%' AND Item.owner_id == {owner_id}"),
         ])
+        db_session.query.assert_called()
 
-    def test_get_multi_with_min_val(self):
+    @mock.patch('app.crud.crud_item.text')
+    def test_get_multi_with_min_val(self, mock_text):
         db_session = AlchemyMagicMock()
         min_val = -3.45
         crud.item.get_multi(db=db_session, min_val=min_val)
-        db_session.query.assert_has_calls([
+        mock_text.assert_has_calls([
             mock.call(f"Item.amount >= {min_val}"),
         ])
+        db_session.query.assert_called()
 
-    def test_get_multi_with_max_val(self):
+    @mock.patch('app.crud.crud_item.text')
+    def test_get_multi_with_max_val(self, mock_text):
         db_session = AlchemyMagicMock()
         max_val = 60.00
         crud.item.get_multi(db=db_session, max_val=max_val)
-        db_session.query.assert_has_calls([
+        mock_text.assert_has_calls([
             mock.call(f"Item.amount <= {max_val}"),
         ])
+        db_session.query.assert_called()
 
-    def test_get_multi_with_min_and_max_val(self):
+    @mock.patch('app.crud.crud_item.text')
+    def test_get_multi_with_min_and_max_val(self, mock_text):
         db_session = AlchemyMagicMock()
         max_val = 60.00
         min_val = -3.45
         crud.item.get_multi(db=db_session, min_val=min_val, max_val=max_val)
-        db_session.query.assert_has_calls([
-            mock.call(f"Item.amount >= {min_val},Item.amount <= {max_val}"),
+        mock_text.assert_has_calls([
+            mock.call(f"Item.amount >= {min_val} AND Item.amount <= {max_val}"),
         ])
+        db_session.query.assert_called()
 
-    def test_get_multi_with_start_and_end_date(self):
+    @mock.patch('app.crud.crud_item.text')
+    def test_get_multi_with_start_and_end_date(self, mock_text):
         db_session = AlchemyMagicMock()
         start_date = "2020-01-20"
         end_date = "2020-01-27"
         crud.item.get_multi(db=db_session, start_date=start_date, end_date=end_date)
-        db_session.query.assert_has_calls([
-            mock.call(f"Item.date >= '{start_date}',Item.date <= '{end_date}'"),
+        mock_text.assert_has_calls([
+            mock.call(f"Item.date >= '{start_date}' AND Item.date <= '{end_date}'"),
         ])
+        db_session.query.assert_called()
 
-    def test_get_multi_with_category_and_payment(self):
+    @mock.patch('app.crud.crud_item.text')
+    def test_get_multi_with_category_and_payment(self, mock_text):
         db_session = AlchemyMagicMock()
         category = [1]
         payment = [3, 4]
         crud.item.get_multi(db=db_session, category=category, payment=payment)
-        db_session.query.assert_has_calls([
-            mock.call(f"Item.category_id in (1),Item.payment_id in (3,4)"),
+        mock_text.assert_has_calls([
+            mock.call(f"Item.category_id in (1) AND Item.payment_id in (3,4)"),
         ])
+        db_session.query.assert_called()
+
+    @pytest.mark.parametrize("order", ["id", "description", "date",
+                                       "created_at", "modified_at", "amount",
+                                       "owner_id", "category_id", "payment_id"])
+    @mock.patch('app.crud.crud_item.text')
+    def test_get_multi_with_category_and_valid_order_by(self, mock_text, order):
+        db_session = AlchemyMagicMock()
+        category = [1]
+        crud.item.get_multi(db=db_session, category=category, order_by=order)
+        mock_text.assert_has_calls([
+            mock.call(f"Item.category_id in (1)"),
+            mock.call(f"Item.{order}"),
+        ])
+        db_session.query.assert_called()
+
+    @pytest.mark.parametrize("order", ["pid", "desc"])
+    @mock.patch('app.crud.crud_item.text')
+    def test_get_multi_with_invalid_order_by_uses_default(self, mock_text, order):
+        db_session = AlchemyMagicMock()
+        crud.item.get_multi(db=db_session, order_by=order)
+        mock_text.assert_has_calls([
+            mock.call(f"Item.id"),
+        ])
+        db_session.query.assert_called()
