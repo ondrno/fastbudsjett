@@ -11,12 +11,14 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
 
         error = None
         try:
-            auth_token = rest.iface.login(username, password)
+            auth_token = rest.iface.login(email, password)
+        except rest.ApiLoginError as e:
+            error = f'{e}'
         except rest.ApiException as e:
             error = f'Unknown user or password, error={e}'
         except rest.ApiConnectionError as e:
@@ -50,8 +52,7 @@ def load_logged_in_user():
 @bp.route('/logout')
 def logout():
     session.clear()
-    print("Cleared cache")
-    return redirect(url_for('index'))
+    return redirect(url_for('auth.login'))
 
 
 def login_required(view):

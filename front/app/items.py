@@ -29,7 +29,9 @@ def get_payments():
     return payments
 
 
+
 @bp.route('/')
+@login_required
 def index():
     categories_lookup = get_categories()
     payments_lookup = get_payments()

@@ -19,9 +19,14 @@ class RestApiInterface:
         except requests.exceptions.ConnectionError as e:
             raise ApiConnectionError(e)
         tokens = r.json()
-        a_token = tokens['access_token']
+
         if r.ok:
+            a_token = tokens['access_token']
             self.auth_token = {"Authorization": f"Bearer {a_token}"}
+        else:
+            detail = tokens.get('detail')
+            raise ApiLoginError(f"{detail}")
+
         return self.auth_token
 
     def get_user(self, id: Union[int, str]) -> dict:
@@ -123,6 +128,10 @@ class ApiException(Exception):
 
 
 class ApiConnectionError(Exception):
+    pass
+
+
+class ApiLoginError(Exception):
     pass
 
 
