@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<div class="container-fluid">
+  <form class="inputform needs-validation">
+    <div class="form-row">
+      <div class="form-group col-md-2">
+        <label for="inputDate">Date</label>
+        <input type="date" class="form-control" id="inputDate" required>
+      </div>
+      <div class="form-group col-md-2">
+        <label for="inputType">Type</label>
+        <select id="inputType" class="form-control" required>
+          <option selected value="expense">Expense</option>
+          <option value="income">Income</option>
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="inputCategory">Category</label>
+        <select id="inputCategory" class="form-control" required>
+          <option>Choose...</option>
+          <option>...</option>
+        </select>
+      </div>
+      <div class="form-group col-md-2">
+        <label for="inputPayment">Payment</label>
+        <select id="inputPayment" class="form-control" required>
+          <option selected value="cash">Cash</option>
+          <option value="card">Debit</option>
+          <option value="transfer">Transfer</option>
+        </select>
+      </div>
+
+      <!-- future extension: labels
+      <div class="form-group col-md-4">
+        <label for="inputDescription">Labels</label>
+        <input type="text" class="form-control" id="inputLabels">
+      </div> -->
+    </div>
+    <div class="form-group">
+      <label for="inputDescription">Description</label>
+      <input type="text" class="form-control" id="inputDescription" placeholder="Coop: bread, butter, milk" required>
+    </div>
+    <button type="submit" class="btn btn-outline-success">Send</button>
+    <button type="reset" class="btn btn-outline-success">Reset</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <table class="table table-striped">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">Date</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Description</th>
+        <th scope="col">Category</th>
+<!--        <th scope="col">Labels</th>-->
+        <th scope="col">Payment</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item['date'] }}</td>
+        <td>{{ item['amount'] }}</td>
+        <td>{{ item['description'] }}</td>
+        <td>{{ item['category'] }}</td>
+<!--        <td>{{ item['labels'] }}</td>-->
+<!--        <img src="../static/cash.svg" alt="cash" width="28" height="28" title="cash">-->
+<!--        <img src="../static/credit-card.svg" alt="" width="24" height="24" title="Bootstrap">-->
+        <td><img src="../static/cash.svg" alt="cash" width="24" height="24" title="cash"></td>
+        <td><button type="button" class="btn btn-sm btn-outline-success">edit</button></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+<script>
+
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>

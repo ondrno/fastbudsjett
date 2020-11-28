@@ -52,6 +52,44 @@ class RestApiInterface:
             raise ApiException(f"Could not add user, {r.content}")
 
     def get_items(self):
+        data = [{
+            "description": "Coop: butter, milk, yoghurt",
+            "amount": 10.25,
+            "date": "2020-11-28",
+            "category_id": 2,
+            "payment_id": 2,
+            "id": 1,
+            "owner_id": 0
+        },
+        {
+            "description": "Amazon: Samsung TV 53inch",
+            "amount": 499.99,
+            "date": "2020-11-29",
+            "category_id": 1,
+            "payment_id": 1,
+            "id": 2,
+            "owner_id": 0
+        },
+        {
+            "description": "Amazon: Apple iPhone 12",
+            "amount": 1100.00,
+            "date": "2020-11-30",
+            "category_id": 1,
+            "payment_id": 1,
+            "id": 3,
+            "owner_id": 0
+        },
+        {
+            "description": "Porsche Stuttgart: Porsche Cayenne Turbo S, 350hp",
+            "amount": 61000.00,
+            "date": "2020-12-01",
+            "category_id": 1,
+            "payment_id": 1,
+            "id": 3,
+            "owner_id": 0
+        }
+        ]
+        return data
         r = requests.get(self.BASE_ITEMS_URL, headers=self.auth_token)
         if r.ok:
             items = r.json()
@@ -60,6 +98,8 @@ class RestApiInterface:
             raise ApiException(f"Could not retrieve items, {r.content}")
 
     def get_categories(self):
+        data = [{'id': 1, 'name': 'Household'}, {'id': 2, 'name': 'Food'}]
+        return data
         r = requests.get(self.BASE_CATEGORIES_URL, headers=self.auth_token)
         if r.ok:
             categories = r.json()
@@ -68,6 +108,8 @@ class RestApiInterface:
             raise ApiException(f"Could not retrieve categories, {r.content}")
 
     def get_payments(self):
+        data = [{'id': 1, 'name': 'cash'}, {'id': 2, 'name': 'card'}, {'id': 3, 'name': 'transfer'}]
+        return data
         r = requests.get(self.BASE_PAYMENTS_URL, headers=self.auth_token)
         if r.ok:
             payments = r.json()
