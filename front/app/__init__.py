@@ -8,6 +8,7 @@ config = {
     "CACHE_DEFAULT_TIMEOUT": 300
 }
 
+
 def create_cached_app():
     app = Flask(__name__)
     app.config.from_mapping(config)
@@ -19,8 +20,7 @@ def create_cached_app():
 
     cache = Cache(app)
 
-    return app, cache
+    return app
 
-
-app, cache = create_cached_app()
+app = create_cached_app()
 

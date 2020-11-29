@@ -85,8 +85,8 @@ class RestApiInterface:
             "owner_id": 0
         },
         {
-            "description": "Porsche Stuttgart: Porsche Cayenne Turbo S, 350hp",
-            "amount": 61000.00,
+            "description": "Porsche Stuttgart: Cayenne Turbo S E-Hybrid III, Cayenne Turbo Design 21inch Platinum wheels, white metallic, 462hp, hybrid engine",
+            "amount": 99543.00,
             "date": "2020-12-01",
             "category_id": 1,
             "payment_id": 1,
@@ -103,7 +103,7 @@ class RestApiInterface:
             raise ApiException(f"Could not retrieve items, {r.content}")
 
     def get_categories(self):
-        data = [{'id': 1, 'name': 'Household'}, {'id': 2, 'name': 'Food'}]
+        data = [{'id': 1, 'name': 'household'}, {'id': 2, 'name': 'food'}, {'id': 3, 'name': 'car'}]
         return data
         r = requests.get(self.BASE_CATEGORIES_URL, headers=self.auth_token)
         if r.ok:
@@ -113,7 +113,7 @@ class RestApiInterface:
             raise ApiException(f"Could not retrieve categories, {r.content}")
 
     def get_payments(self):
-        data = [{'id': 1, 'name': 'cash'}, {'id': 2, 'name': 'card'}, {'id': 3, 'name': 'transfer'}]
+        data = [{'id': 1, 'name': 'cash'}, {'id': 2, 'name': 'debit'}, {'id': 3, 'name': 'transfer'}]
         return data
         r = requests.get(self.BASE_PAYMENTS_URL, headers=self.auth_token)
         if r.ok:

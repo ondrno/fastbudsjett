@@ -1,7 +1,7 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session,
 )
-from werkzeug.exceptions import abort
+import operator
 
 from .auth import login_required
 from . import rest
@@ -29,18 +29,17 @@ def get_payments():
     return payments
 
 
-@bp.route('/', methods=('GET', 'POST'))
+@bp.route('/')
 @login_required
 def index():
-    if request.method == 'POST':
-        date = request.form['inputDate']
-        amount = request.form['inputAmount']
-        expense_type = request.form['inputType']
-        category = request.form['inputCategory']
-        payment = request.form['inputPayment']
-        description = request.form['inputDescription']
-        # TODO
-
+    # if request.method == 'POST':
+    #     date = request.form['inputDate']
+    #     amount = request.form['inputAmount']
+    #     expense_type = request.form['inputType']
+    #     category = request.form['inputCategory']
+    #     payment = request.form['inputPayment']
+    #     description = request.form['inputDescription']
+    #     # TODO
     categories_lookup = get_categories()
     payments_lookup = get_payments()
 
@@ -55,4 +54,23 @@ def index():
         payment['category'] = categories_lookup.get(cat_id)
         payments.append(payment)
 
-    return render_template('items/index.html', items=payments)
+    categories_sorted = {}
+    for k, v in sorted(categories_lookup.items(), key=operator.itemgetter(1)):
+        categories_sorted[k] = {'name': v}
+        if v.lower() == 'food':
+            categories_sorted[k]['selected'] = True
+
+    print(categories_sorted.items())
+
+    payments_sorted = {}
+    for k, v in sorted(payments_lookup.items(), key=operator.itemgetter(1)):
+        payments_sorted[k] = {'name': v}
+        if v.lower() == 'cash':
+            payments_sorted[k]['selected'] = True
+
+    print(payments_sorted.items())
+
+    return render_template('items/index.html',
+                           items=payments,
+                           categories=categories_sorted,
+                           payments=payments_sorted)

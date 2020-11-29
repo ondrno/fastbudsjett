@@ -8,15 +8,15 @@
         <label for="inputDate">Date</label>
         <input type="date" class="form-control" id="inputDate" required>
       </div>
-      <div class="form-group">
+      <div class="form-group col-md-2">
         <label for="inputPayment">Payment</label>
         <select id="inputPayment" class="form-control" required>
-          <option selected value="cash">Cash</option>
-          <option value="card">Debit</option>
-          <option value="transfer">Transfer</option>
+          {% for k, v in payments.items() -%}
+          <option value="{{ k }}" {% if v.selected is true -%}selected{% endif %}>{{v.name.capitalize()}}</option>
+          {% endfor %}
         </select>
       </div>
-      <div class="form-group col-md-1">
+      <div class="form-group col-md-2">
         <label for="inputType">Type</label>
         <select id="inputType" class="form-control" required>
           <option selected value="expense">Expense</option>
@@ -25,15 +25,16 @@
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group col-md-1">
+      <div class="form-group col-md-2">
         <label for="inputAmount">Amount</label>
         <input type="text" class="form-control" id="inputAmount" placeholder="3.99" required>
       </div>
       <div class="form-group col-md-2">
         <label for="inputCategory">Category</label>
         <select id="inputCategory" class="form-control" required>
-          <option>Choose...</option>
-          <option>...</option>
+          {% for k, v in categories.items() -%}
+          <option value="{{ k }}" {% if v.selected is true -%}selected{% endif %}>{{v.name.capitalize()}}</option>
+          {% endfor %}
         </select>
       </div>
     </div>
@@ -72,10 +73,10 @@
     <tbody>
       {% for item in items %}
       <tr>
-        <td>{{ item['date'] }}</td>
-        <td>{{ item['amount'] }}</td>
-        <td>{{ item['description'] }}</td>
-        <td>{{ item['category'] }}</td>
+        <td>{{ item.date }}</td>
+        <td>{{ item.amount }}</td>
+        <td>{{ item.description|truncate(120) }}</td>
+        <td>{{ item.category|capitalize }}</td>
 <!--        <td>{{ item['labels'] }}</td>-->
 <!--        <img src="../static/cash.svg" alt="cash" width="28" height="28" title="cash">-->
 <!--        <img src="../static/credit-card.svg" alt="" width="24" height="24" title="Bootstrap">-->

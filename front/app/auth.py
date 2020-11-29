@@ -40,10 +40,12 @@ def load_logged_in_user():
 
     if auth_token is None:
         g.user = None
+        g.is_superuser = None
     else:
         try:
             user = rest.iface.whoami()
             g.user = user['email']
+            g.is_superuser = user['is_superuser']
         except rest.ApiException:
             session.clear()
             return redirect(url_for('auth.login'))
