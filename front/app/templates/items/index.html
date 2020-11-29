@@ -4,23 +4,9 @@
 <div class="container-fluid">
   <form class="inputform needs-validation">
     <div class="form-row">
-      <div class="form-group col-md-2">
+      <div class="form-group col-md-3">
         <label for="inputDate">Date</label>
         <input type="date" class="form-control" id="inputDate" required>
-      </div>
-      <div class="form-group col-md-1">
-        <label for="inputType">Type</label>
-        <select id="inputType" class="form-control" required>
-          <option selected value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
-      </div>
-      <div class="form-group col-md-1">
-        <label for="inputCategory">Category</label>
-        <select id="inputCategory" class="form-control" required>
-          <option>Choose...</option>
-          <option>...</option>
-        </select>
       </div>
       <div class="form-group">
         <label for="inputPayment">Payment</label>
@@ -30,26 +16,48 @@
           <option value="transfer">Transfer</option>
         </select>
       </div>
-
+      <div class="form-group col-md-1">
+        <label for="inputType">Type</label>
+        <select id="inputType" class="form-control" required>
+          <option selected value="expense">Expense</option>
+          <option value="income">Income</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-1">
+        <label for="inputAmount">Amount</label>
+        <input type="text" class="form-control" id="inputAmount" placeholder="3.99" required>
+      </div>
+      <div class="form-group col-md-2">
+        <label for="inputCategory">Category</label>
+        <select id="inputCategory" class="form-control" required>
+          <option>Choose...</option>
+          <option>...</option>
+        </select>
+      </div>
+    </div>
       <!-- future extension: labels
       <div class="form-group col-md-4">
         <label for="inputDescription">Labels</label>
         <input type="text" class="form-control" id="inputLabels">
       </div> -->
-    </div>
-    <div class="form-group">
-      <label for="inputDescription">Description</label>
-      <input type="text" class="form-control" id="inputDescription" placeholder="Coop: bread, butter, milk" required autofocus>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="inputDescription">Description</label>
+        <input type="text" class="form-control" id="inputDescription" placeholder="Coop: bread, butter, milk" required autofocus>
+      </div>
     </div>
     <button type="submit" class="btn btn-outline-success">Send</button>
     <button type="reset" class="btn btn-outline-success">Reset</button>
+
   </form>
 </div>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-  <table class="table table-striped">
+  <table id="itemsOverviewTable" class="table table-striped">
     <thead class="thead-light">
       <tr>
         <th scope="col">Date</th>
