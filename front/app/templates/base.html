@@ -22,8 +22,13 @@
               <a class="nav-link" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>
             </li>
             {% if g.is_superuser %}
-            <li class="nav-item">
-              <a class="nav-link" href="#">Admin</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Admin</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">Users</a>
+                <a class="dropdown-item" href="#">Categories</a>
+                <a class="dropdown-item" href="#">Payment Types</a>
+              </div>
             </li>
             {% endif %}
             <li class="nav-item">
@@ -43,15 +48,18 @@
             <button class="btn btn-outline-success" type="submit">Search</button>
           </form>
           </div>
-          <ul class="nav justify-content-end">
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Hello {{ g.user }}</a>
+          <ul class="navbar-nav justify-content-end">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ g.user }}</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">Edit profile</a>
+              </div>
             </li>
+
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('auth.logout') }}">Sign out</a>
             </li>
           </ul>
-
          </div>
       </nav>
 {% endif %}
