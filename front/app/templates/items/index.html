@@ -65,9 +65,8 @@
         <th scope="col">Amount</th>
         <th scope="col">Description</th>
         <th scope="col">Category</th>
-<!--        <th scope="col">Labels</th>-->
         <th scope="col">Payment</th>
-        <th scope="col"></th>
+        <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -75,12 +74,9 @@
       <tr>
         <td>{{ item.date }}</td>
         <td>{{ item.amount }}</td>
-        <td>{{ item.description|truncate(120) }}</td>
+        <td>{{ item.description }}</td>
         <td>{{ item.category|capitalize }}</td>
-<!--        <td>{{ item['labels'] }}</td>-->
-<!--        <img src="../static/cash.svg" alt="cash" width="28" height="28" title="cash">-->
-<!--        <img src="../static/credit-card.svg" alt="" width="24" height="24" title="Bootstrap">-->
-        <td><img src="../static/cash.svg" alt="cash" width="24" height="24" title="cash"></td>
+        <td>{{ item.payment|capitalize }}</td>
         <td><button type="button" class="btn btn-sm btn-outline-success">edit</button></td>
       </tr>
       {% endfor %}
