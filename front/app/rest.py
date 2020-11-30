@@ -88,8 +88,8 @@ class RestApiInterface:
             "description": "Porsche Stuttgart: Cayenne Turbo S E-Hybrid III, Cayenne Turbo Design 21inch Platinum wheels, white metallic, 462hp, hybrid engine",
             "amount": 99543.00,
             "date": "2020-12-01",
-            "category_id": 1,
-            "payment_id": 1,
+            "category_id": 3,
+            "payment_id": 3,
             "id": 3,
             "owner_id": 0
         }

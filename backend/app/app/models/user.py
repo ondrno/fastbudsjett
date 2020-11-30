@@ -7,7 +7,6 @@ from app.db.base_class import Base
 
 if TYPE_CHECKING:
     from .item import Item  # noqa: F401
-    from .expense import Expense    # noqa: F401
 
 
 class User(Base):

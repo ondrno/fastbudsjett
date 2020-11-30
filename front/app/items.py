@@ -35,7 +35,6 @@ def index():
     # if request.method == 'POST':
     #     date = request.form['inputDate']
     #     amount = request.form['inputAmount']
-    #     expense_type = request.form['inputType']
     #     category = request.form['inputCategory']
     #     payment = request.form['inputPayment']
     #     description = request.form['inputDescription']
