@@ -3,14 +3,33 @@ import functools
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import InputRequired, Email, Length
+
 from . import rest
+
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[
+        InputRequired(),
+        Email(message='Not a valid email address.')
+    ])
+    password = PasswordField('Password', validators=[
+        InputRequired(),
+        Length(5, 64)
+    ])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Sign In')
+
+
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
-    if request.method == 'POST':
+    form = LoginForm()
+    if form.validate_on_submit():
         email = request.form['email']
         password = request.form['password']
 
@@ -31,7 +50,7 @@ def login():
 
         flash(error)
 
-    return render_template('auth/login.html')
+    return render_template('auth/login.html', form=form)
 
 
 @bp.before_app_request

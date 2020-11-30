@@ -12,24 +12,30 @@
 {% endwith %}
 {% endblock %}
 
-
 {% block content %}
 <div class="container">
   <form method="post">
+    {{ form.hidden_tag() }}
     <img class="mb-4" src="../static/money.png" alt="" width="72" height="72">
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail" class="sr-only">Email address</label>
-    <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+    {{ form.email(class_="form-control", placeholder="Email", onClick="disable-warnings") }}
+    {% if form.email.errors %}
+      {% for error in form.email.errors %}
+        <span class="badge badge-pill badge-warning">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
     <div class="p-1"></div>
-    <label for="inputPassword" class="sr-only">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+    {{ form.password(class_="form-control", placeholder="Password") }}
+    {% if form.password.errors %}
+      {% for error in form.password.errors %}
+        <span class="badge badge-pill badge-warning">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
     <div class="p-2"></div>
     <div class="checkbox mb-3">
-      <label>
-        <input type="checkbox" value="remember-me"> Remember me
-      </label>
+      <label>{{ form.remember_me }} {{ form.remember_me.label }}</label>
     </div>
-    <button class="btn btn-lg btn-success btn-block" type="submit">Sign in</button>
+    {{ form.submit(class_="btn btn-lg btn-success btn-block") }}
   </form>
 </div>
 {% endblock %}
