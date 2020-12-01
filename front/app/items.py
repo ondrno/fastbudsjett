@@ -1,37 +1,64 @@
+from typing import List
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session,
 )
-import operator
+from flask_wtf import FlaskForm
+from wtforms.fields.html5 import DateField
+from wtforms import DecimalField, SelectField, StringField, SubmitField
+from wtforms.validators import InputRequired, Length
+
 
 from .auth import login_required
 from . import rest
+from . import categories
+from . import payment_types
 
 bp = Blueprint('items', __name__)
 
 
-def get_categories():
-    raw = rest.iface.get_categories()
-    categories = {}
-    for p in raw:
-        id = p['id']
-        name = p['name']
-        categories[id] = name
-    return categories
+class ItemsForm(FlaskForm):
+    date = DateField('Date', validators=[InputRequired()])
+    payment_type = SelectField('Payment', coerce=int, validators=[InputRequired()])
+    amount = DecimalField('Amount', validators=[InputRequired()])
+    category = SelectField('Category', coerce=int, validators=[InputRequired()])
+    description = StringField('Description', validators=[
+        InputRequired(),
+        Length(5, 255)
+    ])
+    submit = SubmitField('Create')
 
 
-def get_payments():
-    raw = rest.iface.get_payments()
-    payments = {}
-    for p in raw:
-        id = p['id']
-        name = p['name']
-        payments[id] = name
+def get_items_and_resolve(payment_types, categories):
+    """
+    Get items using rest api and translate the payment_id, category_id
+    into the names.
+    """
+    raw = rest.iface.get_items()
+    print(f"get_items_and_resolve: {raw}")
+    payments = []
+    for i in raw:
+        cat_id = i['category_id']
+        payment_id = i['payment_id']
+
+        payment = i
+        payment['payment'] = payment_types.get(payment_id)
+        payment['category'] = categories.get(cat_id)
+        payments.append(payment)
+
     return payments
 
-
-@bp.route('/')
+@bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
+    categories_lookup = categories.get_categories()
+    payments_lookup = payment_types.get_payments()
+
+    form = ItemsForm()
+    form.payment_type.choices = [(k, v) for k, v in payments_lookup.items()]
+    form.category.choices = [(k, v) for k, v in categories_lookup.items()]
+
+    payments = get_items_and_resolve(payments_lookup, categories_lookup)
+
     # if request.method == 'POST':
     #     date = request.form['inputDate']
     #     amount = request.form['inputAmount']
@@ -39,37 +66,7 @@ def index():
     #     payment = request.form['inputPayment']
     #     description = request.form['inputDescription']
     #     # TODO
-    categories_lookup = get_categories()
-    payments_lookup = get_payments()
+    # print(categories_sorted.items())
+    # print(payments_sorted.items())
 
-    payments_raw = rest.iface.get_items()
-    payments = []
-    for i in payments_raw:
-        cat_id = i['category_id']
-        payment_id = i['payment_id']
-
-        payment = i
-        payment['payment'] = payments_lookup.get(payment_id)
-        payment['category'] = categories_lookup.get(cat_id)
-        payments.append(payment)
-
-    categories_sorted = {}
-    for k, v in sorted(categories_lookup.items(), key=operator.itemgetter(1)):
-        categories_sorted[k] = {'name': v}
-        if v.lower() == 'food':
-            categories_sorted[k]['selected'] = True
-
-    print(categories_sorted.items())
-
-    payments_sorted = {}
-    for k, v in sorted(payments_lookup.items(), key=operator.itemgetter(1)):
-        payments_sorted[k] = {'name': v}
-        if v.lower() == 'cash':
-            payments_sorted[k]['selected'] = True
-
-    print(payments_sorted.items())
-
-    return render_template('items/index.html',
-                           items=payments,
-                           categories=categories_sorted,
-                           payments=payments_sorted)
+    return render_template('items/index.html', items=payments, form=form)
