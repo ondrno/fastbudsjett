@@ -21,14 +21,14 @@
     {{ form.email(class_="form-control", placeholder="Email", onClick="disable-warnings") }}
     {% if form.email.errors %}
       {% for error in form.email.errors %}
-        <span class="badge badge-pill badge-warning">{{ error }}</span>
+        <div id="alert-email" class="alert alert-danger">{{ error }}</div>
       {% endfor %}
     {% endif %}
     <div class="p-1"></div>
     {{ form.password(class_="form-control", placeholder="Password") }}
     {% if form.password.errors %}
       {% for error in form.password.errors %}
-        <span class="badge badge-pill badge-warning">{{ error }}</span>
+        <div id="alert-password" class="alert alert-danger">{{ error }}</div>
       {% endfor %}
     {% endif %}
     <div class="p-2"></div>
@@ -38,4 +38,10 @@
     {{ form.submit(class_="btn btn-lg btn-success btn-block") }}
   </form>
 </div>
+<script type="text/javascript">
+        setTimeout(function () {
+            $('#alert-email').alert('close');
+            $('#alert-password').alert('close');
+        }, 4000);
+    </script>
 {% endblock %}
