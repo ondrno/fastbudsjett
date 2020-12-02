@@ -47,6 +47,7 @@ def get_items_and_resolve(payment_types, categories):
 
     return payments
 
+
 @bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
