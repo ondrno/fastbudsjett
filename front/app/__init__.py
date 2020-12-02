@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_caching import Cache
+from flask_login import LoginManager
 from . import auth, items, search
 from .config import AppConfig, cache_config
 
@@ -14,9 +15,12 @@ def create_app():
     app.add_url_rule('/', endpoint='index')
 
     app.cache = Cache(app, config=cache_config)
+    app.login = LoginManager()
 
     return app
 
 
 app = create_app()
+
+
 

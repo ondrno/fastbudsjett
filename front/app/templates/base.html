@@ -43,8 +43,8 @@
           <div class="col-sm-6">
           {% endif %}
           <form action="{{ url_for('search.index') }}" method="post" class="form-inline my-2 my-lg-0" role="search">
-            <input class="form-control mr-sm-4" type="search" placeholder="Search query" aria-label="Search items">
-            <button class="btn btn-outline-success" id="submitSearch" type="submit">Go</button>
+            <input id="quickSearch" class="form-control mr-sm-4" type="search" placeholder="Search query" aria-label="Quick search items">
+            <button class="btn btn-outline-success" id="quickSearchSubmit" type="submit">Go</button>
           </form>
           </div>
           <ul class="navbar-nav justify-content-end">
@@ -71,18 +71,5 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
   <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.22/datatables.min.js"></script>
-  <script>
-    $(document).ready( function () {
-      $('#itemsOverviewTable').DataTable( {
-          searching: false,
-          paging: false,
-          ordering: true,
-          "columnDefs": [
-             // disable ordering of column "Actions"
-             { "orderable": false, "targets": 5 }
-          ],
-        }
-      );
-    } );
-  </script>
+  {% block script %}{% endblock %}
 </html>

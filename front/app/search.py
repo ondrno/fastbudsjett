@@ -50,16 +50,19 @@ class SearchForm(FlaskForm):
 @bp.route('/search', methods=['POST', 'GET'])
 @login_required
 def index():
-    form = SearchForm()
-
     categories_lookup = categories.get_categories()
     payments_lookup = payment_types.get_payments()
 
+    if request.method == 'GET':
+        print("search/index - get")
+    else:
+        print("search/index - post")
+
+    form = SearchForm()
     form.payment_type.choices = [(k, v) for k, v in payments_lookup.items()]
     form.category.choices = [(k, v) for k, v in categories_lookup.items()]
 
     # print(form.get_active_fields())
     payments = items.get_items_and_resolve(payments_lookup, categories_lookup)
-
 
     return render_template('search/search.html', items=payments, form=form)

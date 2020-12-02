@@ -1,6 +1,7 @@
 python-dotenv==0.15.0
 Flask==1.1.2
 Flask-Caching==1.9.0
+flask-login==0.5.0
 Flask-WTF==0.14.3
 wtforms[email]
 requests==2.25.0

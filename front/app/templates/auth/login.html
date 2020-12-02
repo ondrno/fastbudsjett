@@ -1,3 +1,4 @@
+{{ list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*-_+=<>,./?";:][')|random }}
 {% extends 'base.html' %}
 
 {% block header %}
@@ -37,10 +38,13 @@
     {{ form.submit(class_="btn btn-lg btn-success btn-block") }}
   </form>
 </div>
+{% endblock %}
+
+{% block script %}
 <script type="text/javascript">
         setTimeout(function () {
             $('#alert-email').alert('close');
             $('#alert-password').alert('close');
         }, 4000);
-    </script>
+</script>
 {% endblock %}

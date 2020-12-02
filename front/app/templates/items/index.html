@@ -3,6 +3,7 @@
 {% block header %}
 <div class="container-fluid">
   <form class="inputform" method="post">
+    {{ form.hidden_tag() }}
     <div class="form-row">
       <div class="form-group col-md-3">
         {{ form.date.label() }}
@@ -62,4 +63,21 @@
     </tbody>
   </table>
 </div>
+{% endblock %}
+
+{% block script %}
+<script>
+  $(document).ready( function () {
+    $('#itemsOverviewTable').DataTable( {
+        searching: false,
+        paging: false,
+        ordering: true,
+        "columnDefs": [
+           // disable ordering of column "Actions"
+           { "orderable": false, "targets": 5 }
+        ],
+      }
+    );
+  } );
+</script>
 {% endblock %}
