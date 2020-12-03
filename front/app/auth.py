@@ -4,7 +4,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Email, Length
 
 from . import rest
@@ -22,11 +22,10 @@ class LoginForm(FlaskForm):
         InputRequired(),
         Length(5, 64)
     ])
-    remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
 
 
-@bp.route('/login', methods=('GET', 'POST'))
+@bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -63,8 +62,8 @@ def load_logged_in_user():
     else:
         try:
             user = rest.iface.whoami()
-            g.user = user['email']
-            g.is_superuser = user['is_superuser']
+            g.user = user.get_id()
+            g.is_superuser = user.is_superuser
         except rest.ApiException:
             session.clear()
             return redirect(url_for('auth.login'))

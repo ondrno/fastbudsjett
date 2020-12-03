@@ -16,6 +16,7 @@ def create_app():
 
     app.cache = Cache(app, config=cache_config)
     app.login = LoginManager()
+    app.login.login_view = 'auth.login'
 
     return app
 

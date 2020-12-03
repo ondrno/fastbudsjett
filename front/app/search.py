@@ -30,7 +30,7 @@ class SearchForm(FlaskForm):
         if self.description.data:
             data = str(self.amount.data)
             # allow expressions like: >10, <10, >=20
-            if not re.match(r'^[><]?=?\d+$', data):
+            if not re.match(r'^([><]?=?\d+)?$', data):
                 self.amount.errors.append('Invalid search pattern for amount')
                 print("Validation error")
                 raise ValidationError("Invalid input syntax")
@@ -40,27 +40,40 @@ class SearchForm(FlaskForm):
 
     def get_active_fields(self):
         active = set()
-        for field in [self.from_date, self.to_date, self.description,
-                      self.payment_type, self.amount, self.category]:
-            if self.field.data:
-                active.add(field)
+        for field in ['from_date', 'to_date', 'description',
+                      'payment_type', 'amount', 'category']:
+            print(field, getattr(self, field))
+            # if field.data:
+            #     active.add(field)
         return active
 
 
-@bp.route('/search', methods=['POST', 'GET'])
+@bp.route('/search', methods=['GET', 'POST'])
 @login_required
 def index():
     categories_lookup = categories.get_categories()
     payments_lookup = payment_types.get_payments()
 
-    if request.method == 'GET':
-        print("search/index - get")
-    else:
-        print("search/index - post")
-
     form = SearchForm()
+
     form.payment_type.choices = [(k, v) for k, v in payments_lookup.items()]
+    form.payment_type.choices.insert(0, (0, 'all'))
+    form.payment_type.default = ['0']
+
     form.category.choices = [(k, v) for k, v in categories_lookup.items()]
+    form.category.choices.insert(0, (0, 'all'))
+    form.category.default = ['0']
+
+    if form.validate_on_submit():
+        fields = form.get_active_fields()
+        print(fields)
+        from_date = request.form['from_date']
+        to_date = request.form['to_date']
+        amount = request.form['amount']
+        category = request.form['category']
+        payment_type = request.form['payment_type']
+        description = request.form['description']
+        print("send REST api call to query for items")
 
     # print(form.get_active_fields())
     payments = items.get_items_and_resolve(payments_lookup, categories_lookup)

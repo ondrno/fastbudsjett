@@ -1,9 +1,16 @@
 {% extends 'base.html' %}
 
+{% block title %}Search{% endblock %}
+
 {% block header %}
-<h1 class="centered">Search & Find</h1>
 <div class="container-fluid">
-  <form class="inputform" method="GET">
+  <div class="row justify-content-center">
+    <h3>Search & Find</h3>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <form class="inputform" method="POST">
     <div class="form-row">
       <div class="form-group col-md-6">
         {{ form.description.label() }}

@@ -1,5 +1,6 @@
-{{ list('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*-_+=<>,./?";:][')|random }}
 {% extends 'base.html' %}
+
+{% block title %}Sign in{% endblock %}
 
 {% block header %}
 {% with messages = get_flashed_messages() %}
@@ -32,9 +33,6 @@
       {% endfor %}
     {% endif %}
     <div class="p-2"></div>
-    <div class="checkbox mb-3">
-      <label>{{ form.remember_me }} {{ form.remember_me.label }}</label>
-    </div>
     {{ form.submit(class_="btn btn-lg btn-success btn-block") }}
   </form>
 </div>

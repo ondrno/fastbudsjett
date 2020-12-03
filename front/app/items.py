@@ -5,7 +5,7 @@ from flask import (
 from flask_wtf import FlaskForm
 from wtforms.fields.html5 import DateField
 from wtforms import DecimalField, SelectField, StringField, SubmitField
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import InputRequired, Length, NumberRange
 
 
 from .auth import login_required
@@ -19,7 +19,7 @@ bp = Blueprint('items', __name__)
 class ItemsForm(FlaskForm):
     date = DateField('Date', validators=[InputRequired()])
     payment_type = SelectField('Payment', coerce=int, validators=[InputRequired()])
-    amount = DecimalField('Amount', validators=[InputRequired()])
+    amount = DecimalField('Amount', validators=[InputRequired(), NumberRange(min=0.01)])
     category = SelectField('Category', coerce=int, validators=[InputRequired()])
     description = StringField('Description', validators=[
         InputRequired(),
@@ -59,15 +59,12 @@ def index():
     form.category.choices = [(k, v) for k, v in categories_lookup.items()]
 
     payments = get_items_and_resolve(payments_lookup, categories_lookup)
-
-    # if request.method == 'POST':
-    #     date = request.form['inputDate']
-    #     amount = request.form['inputAmount']
-    #     category = request.form['inputCategory']
-    #     payment = request.form['inputPayment']
-    #     description = request.form['inputDescription']
-    #     # TODO
-    # print(categories_sorted.items())
-    # print(payments_sorted.items())
+    if form.validate_on_submit():
+        date = request.form['date']
+        amount = request.form['amount']
+        category = request.form['category']
+        payment = request.form['payment_type']
+        description = request.form['description']
+        print("send REST api call")
 
     return render_template('items/index.html', items=payments, form=form)
