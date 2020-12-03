@@ -76,3 +76,26 @@
   </table>
 </div>
 {% endblock %}
+
+{% block script %}
+<script>
+  $(document).ready( function () {
+    $('#itemsOverviewTable').DataTable( {
+        searching: false,
+        paging: false,
+        ordering: true,
+        "columnDefs": [
+           // disable ordering of column "Actions"
+           { "orderable": false, "targets": 5 }
+        ],
+      }
+    );
+  } );
+</script>
+<script type="text/javascript">
+        setTimeout(function () {
+            $('#alert-amount').alert('close');
+            $('#alert-description').alert('close');
+        }, 4000);
+</script>
+{% endblock %}

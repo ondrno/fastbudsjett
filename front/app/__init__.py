@@ -21,7 +21,18 @@ def create_app():
     return app
 
 
+def format_datetime(value, format="%Y-%M-%D"):
+    """Format a date time to (Default): YYYY-MM-DD"""
+    if value is None:
+        return ""
+    return value.strftime(format)
+
+
 app = create_app()
+
+# Register the template filter with the Jinja Environment
+app.jinja_env.filters['formatdatetime'] = format_datetime
+
 
 
 

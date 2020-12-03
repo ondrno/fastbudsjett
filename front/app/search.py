@@ -42,9 +42,8 @@ class SearchForm(FlaskForm):
         active = set()
         for field in ['from_date', 'to_date', 'description',
                       'payment_type', 'amount', 'category']:
-            print(field, getattr(self, field))
-            # if field.data:
-            #     active.add(field)
+            if getattr(self, field):
+                active.add(field)
         return active
 
 
@@ -63,6 +62,7 @@ def index():
     form.category.choices = [(k, v) for k, v in categories_lookup.items()]
     form.category.choices.insert(0, (0, 'all'))
     form.category.default = ['0']
+    # payments = []
 
     if form.validate_on_submit():
         fields = form.get_active_fields()
@@ -73,9 +73,9 @@ def index():
         category = request.form['category']
         payment_type = request.form['payment_type']
         description = request.form['description']
+        # print(form.get_active_fields())
         print("send REST api call to query for items")
+        # redirect(url_for('search.index'))
 
-    # print(form.get_active_fields())
     payments = items.get_items_and_resolve(payments_lookup, categories_lookup)
-
     return render_template('search/search.html', items=payments, form=form)
