@@ -1,0 +1,31 @@
+{% import 'icons.html' as icons %}
+
+<div class="container-fluid">
+  <table id="itemsOverviewTable" class="table table-striped">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">Date</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Description</th>
+        <th scope="col">Category</th>
+        <th scope="col">Payment</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.date }}</td>
+        <td>{{ item.amount }}</td>
+        <td>{{ item.description }}</td>
+        <td>{{ item.category|capitalize }}</td>
+        <td>{{ item.payment|capitalize }}</td>
+        <td>
+          <button type="button" class="btn btn-sm btn-outline-success">{{ icons.icon_pencil() }}</button>
+          {% if g.is_superuser %}<button type="button" class="btn btn-sm btn-outline-success">{{ icons.icon_trash() }}</button>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
