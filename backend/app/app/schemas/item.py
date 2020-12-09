@@ -40,12 +40,13 @@ class ItemBase(BaseModel):
 
     category_id: Optional[int] = None
     payment_id: Optional[int] = None
+    itemtype_id: Optional[int] = None
 
 
 # Properties to receive on item creation
 class ItemCreate(ItemBase):
     """
-    Create an item: mandatory fields are description, amount, date, category_id, payment_id
+    Create an item: mandatory fields are description, amount, date, itemtype_id, category_id, payment_id
     """
     description: description_constr
     amount: float
@@ -53,6 +54,7 @@ class ItemCreate(ItemBase):
 
     category_id: int
     payment_id: int
+    itemtype_id: int
 
     @validator("date", pre=True)
     def check_date(cls, date: str) -> str:
@@ -78,6 +80,7 @@ class ItemInDBBase(ItemBase):
     owner_id: int
     category_id: int
     payment_id: int
+    itemtype_id: int
 
     _date_created: datetime.datetime
     _date_modified: datetime.datetime

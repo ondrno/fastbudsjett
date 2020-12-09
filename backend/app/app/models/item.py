@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from .user import User  # noqa: F401
     from .category import Category  # noqa: F401
     from .payment import Payment  # noqa: F401
+    from .itemtype import ItemType  # noqa: F401
 
 
 class Item(Base):
@@ -17,13 +18,16 @@ class Item(Base):
     amount = Column(Float, nullable=False)
     date = Column(Date, nullable=False)
 
-    owner_id = Column(Integer, ForeignKey("user.id"))
+    owner_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     owner = relationship("User", back_populates="items")
 
-    category_id = Column(Integer, ForeignKey("category.id"))
+    itemtype_id = Column(Integer, ForeignKey("itemtype.id"), nullable=False)
+    itemtype = relationship("ItemType", back_populates="items")
+
+    category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
     category = relationship("Category", back_populates="items")
 
-    payment_id = Column(Integer, ForeignKey("payment.id"))
+    payment_id = Column(Integer, ForeignKey("payment.id"), nullable=False)
     payment = relationship("Payment", back_populates="items")
 
     created_at = Column(DateTime, default=datetime.now)

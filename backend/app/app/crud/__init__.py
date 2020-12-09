@@ -1,5 +1,6 @@
 from .crud_category import category
 from .crud_item import item
+from .crud_itemtype import itemtype
 from .crud_user import user
 from .crud_payment import payment
 
