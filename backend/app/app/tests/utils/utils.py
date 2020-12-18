@@ -19,7 +19,7 @@ def random_email() -> str:
 
 
 def random_float(precision: int = 2) -> float:
-    return round(random.uniform(-1000, +1000), precision)
+    return round(random.uniform(0, 1000), precision)
 
 
 def random_date(want_iso: bool = False) -> str:

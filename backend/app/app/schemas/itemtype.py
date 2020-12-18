@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel, constr
 
 
-name_constr = constr(min_length=2, max_length=30)
+name_constr = constr(min_length=3, max_length=30)
 
 
 # Shared properties
@@ -25,7 +25,7 @@ class ItemTypeUpdate(ItemTypeBase):
 
 class ItemTypeInDBBase(ItemTypeBase):
     id: int
-    name: str
+    name: name_constr
 
     class Config:
         orm_mode = True

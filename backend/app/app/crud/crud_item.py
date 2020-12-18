@@ -85,7 +85,7 @@ class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
         return (
             db.query(self.model)
             .filter(filter_expr)
-            .order_by(sqlalchemy.asc(order_expr))
+            .order_by(order_expr)
             .offset(skip)
             .limit(limit)
             .all()

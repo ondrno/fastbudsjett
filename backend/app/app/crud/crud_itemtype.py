@@ -1,5 +1,6 @@
 from app.crud.base import CRUDBase
-from app.schemas.itemtype import ItemType, ItemTypeCreate, ItemTypeUpdate
+from app.models.itemtype import ItemType
+from app.schemas.itemtype import ItemTypeCreate, ItemTypeUpdate
 
 
 class CRUDItemType(CRUDBase[ItemType, ItemTypeCreate, ItemTypeUpdate]):

@@ -6,11 +6,10 @@ from app.core.config import settings
 from app.tests.utils.item import create_random_item
 
 
-def test_create_item(
-    client: TestClient, superuser_token_headers: dict, db: Session, test_payment, test_category
-) -> None:
+def test_create_item(client: TestClient, superuser_token_headers: dict, db: Session,
+                     test_itemtype, test_payment, test_category) -> None:
     data = {"description": "this_is_a_long_text", "amount": 9.95, "date": "01.01.2020",
-            "payment_id": test_payment.id, "category_id": test_category.id}
+            "itemtype_id": test_itemtype.id, "payment_id": test_payment.id, "category_id": test_category.id}
     response = client.post(
         f"{settings.API_V1_STR}/items/", headers=superuser_token_headers, json=data,
     )
@@ -38,9 +37,9 @@ def test_create_item_wrong_date_returns_422(
 
 def test_read_item(
         client: TestClient, superuser_token_headers: dict, db: Session,
-        test_category, test_payment
+        test_itemtype, test_category, test_payment
 ) -> None:
-    item = create_random_item(db, test_category.id, test_payment.id)
+    item = create_random_item(db, test_itemtype.id, test_category.id, test_payment.id)
     response = client.get(
         f"{settings.API_V1_STR}/items/{item.id}", headers=superuser_token_headers,
     )

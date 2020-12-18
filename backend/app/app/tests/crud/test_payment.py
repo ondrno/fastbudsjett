@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+import mock
 import pytest
 from random import randint
 
@@ -38,9 +39,10 @@ def test_payment_items_field_is_propagated_by_items(db: Session, test_category) 
     assert payment.name == name
     assert payment.items == []
 
+    itemtype = mock.MagicMock()
     user = create_random_user(db)
     item_in = ItemCreate(description="test_description", amount="12.20", date="01.01.2020",
-                         payment_id=payment.id, category_id=test_category.id)
+                         payment_id=payment.id, category_id=test_category.id, itemtype_id=itemtype.id)
     item = crud.item.create_with_owner(db=db, obj_in=item_in, owner_id=user.id)
     assert payment.items == [item]
 

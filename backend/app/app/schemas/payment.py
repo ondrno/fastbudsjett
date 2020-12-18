@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, PositiveInt
 
 
 name_constr = constr(min_length=2, max_length=30)
@@ -24,8 +24,8 @@ class PaymentUpdate(PaymentBase):
 
 
 class PaymentInDBBase(PaymentBase):
-    id: int
-    name: str
+    id: PositiveInt
+    name: name_constr
 
     class Config:
         orm_mode = True

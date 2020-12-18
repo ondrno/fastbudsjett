@@ -2,10 +2,9 @@ import datetime
 import re
 
 from typing import Optional
-from pydantic import BaseModel, constr, Field, validator
+from pydantic import BaseModel, constr, Field, validator, PositiveFloat, PositiveInt
 
 
-# description has to have a minimum length of 10 characters
 description_constr = constr(min_length=6, max_length=300)
 
 
@@ -35,12 +34,12 @@ def validate_date(v: str) -> str:
 # Shared properties
 class ItemBase(BaseModel):
     description: Optional[str] = None
-    amount: Optional[float] = Field(None, example="9.95")
+    amount: Optional[PositiveFloat] = Field(None, example="9.95")
     date: Optional[str] = Field(None, example="31.12.2020")
 
-    category_id: Optional[int] = None
-    payment_id: Optional[int] = None
-    itemtype_id: Optional[int] = None
+    category_id: Optional[PositiveInt] = None
+    payment_id: Optional[PositiveInt] = None
+    itemtype_id: Optional[PositiveInt] = None
 
 
 # Properties to receive on item creation
@@ -49,12 +48,12 @@ class ItemCreate(ItemBase):
     Create an item: mandatory fields are description, amount, date, itemtype_id, category_id, payment_id
     """
     description: description_constr
-    amount: float
+    amount: PositiveFloat
     date: str
 
-    category_id: int
-    payment_id: int
-    itemtype_id: int
+    category_id: PositiveInt
+    payment_id: PositiveInt
+    itemtype_id: PositiveInt
 
     @validator("date", pre=True)
     def check_date(cls, date: str) -> str:
@@ -72,15 +71,15 @@ class ItemUpdate(ItemBase):
 
 # Properties shared by models stored in DB
 class ItemInDBBase(ItemBase):
-    id: int
+    id: PositiveInt
     description: description_constr
-    amount: float
+    amount: PositiveFloat
     date: datetime.date
 
-    owner_id: int
-    category_id: int
-    payment_id: int
-    itemtype_id: int
+    owner_id: PositiveInt
+    category_id: PositiveInt
+    payment_id: PositiveInt
+    itemtype_id: PositiveInt
 
     _date_created: datetime.datetime
     _date_modified: datetime.datetime
