@@ -27,7 +27,7 @@ class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
 
     def get_multi(
         self, db: Session, *,
-            skip: int = 0, limit: int = 100,
+            skip: int = 0, limit: int = 200,
             owner_id: Optional[int] = None,
             description: Optional[str] = None,
             min_val: Optional[float] = None,
@@ -36,7 +36,7 @@ class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
             end_date: Optional[str] = None,
             category: Optional[List[int]] = None,
             payment: Optional[List[int]] = None,
-            order_by: Optional[str] = 'id',
+            order_by: Optional[str] = 'date',
     ) -> List[Item]:
         filter_expr = ''
         if description:
@@ -79,7 +79,7 @@ class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
         order_expr = 'Item.id'
         if order_by in ['id', 'description', 'date', 'created_at', 'modified_at',
                         'amount', 'owner_id', 'category_id', 'payment_id']:
-            order_expr = f"Item.{order_by}"
+            order_expr = f"Item.{order_by} desc"
         order_expr = text(order_expr)
 
         return (

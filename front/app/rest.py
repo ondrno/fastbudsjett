@@ -51,8 +51,9 @@ class RestApiInterface:
     BASE_URL = "http://localhost/api/v1"
     BASE_USERS_URL = BASE_URL + '/users'
     BASE_ITEMS_URL = BASE_URL + '/items'
-    BASE_CATEGORIES_URL = BASE_URL + '/categories/'
-    BASE_PAYMENTS_URL = BASE_URL + '/payments/'
+    BASE_ITEMTYPES_URL = BASE_URL + '/itemtypes'
+    BASE_CATEGORIES_URL = BASE_URL + '/categories'
+    BASE_PAYMENTS_URL = BASE_URL + '/payments'
 
     def __init__(self):
         self.auth_token = None
@@ -112,7 +113,19 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not add user, {r.content}")
 
+    def get_items_for_month(self, year: int, month: int):
+        start_date = f"{year}-{month}-01"
+        end_date = f"{year}-{month}-31"
+        r = requests.get(self.BASE_ITEMS_URL, headers=self.auth_token,
+                         params={'start_date': start_date, 'end_date': end_date, 'order_by': 'date'})
+        if r.ok:
+            items = r.json()
+            return items
+        else:
+            raise ApiException(f"Could not retrieve items, {r.content}")
+
     def get_items(self, **data):
+        print(data)
         r = requests.get(self.BASE_ITEMS_URL, headers=self.auth_token, params=data)
         if r.ok:
             items = r.json()
@@ -143,6 +156,39 @@ class RestApiInterface:
             return item
         else:
             raise ApiException(f"Could not create item={data} -> {r.content}")
+
+    def create_category(self, name: str, itemtype_id: int):
+        r = requests.post(self.BASE_CATEGORIES_URL, headers=self.auth_token,
+                          json={'name': name, 'itemtype_id': itemtype_id})
+        if r.ok:
+            item = r.json()
+            return item
+        else:
+            raise ApiException(f"Could not create category with name={name}, itemtype={itemtype_id} -> {r.content}")
+
+    def create_payment(self, name: str):
+        r = requests.post(self.BASE_PAYMENTS_URL, headers=self.auth_token, json={'name': name})
+        if r.ok:
+            item = r.json()
+            return item
+        else:
+            raise ApiException(f"Could not create payment_type with name={name} -> {r.content}")
+
+    def create_itemtype(self, name: str):
+        r = requests.post(self.BASE_ITEMTYPES_URL, headers=self.auth_token, json={'name': name})
+        if r.ok:
+            item = r.json()
+            return item
+        else:
+            raise ApiException(f"Could not create itemtype with name={name} -> {r.content}")
+
+    def get_itemtypes(self):
+        r = requests.get(self.BASE_ITEMTYPES_URL, headers=self.auth_token)
+        if r.ok:
+            itemtypes = r.json()
+            return itemtypes
+        else:
+            raise ApiException(f"Could not get itemtypes -> {r.content}")
 
 
 class ApiException(Exception):

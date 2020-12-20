@@ -1,31 +1,58 @@
 {% import 'icons.html' as icons %}
+<!-- Modal -->
+<div class="modal fade" id="confirmDelete" data-backdrop="static" data-keyboard="true" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteLabel">Confirm Deletion</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Do you really want to delete this entry?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="confirm-delete-ok" onclick="submitForm('delete')">Yes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="container-fluid">
-  <table id="itemsOverviewTable" class="table table-striped">
-    <thead class="thead-light">
-      <tr>
-        <th scope="col">Date</th>
-        <th scope="col">Amount</th>
-        <th scope="col">Description</th>
-        <th scope="col">Category</th>
-        <th scope="col">Payment</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in items %}
-      <tr>
-        <td>{{ item.date }}</td>
-        <td>{{ item.amount }}</td>
-        <td>{{ item.description }}</td>
-        <td>{{ item.category|capitalize }}</td>
-        <td>{{ item.payment|capitalize }}</td>
-        <td>
-          <button type="button" class="btn btn-sm btn-outline-success">{{ icons.icon_pencil() }}</button>
-          {% if g.is_superuser %}<button type="button" class="btn btn-sm btn-outline-success">{{ icons.icon_trash() }}</button>{% endif %}
-        </td>
-      </tr>
+  {% for year in items.keys() -%}
+    {% for month in items[year].keys() -%}
+      {% for day in items[year][month].keys() -%}
+  <div class="row mt-2">
+    <div class="col-1 font-weight-bold h4">{{ day }}</div>
+    <div class="col-2">{{ year}}.{{month}}<br />working_day</div>
+    <div class="col-4">sum_daily_revenues</div>
+    <div class="col-2 offset-2">sum_daily_expenses</div>
+  </div>
+  <div class="row">
+    <div class="col offset-1"></div>
+  </div>
+
+        {% for item in items[year][month][day] %}
+  <div class="row mb">
+    <div class="col-3 font-weight-light">{{ item.category|capitalize }}</div>
+    <div class="col-6 text-truncate">{{ item.description }}</div>
+    <div class="col-2">&euro; {{ item.amount }}</div>
+  </div>
+        {% endfor %}
+  <hr />
+
       {% endfor %}
-    </tbody>
-  </table>
+    {% endfor %}
+  {% endfor %}
 </div>
+
+<script type="text/javascript">
+  function submitForm(action='edit', val) {
+      // alert($("navbarSupportedContent"))
+      $('#edit-or-delete-id').value = val
+      alert(val)
+      alert($('#edit-or-delete-id').id)
+  }
+</script>
