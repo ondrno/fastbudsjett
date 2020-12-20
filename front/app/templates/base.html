@@ -15,59 +15,15 @@
   <body>
     <div class="container-fluid">
 {% if g.user %}
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarFastBudsjett" aria-controls="navbarFastBudsjett" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarFastBudsjett">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('search.index') }}">Search</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Statistics</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Standing Orders</a>
-            </li>
-            {% if g.is_superuser %}
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Admin</a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">manage users</a>
-                <a class="dropdown-item" href="#">edit categories</a>
-                <a class="dropdown-item" href="#">edit payment types</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">cleanup deleted items</a>
-              </div>
-            </li>
-            {% endif %}
-          </ul>
-          <ul class="navbar-nav justify-content-end">
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ g.user }}</a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">Edit profile</a>
-              </div>
-            </li>
-
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('auth.logout') }}">Sign out</a>
-            </li>
-          </ul>
-         </div>
-      </nav>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="collapse navbar-collapse" id="navbarMonths">
-          <a class="nav-link" href="#">&lt;</a>Dec. 2020<a class="nav-link" href="#">&gt;</a>
+      <nav class="navbar fixed-bottom navbar-expand navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarOverview">
+          <a class="nav-link" href="#">Statistics</a>
+          <a class="nav-link" href="#">Settings</a>
+          <a class="nav-link" href="{{ url_for('auth.logout') }}">Sign out</a>
         </div>
       </nav>
 {% endif %}
-      <div class="p-2"></div>
-      {% block header %}{% endblock %}
+{% block header %}{% endblock %}
       <div class="p-2"></div>
       {% block content %}{% endblock %}
     </div>

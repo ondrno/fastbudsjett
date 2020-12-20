@@ -24,25 +24,27 @@
   {% for year in items.keys() -%}
     {% for month in items[year].keys() -%}
       {% for day in items[year][month].keys() -%}
-  <div class="row mt-2">
-    <div class="col-1 font-weight-bold h4">{{ day }}</div>
-    <div class="col-2">{{ year}}.{{month}}<br />working_day</div>
-    <div class="col-4">sum_daily_revenues</div>
-    <div class="col-2 offset-2">sum_daily_expenses</div>
-  </div>
-  <div class="row">
-    <div class="col offset-1"></div>
-  </div>
+        <div class="shadow">
+        <div class="row pl-2 mt-2">
+          <div class="col-1 font-weight-bold h4">{{ day }}</div>
+          <div class="col-2">{{ year}}.{{month}}<br /><button class="btn btn-secondary btn-sm px-1 disabled">Sa</button></div>
+          <div class="col-4 text-right text-primary">&euro; 1200.00</div>
+          <div class="col-2 offset-2 text-right text-danger">&euro; 487.00</div>
+        </div>
+        <div class="row">
+          <div class="col offset-1"></div>
+        </div>
 
-        {% for item in items[year][month][day] %}
-  <div class="row mb">
-    <div class="col-3 font-weight-light">{{ item.category|capitalize }}</div>
-    <div class="col-6 text-truncate">{{ item.description }}</div>
-    <div class="col-2">&euro; {{ item.amount }}</div>
-  </div>
-        {% endfor %}
-  <hr />
-
+          {% for item in items[year][month][day] %}
+          <div class="row mb pl-2">
+            <div class="col-3 font-weight-light">{{ item.category|capitalize }}</div>
+            <div class="col-6 text-truncate">
+              <a href="{{ url_for('items.edit',item_id=item.id) }}" class="text-secondary">{{ item.description }}</a>
+            </div>
+            <div class="col-2 text-right text-danger">&euro; {{ item.amount }}</div>
+          </div>
+          {% endfor %}
+        </div>
       {% endfor %}
     {% endfor %}
   {% endfor %}

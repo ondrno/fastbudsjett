@@ -9,9 +9,7 @@ from wtforms.validators import ValidationError
 
 
 from .auth import login_required
-from . import items
-from . import categories
-from . import payment_types
+from . import items, utils
 
 bp = Blueprint('search', __name__)
 
@@ -50,8 +48,9 @@ class SearchForm(FlaskForm):
 @bp.route('/search', methods=['GET', 'POST'])
 @login_required
 def index():
-    categories_lookup = categories.get_categories()
-    payments_lookup = payment_types.get_payments()
+    categories_lookup = utils.get_categories()
+    payments_lookup = utils.get_payments()
+    itemtypes_lookup = utils.get_itemtypes()
 
     form = SearchForm()
 
@@ -77,5 +76,5 @@ def index():
         print("send REST api call to query for items")
         # redirect(url_for('search.index'))
 
-    payments = items.get_items_and_resolve(payments_lookup, categories_lookup)
+    payments = items.get_items_and_resolve(itemtypes_lookup, payments_lookup, categories_lookup)
     return render_template('search/search.html', items=payments, form=form)

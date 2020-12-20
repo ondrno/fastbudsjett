@@ -1,61 +1,42 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Items{% endblock %}
+{% block title %}Show items{% endblock %}
 
 {% block header %}
+<nav class="navbar navbar-expand navbar-light bg-light">
+  <div class="collapse navbar-collapse" id="navbarMonths">
+    <a class="nav-link" href="#">&lt;</a>
+    <a class="nav-link" href="#">Dec. 2020</a>
+    <a class="nav-link" href="#">&gt;</a>
+    <a class="nav-link" href="{{ url_for('items.create') }}"><img src="/static/img/plus-square.svg" alt="" width="25" height="25" title="add entry" /></a>
+    <div class="container justify-content-center">
+      <form class="form-inline">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+
+{% block content %}
 <div class="container-fluid">
-  <div class="row justify-content-center">
-    <h3>Create Items</h3>
+  <div class="row">
+    <div class="col offset-1">Revenues</div>
+    <div class="col">Expenditures</div>
+    <div class="col">Saldo</div>
+  </div>
+  <div class="row">
+    <div class="col offset-1 text-primary">&euro; 1200.00</div>
+    <div class="col text-danger">&euro; 437.00</div>
+    <div class="col text-secondary">&euro; 763.00</div>
   </div>
 </div>
 
-<div class="container-fluid">
-  <form class="inputform" method="post">
-    {{ form.hidden_tag() }}
-    <div class="form-row">
-      <div class="form-group col-md-4">
-        {{ form.date.label() }}
-        {{ form.date(class_="form-control") }}
-      </div>
-      <div class="invisible col-md-2"></div>
-      <div class="form-group col-md-3">
-        {{ form.payment_type.label() }}
-        {{ form.payment_type(class_="form-control") }}
-      </div>
-      <div class="form-group col-md-3">
-        {{ form.category.label() }}
-        {{ form.category(class_="form-control") }}
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group col-md-2">
-        {{ form.amount.label() }}
-        {{ form.amount(class_="form-control") }}
-        {% if form.amount.errors %}
-          {% for error in form.amount.errors %}
-             <div id="alert-amount" class="alert alert-danger">{{ error }}</div>
-          {% endfor %}
-        {% endif %}
-      </div>
-      <div class="form-group col-md-10">
-        {{ form.description.label() }}
-        {{ form.description(class_="form-control", placeholder="Coop: bread, butter, milk") }}
-        {% if form.description.errors %}
-          {% for error in form.description.errors %}
-             <div id="alert-description" class="alert alert-danger">{{ error }}</div>
-          {% endfor %}
-        {% endif %}
-      </div>
-    </div>
-    {{ form.submit(class_="btn btn-outline-success") }}
-    <button type="reset" class="btn btn-outline-success">Reset</button>
-  </form>
-</div>
-{% endblock %}
-
-{% block content %}
 {% include 'render_items.html' %}
 {% endblock %}
+
 
 {% block script %}
 <script type="text/javascript">
