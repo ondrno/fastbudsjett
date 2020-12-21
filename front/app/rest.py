@@ -133,6 +133,14 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not retrieve items, {r.content}")
 
+    def get_item_by_id(self, item_id: int):
+        r = requests.get(self.BASE_ITEMS_URL + f"/{item_id}", headers=self.auth_token)
+        if r.ok:
+            items = r.json()
+            return items
+        else:
+            raise ApiException(f"Could not retrieve item with id={items_id}, {r.content}")
+
     def get_categories(self):
         r = requests.get(self.BASE_CATEGORIES_URL, headers=self.auth_token)
         if r.ok:
@@ -156,6 +164,14 @@ class RestApiInterface:
             return item
         else:
             raise ApiException(f"Could not create item={data} -> {r.content}")
+
+    def update_item(self, item_id: int, data: dict):
+        r = requests.put(self.BASE_ITEMS_URL + f"/{item_id}", headers=self.auth_token, json=data)
+        if r.ok:
+            item = r.json()
+            return item
+        else:
+            raise ApiException(f"Could not update item with id={item_id} and data={data} -> {r.content}")
 
     def create_category(self, name: str, itemtype_id: int):
         r = requests.post(self.BASE_CATEGORIES_URL, headers=self.auth_token,

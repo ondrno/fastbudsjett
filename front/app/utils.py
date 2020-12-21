@@ -33,3 +33,18 @@ def _get_x_and_resolve(callback, sort_by_name: bool = True) -> dict:
         name = p['name']
         items[id] = name
     return items
+
+
+def set_form_field_default(request, field, lookup, default: str):
+    """
+    set the default of a select/radio field dynamically,
+    c.f. https://stackoverflow.com/questions/5519729/wtforms-how-to-select-options-in-selectmultiplefield/5519971#5519971
+
+    Example: set_form_field_default(form.payment_type, 'cash')
+    """
+    field.choices = [(k, v) for k, v in lookup.items()]
+    default_value = [k for (k, v) in field.choices if v == default]
+    if default_value:
+        field.default = default_value[0]
+        field.process(request.form)
+

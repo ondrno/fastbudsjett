@@ -26,7 +26,14 @@ class ItemsForm(FlaskForm):
         InputRequired(),
         Length(6, 255)
     ])
+
+
+class ItemsCreateForm(ItemsForm):
     submit = SubmitField('Create')
+
+
+class ItemsUpdateForm(ItemsForm):
+    submit = SubmitField('Update')
 
 
 def get_items_and_resolve(itemtypes: dict, payment_types: dict, categories: dict):
@@ -71,17 +78,26 @@ def index():
     return render_template('items/index.html', items=payments)
 
 
-@bp.route('/edit/<int:item_id>', methods=['GET'])
+@bp.route('/edit/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def edit(item_id: int):
     categories_lookup = utils.get_categories()
     payments_lookup = utils.get_payments()
     itemtypes_lookup = utils.get_itemtypes()
 
-    form = ItemsForm()
-    form.payment_type.choices = [(k, v) for k, v in payments_lookup.items()]
-    form.category.choices = [(k, v) for k, v in categories_lookup.items()]
-    form.itemtype.choices = [(k, v) for k, v in itemtypes_lookup.items()]
+    current_item = rest.iface.get_item_by_id(item_id)
+    (year, month, day) = current_item.get('date').split("-")
+
+    form = ItemsUpdateForm(amount=current_item.get('amount'),
+                           description=current_item.get('description'),
+                           date=datetime.date(year=int(year), month=int(month), day=int(day))
+                           )
+    utils.set_form_field_default(request, form.payment_type, payments_lookup,
+                                 default=payments_lookup[current_item.get('payment_id')])
+    utils.set_form_field_default(request, form.category, categories_lookup,
+                                 default=categories_lookup[current_item.get('category_id')])
+    utils.set_form_field_default(request, form.itemtype, itemtypes_lookup,
+                                 default=itemtypes_lookup[current_item.get('itemtype_id')])
 
     if form.validate_on_submit():
         date = request.form['date']
@@ -92,12 +108,10 @@ def edit(item_id: int):
         itemtype = request.form['itemtype']
         data = {'date': date, 'amount': amount, 'category_id': category,
                 'payment_id': payment, 'description': description, 'itemtype_id': itemtype}
-        rest.iface.create_item(data)
+        rest.iface.update_item(item_id, data)
         return redirect(url_for('index'))
 
-    print(f"edit {item_id}")
-
-    return redirect(url_for('index'))
+    return render_template('items/create.html', form=form, form_action=url_for('items.edit', item_id=item_id))
 
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -107,9 +121,10 @@ def create():
     payments_lookup = utils.get_payments()
     itemtypes_lookup = utils.get_itemtypes()
 
-    form = ItemsForm()
-    form.payment_type.choices = [(k, v) for k, v in payments_lookup.items()]
-    form.category.choices = [(k, v) for k, v in categories_lookup.items()]
+    form = ItemsCreateForm()
+    utils.set_form_field_default(request, form.payment_type, payments_lookup, 'cash')
+    utils.set_form_field_default(request, form.category, categories_lookup, 'food')
+    utils.set_form_field_default(request, form.itemtype, itemtypes_lookup, 'expenditure')
 
     if form.validate_on_submit():
         date = request.form['date']
@@ -119,8 +134,8 @@ def create():
         itemtype = request.form['itemtype']
         description = request.form['description']
         data = {'date': date, 'amount': amount, 'category_id': category,
-                'payment_id': payment, 'description': description}
+                'payment_id': payment, 'description': description, 'itemtype_id': itemtype}
         rest.iface.create_item(data)
         return redirect(url_for('index'))
 
-    return render_template('items/create.html', form=form)
+    return render_template('items/create.html', form=form, form_action=url_for('items.create'))

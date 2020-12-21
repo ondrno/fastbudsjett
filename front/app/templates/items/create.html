@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Show items{% endblock %}
+{% block title %}Create/modify items{% endblock %}
 
 {% block header %}
 <nav class="navbar navbar-expand navbar-light bg-light">
@@ -14,15 +14,17 @@
 
 {% block content %}
 <div class="container-fluid">
-  <form class="inputform" method="post" action="{{ url_for('items.create') }}">
+  <form class="inputform" method="post" action="{{ form_action }}">
     {{ form.hidden_tag() }}
-    <div class="form-row p-2">
-      <div class="radio-toolbar col-mx-1 offset-5">
-        <input type="radio" id="radioRevenue" name="radioItemType" value="1" checked>
-        <label for="radioRevenue">Revenue</label>
 
-        <input type="radio" id="radioExpenditure" name="radioItemType" value="2">
-        <label for="radioExpenditure">Expenditure</label>
+    <div class="form-row">
+      <div class="form-group col-md-4 offset-3">
+        <div class="radio-toolbar col-mx-1">
+          {% for subfield in form.itemtype %}
+            {{ subfield }}
+            {{ subfield.label }}
+          {% endfor %}
+        </div>
       </div>
     </div>
     <div class="form-row">
