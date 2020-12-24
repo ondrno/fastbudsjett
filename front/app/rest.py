@@ -1,4 +1,6 @@
 from typing import Union
+import datetime
+import calendar
 import requests
 
 
@@ -114,8 +116,10 @@ class RestApiInterface:
             raise ApiException(f"Could not add user, {r.content}")
 
     def get_items_for_month(self, year: int, month: int):
-        start_date = f"{year}-{month}-01"
-        end_date = f"{year}-{month}-31"
+        start_date = f"{year}-{month:02d}-01"
+        last_day_of_month = calendar.monthrange(year, month)[1]
+        end_date = f"{year}-{month:02d}-{last_day_of_month}"
+
         r = requests.get(self.BASE_ITEMS_URL, headers=self.auth_token,
                          params={'start_date': start_date, 'end_date': end_date, 'order_by': 'date'})
         if r.ok:

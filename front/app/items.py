@@ -1,12 +1,14 @@
 from typing import List
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, session,
+    Blueprint, flash, g, redirect, render_template, request, url_for, session, g
 )
 from flask_wtf import FlaskForm
 from wtforms.fields.html5 import DateField
 from wtforms import DecimalField, SelectField, StringField, SubmitField, RadioField
 from wtforms.validators import InputRequired, Length, NumberRange
 import datetime
+import calendar
+from dateutil.relativedelta import relativedelta
 
 from .auth import login_required
 from . import rest
@@ -41,7 +43,12 @@ def get_items_and_resolve(itemtypes: dict, payment_types: dict, categories: dict
     Get items using rest api and translate the payment_id, category_id
     into the names.
     """
-    raw = rest.iface.get_items_for_month(2020, 12)
+    today = datetime.datetime.today()
+    if 'curr_month' not in g:
+        g.curr_month = f"{today.year}/{today.month}"
+
+    year, month = [int(i) for i in g.curr_month.split("/")]
+    raw = rest.iface.get_items_for_month(year, month)
     # print(f"get_items_and_resolve: {raw}")
     payments = {}
     for i in raw:
@@ -54,14 +61,27 @@ def get_items_and_resolve(itemtypes: dict, payment_types: dict, categories: dict
         payment['is_revenue'] = payment['itemtype'].lower() == 'revenue'
         payment['payment'] = payment_types.get(payment_id)
         payment['category'] = categories.get(cat_id)
-        year, month, day = str(payment['date']).split('-')
+        year, month, day = [int(i) for i in str(payment['date']).split('-')]
         if year not in payments:
             payments[year] = {}
         if month not in payments[year]:
             payments[year][month] = {}
+            payments[year][month]['sum_revenues'] = 0
+            payments[year][month]['sum_expenditures'] = 0
         if day not in payments[year][month]:
-            payments[year][month][day] = []
-        payments[year][month][day].append(payment)
+            payments[year][month][day] = {}
+            now = datetime.date(year, month, day)
+            payments[year][month][day]['weekday'] = calendar.day_abbr[now.weekday()]
+            payments[year][month][day]['entries'] = []
+            payments[year][month][day]['sum_expenditures'] = 0
+            payments[year][month][day]['sum_revenues'] = 0
+        payments[year][month][day]['entries'].append(payment)
+        if payment['is_revenue']:
+            payments[year][month][day]['sum_revenues'] += payment['amount']
+            payments[year][month]['sum_revenues'] += payment['amount']
+        else:
+            payments[year][month][day]['sum_expenditures'] += payment['amount']
+            payments[year][month]['sum_expenditures'] += payment['amount']
 
     return payments
 
@@ -69,6 +89,28 @@ def get_items_and_resolve(itemtypes: dict, payment_types: dict, categories: dict
 @bp.route('/', methods=['GET'])
 @login_required
 def index():
+    today = datetime.datetime.today()
+    return redirect(url_for('items.show', year=today.year, month=today.month))
+
+
+def calc_next_and_prev_month(now: datetime.date):
+    next_month = now + relativedelta(months=+1)
+    prev_month = now + relativedelta(months=-1)
+
+    g.curr_month = f"{now.year}/{now.month}"
+    g.curr_month_abbr = calendar.month_abbr[now.month]
+
+    g.prev_month = f"{prev_month.year}/{prev_month.month}"
+    g.next_month = f"{next_month.year}/{next_month.month}"
+
+
+@bp.route('/show/<int:year>/<int:month>', methods=['GET'])
+@login_required
+def show(year: int, month: int):
+    now = datetime.date(year, month, 1)
+
+    calc_next_and_prev_month(now)
+
     categories_lookup = utils.get_categories()
     payments_lookup = utils.get_payments()
     itemtypes_lookup = utils.get_itemtypes()
