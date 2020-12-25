@@ -18,6 +18,14 @@ from . import utils
 bp = Blueprint('items', __name__)
 
 
+class QuickSearchForm(FlaskForm):
+    description = StringField('Description')
+    submit = SubmitField('Search')
+
+    def __repr__(self):
+        return f"description: {self.description}"
+
+
 class ItemsForm(FlaskForm):
     date = DateField('Date', format="%Y-%m-%d", default=datetime.date.today, validators=[InputRequired()])
     payment_type = SelectField('Payment', coerce=int, validators=[InputRequired()])
@@ -38,19 +46,10 @@ class ItemsUpdateForm(ItemsForm):
     submit = SubmitField('Update')
 
 
-def get_items_and_resolve(itemtypes: dict, payment_types: dict, categories: dict):
-    """
-    Get items using rest api and translate the payment_id, category_id
-    into the names.
-    """
-    today = datetime.datetime.today()
-    if 'curr_month' not in g:
-        g.curr_month = f"{today.year}/{today.month}"
-
-    year, month = [int(i) for i in g.curr_month.split("/")]
-    raw = rest.iface.get_items_for_month(year, month)
-    # print(f"get_items_and_resolve: {raw}")
+def resolve_items(raw, itemtypes: dict, payment_types: dict, categories: dict):
     payments = {}
+    payments['sum_expenditures'] = 0
+    payments['sum_revenues'] = 0
     for i in raw:
         cat_id = i['category_id']
         payment_id = i['payment_id']
@@ -64,6 +63,8 @@ def get_items_and_resolve(itemtypes: dict, payment_types: dict, categories: dict
         year, month, day = [int(i) for i in str(payment['date']).split('-')]
         if year not in payments:
             payments[year] = {}
+            payments[year]['sum_revenues'] = 0
+            payments[year]['sum_expenditures'] = 0
         if month not in payments[year]:
             payments[year][month] = {}
             payments[year][month]['sum_revenues'] = 0
@@ -79,11 +80,29 @@ def get_items_and_resolve(itemtypes: dict, payment_types: dict, categories: dict
         if payment['is_revenue']:
             payments[year][month][day]['sum_revenues'] += payment['amount']
             payments[year][month]['sum_revenues'] += payment['amount']
+            payments[year]['sum_revenues'] += payment['amount']
+            payments['sum_revenues'] += payment['amount']
         else:
             payments[year][month][day]['sum_expenditures'] += payment['amount']
             payments[year][month]['sum_expenditures'] += payment['amount']
+            payments[year]['sum_expenditures'] += payment['amount']
+            payments['sum_expenditures'] += payment['amount']
 
     return payments
+
+
+def get_items_and_resolve(itemtypes: dict, payment_types: dict, categories: dict):
+    """
+    Get items using rest api and translate the payment_id, category_id
+    into the names.
+    """
+    today = datetime.datetime.today()
+    if 'curr_month' not in g:
+        g.curr_month = f"{today.year}/{today.month}"
+
+    year, month = [int(i) for i in g.curr_month.split("/")]
+    raw = rest.iface.get_items_for_month(year, month)
+    return resolve_items(raw, itemtypes, payment_types, categories)
 
 
 @bp.route('/', methods=['GET'])
@@ -109,6 +128,7 @@ def calc_next_and_prev_month(now: datetime.date):
 def show(year: int, month: int):
     now = datetime.date(year, month, 1)
 
+    search_form = QuickSearchForm()
     calc_next_and_prev_month(now)
 
     categories_lookup = utils.get_categories()
@@ -117,7 +137,7 @@ def show(year: int, month: int):
 
     payments = get_items_and_resolve(itemtypes_lookup, payments_lookup, categories_lookup)
 
-    return render_template('items/index.html', items=payments)
+    return render_template('items/index.html', items=payments, search_form=search_form)
 
 
 @bp.route('/edit/<int:item_id>', methods=['GET', 'POST'])

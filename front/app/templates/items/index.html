@@ -12,13 +12,14 @@
 <nav class="navbar navbar-expand navbar-light bg-light">
   <div class="collapse navbar-collapse" id="navbarMonths">
     <a class="nav-link" href="{{ url_for('items.show', year=prev_year, month=prev_month) }}">&lt;</a>
-    <a class="nav-link" href="#" name="monthOnlyPicker">{{ g.curr_month_abbr }} {{ this_year }}</a>
+    <a class="nav-link" href="#" name="monthlyPicker">{{ g.curr_month_abbr }} {{ this_year }}</a>
     <a class="nav-link" href="{{ url_for('items.show', year=next_year, month=next_month) }}">&gt;</a>
     <a class="nav-link" href="{{ url_for('items.create') }}"><img src="/static/img/plus-square.svg" alt="" width="25" height="25" title="add entry" /></a>
     <div class="container justify-content-center">
-      <form class="form-inline">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      <form class="form-inline" method="post" action="{{ url_for('search.index') }}">
+        {{ search_form.hidden_tag() }}
+        {{ search_form.description(class_="form-control mr-sm-2", placeholder="Search") }}
+        {{ search_form.submit(class_="btn btn-outline-success my-2 my-sm-0") }}
       </form>
     </div>
   </div>
@@ -27,7 +28,7 @@
 
 
 {% block content %}
-{% if items %}
+{% if items and this_year in items %}
   {% set sum_revenues = items[this_year][this_month]['sum_revenues'] %}
   {% set sum_expenditures = items[this_year][this_month]['sum_expenditures'] %}
   {% set saldo = sum_revenues - sum_expenditures %}
@@ -36,21 +37,25 @@
   {% set sum_expenditures = 0 %}
   {% set saldo = 0 %}
 {% endif %}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col offset-1">Revenues</div>
-    <div class="col">Expenditures</div>
-    <div class="col">Saldo</div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="col offset-1 text-primary">&euro; {{ "%.2f"|format(sum_revenues) }}</div>
-    <div class="col text-danger">&euro; {{ "%.2f"|format(sum_expenditures) }}</div>
+<div class="container-fluid mb-3">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col offset-1">Revenues</div>
+        <div class="col">Expenditures</div>
+        <div class="col">Saldo</div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col offset-1 text-primary">&euro; {{ "%.2f"|format(sum_revenues) }}</div>
+        <div class="col text-danger">&euro; {{ "%.2f"|format(sum_expenditures) }}</div>
 
-    <div class="col text-secondary">&euro; {{ "%.2f"|format(saldo) }}</div>
+        <div class="col text-secondary">&euro; {{ "%.2f"|format(saldo) }}</div>
+      </div>
+    </div>
   </div>
 </div>
 
-{% include 'render_items.html' %}
+{% include 'items/render_items.html' %}
 {% endblock %}
 
 
@@ -72,24 +77,6 @@
       });
     });
     // https://github.com/dangrossman/daterangepicker/issues/727#issuecomment-675301155
-    $('a[name="monthOnlyPicker"]').daterangepicker({
-      opens: 'right',
-      startDate: moment(start),
-      endDate: moment(end),
-      showDropdowns: true,
-      linkedCalendars: false,
-      locale: {
-        firstDay: 1
-      }
-    }, (start, end) => {
-      $(''#datepicker' span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-      onChange(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'))
-    }).on('showCalendar.daterangepicker', (ev, picker) => {
-      $('.table-condensed thead tr:nth-child(2), .table-condensed tbody').hide();
-      var start = moment((parseInt($('.left .monthselect').val()) + 1) + '/01/' + $('.left .yearselect').val())
-      var end = moment((parseInt($('.right .monthselect').val()) + 1) + '/01/' + $('.right .yearselect').val())
-      $('#datepicker').data('daterangepicker').setStartDate(start);
-      $('#datepicker').data('daterangepicker').setEndDate(end);
-    })
+
 </script>
 {% endblock %}

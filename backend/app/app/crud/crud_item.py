@@ -42,7 +42,7 @@ class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
         if description:
             if filter_expr:
                 filter_expr += " AND "
-            filter_expr = f"Item.description like '%{description}%'"
+            filter_expr += f"Item.description ~* '{description}'"
         if owner_id:
             if filter_expr:
                 filter_expr += " AND "
@@ -81,7 +81,7 @@ class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
                         'amount', 'owner_id', 'category_id', 'payment_id']:
             order_expr = f"Item.{order_by} desc"
         order_expr = text(order_expr)
-
+        print(filter_expr)
         return (
             db.query(self.model)
             .filter(filter_expr)

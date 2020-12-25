@@ -20,9 +20,11 @@
   </div>
 </div>
 
-<div class="container-fluid">
+<div class="container-fluid mb-4">
   {% for year in items.keys() -%}
+  {% if not year is string %}
     {% for month in items[year].keys() -%}
+    {% if not month is string %}
       {% for day in items[year][month].keys() -%}
         {% if not day is string %}
           <div class="shadow">
@@ -43,7 +45,7 @@
           </div>
 
             {% for item in items[year][month][day]['entries'] %}
-            <div class="row mb pl-2">
+            <div class="row pl-2">
               <div class="col-3 font-weight-light">{{ item.category|capitalize }}</div>
               <div class="col-6 text-truncate">
                 <a href="{{ url_for('items.edit',item_id=item.id) }}" class="text-secondary">{{ item.description }}</a>
@@ -55,7 +57,9 @@
           </div>
         {% endif %}
       {% endfor %}
+    {% endif %}
     {% endfor %}
+  {% endif %}
   {% endfor %}
 </div>
 

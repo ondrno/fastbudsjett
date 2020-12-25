@@ -128,8 +128,7 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not retrieve items, {r.content}")
 
-    def get_items(self, **data):
-        print(data)
+    def get_items(self, data):
         r = requests.get(self.BASE_ITEMS_URL, headers=self.auth_token, params=data)
         if r.ok:
             items = r.json()

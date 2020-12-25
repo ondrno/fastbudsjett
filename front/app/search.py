@@ -4,12 +4,12 @@ from flask import (
 import re
 from flask_wtf import FlaskForm
 from wtforms.fields.html5 import DateField
-from wtforms import DecimalField, SelectMultipleField, StringField, SubmitField
+from wtforms import DecimalField, SelectMultipleField, StringField, SubmitField, RadioField
 from wtforms.validators import ValidationError
 
 
 from .auth import login_required
-from . import items, utils
+from . import items, utils, rest
 
 bp = Blueprint('search', __name__)
 
@@ -53,28 +53,25 @@ def index():
     itemtypes_lookup = utils.get_itemtypes()
 
     form = SearchForm()
-
-    form.payment_type.choices = [(k, v) for k, v in payments_lookup.items()]
-    form.payment_type.choices.insert(0, (0, 'all'))
-    form.payment_type.default = ['0']
-
-    form.category.choices = [(k, v) for k, v in categories_lookup.items()]
-    form.category.choices.insert(0, (0, 'all'))
-    form.category.default = ['0']
-    # payments = []
+    utils.set_form_field_default(request, form.payment_type, payments_lookup, 'cash')
+    utils.set_form_field_default(request, form.category, categories_lookup, 'food')
 
     if form.validate_on_submit():
         fields = form.get_active_fields()
-        print(fields)
-        from_date = request.form['from_date']
-        to_date = request.form['to_date']
-        amount = request.form['amount']
-        category = request.form['category']
-        payment_type = request.form['payment_type']
+        print("active fields:", fields)
+        # from_date = request.form['from_date']
+        # to_date = request.form['to_date']
+        # amount = request.form['amount']
+        # category = request.form['category']
+        # payment_type = request.form['payment_type']
         description = request.form['description']
-        # print(form.get_active_fields())
-        print("send REST api call to query for items")
+        print(description)
+
+        data = {'description': description, 'order_by': 'date'}
+        raw = rest.iface.get_items(data)
+        print(raw)
+        payments = items.resolve_items(raw, itemtypes_lookup, payments_lookup, categories_lookup)
+
         # redirect(url_for('search.index'))
 
-    payments = items.get_items_and_resolve(itemtypes_lookup, payments_lookup, categories_lookup)
     return render_template('search/search.html', items=payments, form=form)

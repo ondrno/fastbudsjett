@@ -40,7 +40,7 @@ def read_items(
         regex=r'^(id|description|date|created_at|modified_at|amount|owner_id|category_id|payment_id)$'
     ),
     skip: int = 0,
-    limit: int = 100,
+    limit: int = 200,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """

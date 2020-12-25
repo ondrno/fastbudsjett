@@ -3,53 +3,83 @@
 {% block title %}Search{% endblock %}
 
 {% block header %}
-<div class="container-fluid">
-  <div class="row justify-content-center">
-    <h3>Search & Find</h3>
+<nav class="navbar navbar-expand navbar-light bg-light">
+  <div class="collapse navbar-collapse" id="navbarMonths">
+    <a class="nav-link" href="{{ url_for('index') }}">
+      <img src="/static/img/arrow-left-square.svg" alt="" width="25" height="25" title="back"/>
+    </a>
   </div>
-</div>
+</nav>
 
 <div class="container-fluid">
-  <form class="inputform" method="POST">
+  <form class="inputform" method="post" action="{{ url_for('search.index') }}">
+    {{ form.hidden_tag() }}
     <div class="form-row">
-      <div class="form-group col-md-6">
-        {{ form.description.label() }}
+      <div class="form-group col-md-4">
         {{ form.description(class_="form-control", placeholder="Coop: bread, butter, milk") }}
       </div>
       <div class="form-group col-md-3">
-        {{ form.from_date.label() }}
-        {{ form.from_date(class_="form-control") }}
+          {{ form.submit(class_="btn btn-outline-success") }}
       </div>
-      <div class="form-group col-md-3">
-        {{ form.to_date.label() }}
-        {{ form.to_date(class_="form-control") }}
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group col-md-6">
-        {{ form.amount.label() }}
-        {{ form.amount(class_="form-control") }}
-      </div>
-      <div class="form-group col-md-3">
-        {{ form.category.label() }}
-        {{ form.category(class_="form-control") }}
-      </div>
-      <div class="form-group col-md-3">
-        {{ form.payment_type.label() }}
-        {{ form.payment_type(class_="form-control") }}
-      </div>
-    </div>
-    <div class="form-row">
 
+<!--      <div class="form-group col-md-3">-->
+<!--        {{ form.from_date.label() }}-->
+<!--        {{ form.from_date(class_="form-control") }}-->
+<!--      </div>-->
+<!--      <div class="form-group col-md-3">-->
+<!--        {{ form.to_date.label() }}-->
+<!--        {{ form.to_date(class_="form-control") }}-->
+<!--      </div>-->
     </div>
-    {{ form.submit(class_="btn btn-outline-success") }}
-    <button type="reset" class="btn btn-outline-success">Reset</button>
+<!--    <div class="form-row">-->
+<!--      <div class="form-group col-md-6">-->
+<!--        {{ form.amount.label() }}-->
+<!--        {{ form.amount(class_="form-control") }}-->
+<!--      </div>-->
+<!--      <div class="form-group col-md-3">-->
+<!--        {{ form.category.label() }}-->
+<!--        {{ form.category(class_="form-control") }}-->
+<!--      </div>-->
+<!--      <div class="form-group col-md-3">-->
+<!--        {{ form.payment_type.label() }}-->
+<!--        {{ form.payment_type(class_="form-control") }}-->
+<!--      </div>-->
+<!--    </div>-->
   </form>
 </div>
 {% endblock %}
 
 {% block content %}
-{% include 'render_items.html' %}
+
+{% if items %}
+  {% set sum_revenues = items['sum_revenues'] %}
+  {% set sum_expenditures = items['sum_expenditures'] %}
+  {% set saldo = sum_revenues - sum_expenditures %}
+{% else %}
+  {% set sum_revenues = 0 %}
+  {% set sum_expenditures = 0 %}
+  {% set saldo = 0 %}
+{% endif %}
+<div class="container-fluid mb-3">
+  <div class="card">
+    <div class="card-body">
+
+      <div class="row">
+        <div class="col offset-1">Revenues</div>
+        <div class="col">Expenditures</div>
+        <div class="col">Saldo</div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col offset-1 text-primary">&euro; {{ "%.2f"|format(sum_revenues) }}</div>
+        <div class="col text-danger">&euro; {{ "%.2f"|format(sum_expenditures) }}</div>
+
+        <div class="col text-secondary">&euro; {{ "%.2f"|format(saldo) }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include 'search/render_items.html' %}
 {% endblock %}
 
 {% block script %}
