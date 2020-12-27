@@ -13,23 +13,16 @@ from dateutil.relativedelta import relativedelta
 from .auth import login_required
 from . import rest
 from . import utils
+from . import search
 
 
 bp = Blueprint('items', __name__)
 
 
-class QuickSearchForm(FlaskForm):
-    description = StringField('Description')
-    submit = SubmitField('Search')
-
-    def __repr__(self):
-        return f"description: {self.description}"
-
-
 class ItemsForm(FlaskForm):
     date = DateField('Date', format="%Y-%m-%d", default=datetime.date.today, validators=[InputRequired()])
     payment_type = SelectField('Payment', coerce=int, validators=[InputRequired()])
-    amount = DecimalField('Amount', validators=[InputRequired(), NumberRange(min=0.01)])
+    amount = DecimalField('Amount', places=2, validators=[InputRequired(), NumberRange(min=0.01)])
     category = SelectField('Category', coerce=int, validators=[InputRequired()])
     itemtype = RadioField('ItemType', coerce=int, validators=[InputRequired()])
     description = StringField('Description', validators=[
@@ -128,7 +121,7 @@ def calc_next_and_prev_month(now: datetime.date):
 def show(year: int, month: int):
     now = datetime.date(year, month, 1)
 
-    search_form = QuickSearchForm()
+    search_form = search.SearchForm()
     calc_next_and_prev_month(now)
 
     categories_lookup = utils.get_categories()

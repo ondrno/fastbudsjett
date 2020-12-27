@@ -21,36 +21,48 @@
       <div class="form-group col-md-3">
           {{ form.submit(class_="btn btn-outline-success") }}
       </div>
-
-<!--      <div class="form-group col-md-3">-->
-<!--        {{ form.from_date.label() }}-->
-<!--        {{ form.from_date(class_="form-control") }}-->
-<!--      </div>-->
-<!--      <div class="form-group col-md-3">-->
-<!--        {{ form.to_date.label() }}-->
-<!--        {{ form.to_date(class_="form-control") }}-->
-<!--      </div>-->
     </div>
-<!--    <div class="form-row">-->
-<!--      <div class="form-group col-md-6">-->
-<!--        {{ form.amount.label() }}-->
-<!--        {{ form.amount(class_="form-control") }}-->
-<!--      </div>-->
-<!--      <div class="form-group col-md-3">-->
-<!--        {{ form.category.label() }}-->
-<!--        {{ form.category(class_="form-control") }}-->
-<!--      </div>-->
-<!--      <div class="form-group col-md-3">-->
-<!--        {{ form.payment_type.label() }}-->
-<!--        {{ form.payment_type(class_="form-control") }}-->
-<!--      </div>-->
-<!--    </div>-->
+    <div class="form-row">
+      <div class="col">
+        <a id="collapseSearchDetailsHeader" data-toggle="collapse" href="#collapseSearchDetails" role="button" aria-expanded="false" aria-controls="collapseSearchDetails">
+          <img src="static/img/arrow-down-up.svg" />
+        </a>
+      </div>
+    </div>
+    <div class="collapse p-3" id="collapseSearchDetails">
+      <div class="form-inline">
+        <div class="col-1">
+          Betrag
+        </div>
+        <div class="col-2 md-3">
+          {{ form.min_val(class_="form-control", placeholder="min") }}
+        </div>
+        <div class="col-1">
+          {{ form.max_val(class_="form-control", placeholder="max") }}
+        </div>
+      </div>
+      <div class="form-row p-3">
+        <div class="col-1">
+          {{ form.category.label() }}
+        </div>
+        <div class="col">
+          {{ form.category(class_="form-control") }}
+        </div>
+      </div>
+      <div class="form-row p-3">
+        <div class="col-1">
+          {{ form.payment.label() }}
+        </div>
+        <div class="form-group col">
+          {{ form.payment(class_="form-control") }}
+        </div>
+      </div>
+    </div>
   </form>
 </div>
 {% endblock %}
 
 {% block content %}
-
 {% if items %}
   {% set sum_revenues = items['sum_revenues'] %}
   {% set sum_expenditures = items['sum_expenditures'] %}
@@ -63,7 +75,6 @@
 <div class="container-fluid mb-3">
   <div class="card">
     <div class="card-body">
-
       <div class="row">
         <div class="col offset-1">Revenues</div>
         <div class="col">Expenditures</div>
@@ -72,7 +83,6 @@
       <div class="row justify-content-center">
         <div class="col offset-1 text-primary">&euro; {{ "%.2f"|format(sum_revenues) }}</div>
         <div class="col text-danger">&euro; {{ "%.2f"|format(sum_expenditures) }}</div>
-
         <div class="col text-secondary">&euro; {{ "%.2f"|format(saldo) }}</div>
       </div>
     </div>
@@ -83,6 +93,33 @@
 {% endblock %}
 
 {% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+<script language="javascript" type="text/javascript">
+    function retainDivCollapsedState(nameOfDiv, nameOfHeader) {
+        // when the div is shown, save a cookie with a value of 'true'
+        $("#" + nameOfDiv).on('shown.bs.collapse', function () {
+            $.cookie(nameOfDiv, "true"); // this is a cookie.  named the same as the control (poor practice) for brevity
+        });
+        // when the div is collapsed, remove the same cookie
+        $("#" + nameOfDiv).on('hidden.bs.collapse', function () {
+            $.removeCookie(nameOfDiv);
+        });
+
+        // on page load, show or hide the div (and stylized the header) according to the cookie (if it exists)
+        var showDiv = $.cookie(nameOfDiv);
+        if (showDiv != null) {
+            $("#" + nameOfDiv).addClass("show");                      // The div to show
+            $("#" + nameOfHeader).removeClass("collapsed");         // The header to stylize as expanded
+        }
+    };
+</script>
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(
+        retainDivCollapsedState("collapseSearchDetails", "collapseSearchDetails")
+    );
+</script>
 <script type="text/javascript">
         setTimeout(function () {
             $('#alert-amount').alert('close');
