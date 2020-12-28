@@ -53,6 +53,71 @@ def test_read_item(
     assert content["owner_id"] == item.owner_id
 
 
+def test_read_items_by_category(
+        client: TestClient, superuser_token_headers: dict, db: Session,
+        test_itemtype, test_category, test_payment
+) -> None:
+    item = create_random_item(db, test_itemtype.id, test_category.id, test_payment.id)
+    get_payload = {'category': test_category.id}
+    response = client.get(
+        f"{settings.API_V1_STR}/items", headers=superuser_token_headers, params=get_payload,
+    )
+    assert response.status_code == 200
+    content = response.json()
+    assert len(content) >= 1
+    for c in content:
+        assert c['category_id'] == test_category.id, f"Invalid category for dataset={c}"
+
+
+def test_read_items_by_payment(
+        client: TestClient, superuser_token_headers: dict, db: Session,
+        test_itemtype, test_category, test_payment
+) -> None:
+    item = create_random_item(db, test_itemtype.id, test_category.id, test_payment.id)
+    get_payload = {'payment': test_payment.id}
+    response = client.get(
+        f"{settings.API_V1_STR}/items", headers=superuser_token_headers, params=get_payload,
+    )
+    assert response.status_code == 200
+    content = response.json()
+    assert len(content) >= 1
+    for c in content:
+        assert c['payment_id'] == test_payment.id, f"Invalid payment_id for dataset={c}"
+
+
+def test_read_items_by_category_and_payment(
+        client: TestClient, superuser_token_headers: dict, db: Session,
+        test_itemtype, test_category, test_payment
+) -> None:
+    item = create_random_item(db, test_itemtype.id, test_category.id, test_payment.id)
+    get_payload = {'payment': test_payment.id, 'category': test_category.id}
+    response = client.get(
+        f"{settings.API_V1_STR}/items", headers=superuser_token_headers, params=get_payload,
+    )
+    assert response.status_code == 200
+    content = response.json()
+    assert len(content) >= 1
+    for c in content:
+        assert c['payment_id'] == test_payment.id, f"Invalid payment_id for dataset={c}"
+        assert c['category_id'] == test_category.id, f"Invalid category for dataset={c}"
+
+
+def test_read_items_by_description(
+        client: TestClient, superuser_token_headers: dict, db: Session,
+        test_itemtype, test_category, test_payment
+) -> None:
+    item = create_random_item(db, test_itemtype.id, test_category.id, test_payment.id)
+    get_payload = {'description': item.description}
+    response = client.get(
+        f"{settings.API_V1_STR}/items", headers=superuser_token_headers, params=get_payload,
+    )
+    assert response.status_code == 200
+    content = response.json()
+    assert len(content) >= 1
+    for c in content:
+        assert c['description'] == item.description, f"Invalid description for dataset={c}"
+
+
 def test_remove_item_with_invalid_id_returns_404(client: TestClient, superuser_token_headers: dict,
                                                  db: Session) -> None:
     r = client.delete(

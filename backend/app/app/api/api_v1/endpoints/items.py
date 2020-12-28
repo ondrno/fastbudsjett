@@ -33,8 +33,8 @@ def read_items(
     max_val: Optional[float] = None,
     start_date: Optional[str] = Query(None, regex=r'^\d{4}-\d{2}-\d{2}$'),
     end_date: Optional[str] = Query(None, regex=r'^\d{4}-\d{2}-\d{2}$'),
-    category: Optional[List[int]] = None,
-    payment: Optional[List[int]] = None,
+    category: Optional[List[int]] = Query(None),
+    payment: Optional[List[int]] = Query(None),
     order_by: Optional[str] = Query(
         None,
         regex=r'^(id|description|date|created_at|modified_at|amount|owner_id|category_id|payment_id)$'

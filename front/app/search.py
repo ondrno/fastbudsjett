@@ -7,6 +7,7 @@ from wtforms.fields import HiddenField
 from wtforms import DecimalField, SelectMultipleField, StringField, SubmitField, RadioField
 from wtforms.validators import ValidationError, NumberRange, Optional
 import json
+from functools import lru_cache
 
 from .auth import login_required
 from . import items, utils, rest

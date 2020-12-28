@@ -2,6 +2,7 @@ from typing import Union
 import datetime
 import calendar
 import requests
+from functools import lru_cache
 
 
 class User:
@@ -83,6 +84,7 @@ class RestApiInterface:
 
         return self.auth_token
 
+    @lru_cache
     def get_user(self, id: Union[int, str]) -> User:
         url = self.BASE_USERS_URL
         r = requests.get(f"{url}/{id}", headers=self.auth_token)
@@ -144,6 +146,7 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not retrieve item with id={items_id}, {r.content}")
 
+    @lru_cache
     def get_categories(self):
         r = requests.get(self.BASE_CATEGORIES_URL, headers=self.auth_token)
         if r.ok:
@@ -152,6 +155,7 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not retrieve categories, {r.content}")
 
+    @lru_cache
     def get_payments(self):
         r = requests.get(self.BASE_PAYMENTS_URL, headers=self.auth_token)
         if r.ok:
@@ -201,6 +205,7 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not create itemtype with name={name} -> {r.content}")
 
+    @lru_cache
     def get_itemtypes(self):
         r = requests.get(self.BASE_ITEMTYPES_URL, headers=self.auth_token)
         if r.ok:
