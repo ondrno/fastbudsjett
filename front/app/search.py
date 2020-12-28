@@ -3,9 +3,10 @@ from flask import (
 )
 from flask_wtf import FlaskForm
 from wtforms.fields.html5 import DateField
+from wtforms.fields import HiddenField
 from wtforms import DecimalField, SelectMultipleField, StringField, SubmitField, RadioField
 from wtforms.validators import ValidationError, NumberRange, Optional
-
+import json
 
 from .auth import login_required
 from . import items, utils, rest
@@ -17,10 +18,10 @@ class SearchForm(FlaskForm):
     start_date = DateField('From', validators=[Optional()])
     end_date = DateField('To', validators=[Optional()])
     description = StringField('Description', validators=[Optional()])
-    payment = SelectMultipleField('Payment', coerce=int)
     min_val = DecimalField('Amount min', validators=[Optional()])
     max_val = DecimalField('Amount max', validators=[Optional()])
-    category = SelectMultipleField('Category', coerce=int)
+    category = HiddenField('Category', validators=[Optional()])
+    payment = HiddenField('Payment', validators=[Optional()])
     submit = SubmitField('Search')
 
 
@@ -32,25 +33,25 @@ def index():
     itemtypes_lookup = utils.get_itemtypes()
 
     form = SearchForm()
-    utils.set_form_field_default(request, form.payment, payments_lookup, 'cash')
-    utils.set_form_field_default(request, form.category, categories_lookup, 'food')
 
     payments = {}
-    print(form)
     print(request.form)
     for i in request.form.keys():
         print(i, request.form[i])
     print(form.validate())
     print(form.validate_on_submit())
     if form.validate_on_submit():
-        data_keys = ["description", "min_val", "max_val"]
+        data_keys = ["description", "min_val", "max_val", "category", "payment"]
         data = {}
         for i in request.form.keys():
             print(i)
             if i not in data_keys:
                 continue
             if request.form[i]:
-                data[i] = request.form[i]
+                val = request.form[i]
+                if i in ["category", 'payment']:
+                    val = json.loads(val)
+                data[i] = val
         data['order_by'] = 'date'
 
         print(data)
@@ -60,3 +61,23 @@ def index():
         redirect(url_for('search.index'))
 
     return render_template('search/search.html', items=payments, form=form)
+
+
+@bp.route('/search/get_categories', methods=['POST'])
+@login_required
+def get_categories():
+    categories_lookup = utils.get_categories()
+    data = []
+    for k, v in categories_lookup.items():
+        data.append({'id': k, 'name': v})
+    return {'results': data}
+
+
+@bp.route('/search/get_payments', methods=['POST'])
+@login_required
+def get_payments():
+    payments_lookup = utils.get_payments()
+    data = []
+    for k, v in payments_lookup.items():
+        data.append({'id': k, 'name': v})
+    return {'results': data}

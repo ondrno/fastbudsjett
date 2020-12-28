@@ -46,7 +46,7 @@
           {{ form.category.label() }}
         </div>
         <div class="col">
-          {{ form.category(class_="form-control") }}
+          <input class="form-control" id="CategoryFilter">
         </div>
       </div>
       <div class="form-row p-3">
@@ -54,7 +54,7 @@
           {{ form.payment.label() }}
         </div>
         <div class="form-group col">
-          {{ form.payment(class_="form-control") }}
+          <input class="form-control" id="PaymentFilter">
         </div>
       </div>
     </div>
@@ -94,8 +94,26 @@
 
 {% block script %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-
 <script language="javascript" type="text/javascript">
+    $(function() {
+        $('#CategoryFilters').magicSuggest({
+            placeholder: 'Select...',
+            allowFreeEntries: false,
+            data: [{
+                id: 1,
+                name: 'Location',
+                nb: 34
+            }, {
+                id: 2,
+                name: 'Keyword',
+                nb: 106
+            }],
+            selectionRenderer: function (data) {
+                return data.name + ' (<b>' + data.nb + '</b>)';
+            }
+        });
+    });
+
     function retainDivCollapsedState(nameOfDiv, nameOfHeader) {
         // when the div is shown, save a cookie with a value of 'true'
         $("#" + nameOfDiv).on('shown.bs.collapse', function () {
@@ -113,17 +131,50 @@
             $("#" + nameOfHeader).removeClass("collapsed");         // The header to stylize as expanded
         }
     };
-</script>
 
-<script language="javascript" type="text/javascript">
+    var msCFPreSelectedValues = [];
+    if (document.querySelector("#category").value) {
+        msCFPreSelectedValues = JSON.parse(document.querySelector("#category").value)
+        console.log("msPFPreSelectedValues " + msCFPreSelectedValues)
+    }
+    else {
+        console.log("category.value is " + document.querySelector("#category").value)
+    }
+    var msCF = $('#CategoryFilter').magicSuggest({
+        value: msCFPreSelectedValues,
+        sortOrder: 'name',
+        data: '{{ url_for("search.get_categories") }}'
+    });
+    $(msCF).on('selectionchange', function(){
+        $('input[name=category]').val(JSON.stringify(this.getValue()));
+    });
+
+    var msPFPreSelectedValues = [];
+    if (document.querySelector("#payment").value) {
+        msPFPreSelectedValues = JSON.parse(document.querySelector("#payment").value)
+        console.log("msPFPreSelectedValues " + msPFPreSelectedValues)
+    }
+    else {
+        console.log("payment.value is " + document.querySelector("#payment").value)
+    }
+    var msPF = $('#PaymentFilter').magicSuggest({
+        value: msPFPreSelectedValues,
+        sortOrder: 'name',
+        data: '{{ url_for("search.get_payments") }}',
+    });
+
+    $(msPF).on('selectionchange', function(){
+        $('input[name=payment]').val(JSON.stringify(this.getValue()));
+    });
+
     $(document).ready(
         retainDivCollapsedState("collapseSearchDetails", "collapseSearchDetails")
     );
-</script>
-<script type="text/javascript">
-        setTimeout(function () {
-            $('#alert-amount').alert('close');
-            $('#alert-description').alert('close');
-        }, 4000);
+
+
+    setTimeout(function () {
+        $('#alert-amount').alert('close');
+        $('#alert-description').alert('close');
+    }, 4000);
 </script>
 {% endblock %}
