@@ -1,5 +1,4 @@
 from typing import Union
-import datetime
 import calendar
 import requests
 from functools import lru_cache
@@ -95,6 +94,7 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not find user with id={id}")
 
+    @lru_cache
     def whoami(self) -> User:
         url = self.BASE_USERS_URL + "/me"
         r = requests.get(url, headers=self.auth_token)

@@ -166,7 +166,7 @@ def edit(item_id: int):
         rest.iface.update_item(item_id, data)
         return redirect(url_for('index'))
 
-    return render_template('items/create.html', form=form, form_action=url_for('items.edit', item_id=item_id))
+    return render_template('items/create_or_edit.html', form=form, form_action=url_for('items.edit', item_id=item_id))
 
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -193,4 +193,4 @@ def create():
         rest.iface.create_item(data)
         return redirect(url_for('index'))
 
-    return render_template('items/create.html', form=form, form_action=url_for('items.create'))
+    return render_template('items/create_or_edit.html', form=form, form_action=url_for('items.create'))

@@ -13,6 +13,21 @@
 {% endblock %}
 
 {% block content %}
+<!-- Modal -->
+<div class="modal fade" id="deleteItemModal" tabindex="-1" aria-labelledby="deleteItemModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        Delete this item?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" id="deleteItemConfirmed" name="deleteItemConfirmed">Yes, delete</button>
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="container-fluid">
   <form class="inputform" method="post" action="{{ form_action }}">
     {{ form.hidden_tag() }}
@@ -63,7 +78,10 @@
       </div>
     </div>
     {{ form.submit(class_="btn btn-outline-success") }}
-    <button type="reset" class="btn btn-outline-success">Reset</button>
+    <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteItemModal">
+      Delete
+    </button>
+    <button type="reset" class="btn btn-outline-secondary">Reset</button>
   </form>
 </div>
 {% endblock %}
