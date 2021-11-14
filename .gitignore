@@ -5,3 +5,5 @@
 docker-stack.yml
 **/.env
 README.md.local
+**/venv
+**/.pytest_cache

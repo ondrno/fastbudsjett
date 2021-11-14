@@ -37,6 +37,7 @@ class ItemsCreateForm(ItemsForm):
 
 class ItemsUpdateForm(ItemsForm):
     submit = SubmitField('Update')
+    delete = SubmitField('Delete')
 
 
 def resolve_items(raw, itemtypes: dict, payment_types: dict, categories: dict):
@@ -44,6 +45,7 @@ def resolve_items(raw, itemtypes: dict, payment_types: dict, categories: dict):
     payments['sum_expenditures'] = 0
     payments['sum_revenues'] = 0
     for i in raw:
+
         cat_id = i['category_id']
         payment_id = i['payment_id']
         itemtype_id = i['itemtype_id']

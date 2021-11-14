@@ -78,9 +78,9 @@
       </div>
     </div>
     {{ form.submit(class_="btn btn-outline-success") }}
-    <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteItemModal">
-      Delete
-    </button>
+    {% if form.delete %}
+      {{ form.delete(class_="btn btn-outline-danger", data_toggle="modal", data_target="#deleteItemModal") }}
+    {% endif %}
     <button type="reset" class="btn btn-outline-secondary">Reset</button>
   </form>
 </div>

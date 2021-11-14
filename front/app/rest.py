@@ -214,6 +214,16 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not get itemtypes -> {r.content}")
 
+    def delete_itemtype(self, id: int):
+        r = requests.post(self.BASE_ITEMTYPES_URL + f"/{id}", headers=self.auth_token)
+        if r.ok:
+            # https://stackoverflow.com/questions/37653784/how-do-i-use-cache-clear-on-python-functools-lru-cache
+            self.get_itemtypes.cache.clear()
+            item = r.json()
+            return item
+        else:
+            raise ApiException(f"Could not delete itemtype with id={id} -> {r.content}")
+
 
 class ApiException(Exception):
     pass
