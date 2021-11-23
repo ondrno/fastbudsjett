@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-{% block title %}Show items{% endblock %}
 
 {% set this_year, this_month = g.curr_month.split("/") %}
 {% set this_year = this_year | int %}
@@ -88,7 +87,7 @@
     function redirect_to_month(e) {
       const items = e.target.value.split("-");
       const selected_year = items[0];
-      const selected_month = items[1];
+      const selected_month = items[1].replace(/^0/g, '');
       const new_base_path = '../' + selected_year + '/' + selected_month;
       const url = new URL(new_base_path, window.location.href);
       window.location.href=url;

@@ -1,6 +1,6 @@
 from typing import List
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, session, g
+    Blueprint, flash, g, redirect, render_template, request, url_for, session
 )
 from flask_wtf import FlaskForm
 from wtforms.fields.html5 import DateField
@@ -91,31 +91,53 @@ def get_items_and_resolve(itemtypes: dict, payment_types: dict, categories: dict
     Get items using rest api and translate the payment_id, category_id
     into the names.
     """
-    today = datetime.datetime.today()
+    year, month = get_year_month_from_url()
     if 'curr_month' not in g:
-        g.curr_month = f"{today.year}/{today.month}"
+        g.curr_month = format_suburl(year, month)
 
-    year, month = [int(i) for i in g.curr_month.split("/")]
     raw = rest.iface.get_items_for_month(year, month)
     return resolve_items(raw, itemtypes, payment_types, categories)
-
-
-@bp.route('/', methods=['GET'])
-@login_required
-def index():
-    today = datetime.datetime.today()
-    return redirect(url_for('items.show', year=today.year, month=today.month))
 
 
 def calc_next_and_prev_month(now: datetime.date):
     next_month = now + relativedelta(months=+1)
     prev_month = now + relativedelta(months=-1)
 
-    g.curr_month = f"{now.year}/{now.month}"
+    g.curr_month = format_suburl(now.year, now.month)
+    session["selected_month"] = g.curr_month
     g.curr_month_abbr = calendar.month_abbr[now.month]
 
-    g.prev_month = f"{prev_month.year}/{prev_month.month}"
-    g.next_month = f"{next_month.year}/{next_month.month}"
+    g.prev_month = format_suburl(prev_month.year, prev_month.month)
+    g.next_month = format_suburl(next_month.year, next_month.month)
+
+
+def get_year_month_from_url(sub_url=None) -> (int, int):
+    """
+        Extract the year and month from a string in the format 'year/month'
+        If sub_url is not provided the session variable selected_month is
+        used as default
+    """
+    if not sub_url:
+        if 'selected_month' in session:
+            sub_url = session["selected_month"]
+        else:
+            today = datetime.datetime.today()
+            year = today.year
+            month = today.month
+            sub_url = format_suburl(year, month)
+    year, month = [int(i) for i in sub_url.split("/")]
+    return year, month
+
+
+def format_suburl(year: int, month: int) -> str:
+    return f"{year}/{month}"
+
+
+@bp.route('/', methods=['GET'])
+@login_required
+def index():
+    year, month = get_year_month_from_url()
+    return redirect(url_for('items.show', year=year, month=month))
 
 
 @bp.route('/show/<int:year>/<int:month>', methods=['GET'])
@@ -166,6 +188,9 @@ def edit(item_id: int):
         data = {'date': date, 'amount': amount, 'category_id': category,
                 'payment_id': payment, 'description': description, 'itemtype_id': itemtype}
         rest.iface.update_item(item_id, data)
+
+        # show the same month as the date of the item which was created/modified
+        session["selected_month"] = "/".join(date.split("-")[0:2])
         return redirect(url_for('index'))
 
     return render_template('items/create_or_edit.html', form=form, form_action=url_for('items.edit', item_id=item_id))
@@ -193,6 +218,9 @@ def create():
         data = {'date': date, 'amount': amount, 'category_id': category,
                 'payment_id': payment, 'description': description, 'itemtype_id': itemtype}
         rest.iface.create_item(data)
+
+        # show the same month as the date of the item which was created/modified
+        session["selected_month"] = "/".join(date.split("-")[0:2])
         return redirect(url_for('index'))
 
     return render_template('items/create_or_edit.html', form=form, form_action=url_for('items.create'))

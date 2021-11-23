@@ -12,6 +12,7 @@ from functools import lru_cache
 from .auth import login_required
 from . import items, utils, rest
 
+
 bp = Blueprint('search', __name__)
 
 
@@ -37,22 +38,25 @@ def index():
 
     payments = {}
     print(request.form)
-    for i in request.form.keys():
-        print(i, request.form[i])
-    print(form.validate())
-    print(form.validate_on_submit())
+    for key in request.form.keys():
+        print(key, request.form[key])
     if form.validate_on_submit():
-        data_keys = ["description", "min_val", "max_val", "category", "payment"]
+        data_keys = ["description", "min_val", "max_val", "category", "payment", "start_date", "end_date"]
         data = {}
-        for i in request.form.keys():
-            print(i)
-            if i not in data_keys:
+        for key in request.form.keys():
+            if key not in data_keys:
                 continue
-            if request.form[i]:
-                val = request.form[i]
-                if i in ["category", 'payment']:
+            if request.form[key]:
+                val = request.form[key]
+                if key in ["category", 'payment']:
                     val = json.loads(val)
-                data[i] = val
+                data[key] = val
+        if 'start_date' not in data and 'end_date' not in data:
+            # if no start and no end is given, limit the search to start from the current month
+            year, month = items.get_year_month_from_url(session["selected_month"])
+            data['start_date'] = f"{year}-{month:02}-01"
+            # FIXME: last day of month must be calculated
+            # data['end_date'] = f"{year}-{month:02}-30"
         data['order_by'] = 'date'
 
         print(data)

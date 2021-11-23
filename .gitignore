@@ -7,3 +7,4 @@ docker-stack.yml
 README.md.local
 **/venv
 **/.pytest_cache
+**/__pycache__
