@@ -2,9 +2,8 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session,
 )
 from flask_wtf import FlaskForm
-from wtforms.fields.html5 import DateField
 from wtforms.fields import HiddenField
-from wtforms import DecimalField, SelectMultipleField, StringField, SubmitField, RadioField
+from wtforms import DecimalField, SelectMultipleField, StringField, SubmitField, RadioField, DateField
 from wtforms.validators import ValidationError, NumberRange, Optional
 import json
 from functools import lru_cache

@@ -1,8 +1,10 @@
 python-dateutil==2.8.2
 python-dotenv==0.19.0
-Flask==2.0.1
+Flask==2.0.2
 Flask-Caching==1.10.1
 flask-login==0.5.0
-Flask-WTF==0.15.1
+Flask-WTF==1.0.0
 wtforms[email]
 requests==2.26.0
+email-validator
+jsonpickle

@@ -144,7 +144,7 @@ class RestApiInterface:
             items = r.json()
             return items
         else:
-            raise ApiException(f"Could not retrieve item with id={items_id}, {r.content}")
+            raise ApiException(f"Could not retrieve item with id={item_id}, {r.content}")
 
     @lru_cache
     def get_categories(self):

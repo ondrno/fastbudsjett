@@ -17,7 +17,6 @@ def create_app():
     app.cache = Cache(app, config=cache_config)
     app.login = LoginManager()
     app.login.login_view = 'auth.login'
-
     return app
 
 
@@ -29,6 +28,7 @@ def format_datetime(value, format="%Y-%M-%D"):
 
 
 app = create_app()
+app.config['FLASK_ENV'] = 'development'
 
 # Register the template filter with the Jinja Environment
 app.jinja_env.filters['formatdatetime'] = format_datetime

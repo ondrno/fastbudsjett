@@ -1,18 +1,17 @@
-from typing import List
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session
 )
 from flask_wtf import FlaskForm
-from wtforms.fields.html5 import DateField
-from wtforms import DecimalField, SelectField, StringField, SubmitField, RadioField
+from wtforms import DecimalField, SelectField, StringField, SubmitField, RadioField, DateField
 from wtforms.validators import InputRequired, Length, NumberRange
 import datetime
 import calendar
 from dateutil.relativedelta import relativedelta
+import jsonpickle
 
 from .auth import login_required
 from . import rest
-from . import utils
+from front.app.utils import utils
 from . import search
 
 
@@ -40,7 +39,10 @@ class ItemsUpdateForm(ItemsForm):
     delete = SubmitField('Delete')
 
 
-def resolve_items(raw, itemtypes: dict, payment_types: dict, categories: dict):
+def resolve_items(raw,
+                  itemtypes: utils.ItemTypes,
+                  payment_types: utils.PaymentTypes,
+                  categories: utils.CategoryTypes):
     payments = {}
     payments['sum_expenditures'] = 0
     payments['sum_revenues'] = 0
@@ -51,10 +53,10 @@ def resolve_items(raw, itemtypes: dict, payment_types: dict, categories: dict):
         itemtype_id = i['itemtype_id']
 
         payment = i
-        payment['itemtype'] = itemtypes.get(itemtype_id)
+        payment['itemtype'] = itemtypes.get_value(itemtype_id)
         payment['is_revenue'] = payment['itemtype'].lower() == 'revenue'
-        payment['payment'] = payment_types.get(payment_id)
-        payment['category'] = categories.get(cat_id)
+        payment['payment'] = payment_types.get_value(payment_id)
+        payment['category'] = categories.get_value(cat_id)
         year, month, day = [int(i) for i in str(payment['date']).split('-')]
         if year not in payments:
             payments[year] = {}
@@ -86,7 +88,9 @@ def resolve_items(raw, itemtypes: dict, payment_types: dict, categories: dict):
     return payments
 
 
-def get_items_and_resolve(itemtypes: dict, payment_types: dict, categories: dict):
+def get_items_and_resolve(itemtypes: utils.ItemTypes,
+                          payment_types: utils.PaymentTypes,
+                          categories: utils.CategoryTypes):
     """
     Get items using rest api and translate the payment_id, category_id
     into the names.
@@ -111,7 +115,7 @@ def calc_next_and_prev_month(now: datetime.date):
     g.next_month = format_suburl(next_month.year, next_month.month)
 
 
-def get_year_month_from_url(sub_url=None) -> (int, int):
+def get_year_month_from_url(sub_url: str = None) -> (int, int):
     """
         Extract the year and month from a string in the format 'year/month'
         If sub_url is not provided the session variable selected_month is
@@ -148,11 +152,14 @@ def show(year: int, month: int):
     search_form = search.SearchForm()
     calc_next_and_prev_month(now)
 
-    categories_lookup = utils.get_categories()
-    payments_lookup = utils.get_payments()
-    itemtypes_lookup = utils.get_itemtypes()
+    categories = utils.CategoryTypes()
+    payments = utils.PaymentTypes()
+    itemtypes = utils.ItemTypes()
+    session["categories"] = jsonpickle.encode(categories)
+    session["payments"] = jsonpickle.encode(payments)
+    session["itemtypes"] = jsonpickle.encode(itemtypes)
 
-    payments = get_items_and_resolve(itemtypes_lookup, payments_lookup, categories_lookup)
+    payments = get_items_and_resolve(itemtypes, payments, categories)
 
     return render_template('items/index.html', items=payments, search_form=search_form)
 
@@ -160,9 +167,9 @@ def show(year: int, month: int):
 @bp.route('/edit/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def edit(item_id: int):
-    categories_lookup = utils.get_categories()
-    payments_lookup = utils.get_payments()
-    itemtypes_lookup = utils.get_itemtypes()
+    categories = jsonpickle.decode(session["categories"])
+    payments = jsonpickle.decode(session["payments"])
+    itemtypes = jsonpickle.decode(session["itemtypes"])
 
     current_item = rest.iface.get_item_by_id(item_id)
     (year, month, day) = current_item.get('date').split("-")
@@ -171,12 +178,12 @@ def edit(item_id: int):
                            description=current_item.get('description'),
                            date=datetime.date(year=int(year), month=int(month), day=int(day))
                            )
-    utils.set_form_field_default(request, form.payment_type, payments_lookup,
-                                 default=payments_lookup[current_item.get('payment_id')])
-    utils.set_form_field_default(request, form.category, categories_lookup,
-                                 default=categories_lookup[current_item.get('category_id')])
-    utils.set_form_field_default(request, form.itemtype, itemtypes_lookup,
-                                 default=itemtypes_lookup[current_item.get('itemtype_id')])
+    utils.set_form_field_default(request, form.payment_type, payments,
+                                 default=payments.get_value(current_item.get('payment_id')))
+    utils.set_form_field_default(request, form.category, categories,
+                                 default=categories.get_value(current_item.get('category_id')))
+    utils.set_form_field_default(request, form.itemtype, itemtypes,
+                                 default=itemtypes.get_value(current_item.get('itemtype_id')))
 
     if form.validate_on_submit():
         date = request.form['date']
@@ -199,14 +206,14 @@ def edit(item_id: int):
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
-    categories_lookup = utils.get_categories()
-    payments_lookup = utils.get_payments()
-    itemtypes_lookup = utils.get_itemtypes()
+    categories = jsonpickle.decode(session["categories"])
+    payments = jsonpickle.decode(session["payments"])
+    itemtypes = jsonpickle.decode(session["itemtypes"])
 
     form = ItemsCreateForm()
-    utils.set_form_field_default(request, form.payment_type, payments_lookup, 'cash')
-    utils.set_form_field_default(request, form.category, categories_lookup, 'food')
-    utils.set_form_field_default(request, form.itemtype, itemtypes_lookup, 'expenditure')
+    utils.set_form_field_default(request, form.payment_type, payments, 'cash')
+    utils.set_form_field_default(request, form.category, categories, 'food')
+    utils.set_form_field_default(request, form.itemtype, itemtypes, 'expenditure')
 
     if form.validate_on_submit():
         date = request.form['date']
