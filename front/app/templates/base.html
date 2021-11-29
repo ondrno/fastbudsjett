@@ -12,6 +12,7 @@
     <title>{% block title %}{% endblock %} - FastBudsjett</title>
   </head>
   <body>
+  {% if g.user %}
     <nav class="navbar navbar-expand-sm navbar-light">
       <div class="container-xl">
         <a href="{{ url_for('index') }}" class="navbar-brand">FastBudsjett</a>
@@ -42,6 +43,7 @@
         </div>
       </div>
     </nav>
+  {% endif %}
 {% block header %}{% endblock %}
 {% block content %}{% endblock %}
   </body>
