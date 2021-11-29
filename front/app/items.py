@@ -36,7 +36,8 @@ class ItemsCreateForm(ItemsForm):
 
 class ItemsUpdateForm(ItemsForm):
     submit = SubmitField('Update')
-    delete = SubmitField('Delete')
+    submit_delete = SubmitField('Delete')
+    submit_copy = SubmitField('Copy')
 
 
 def resolve_items(raw,
@@ -185,7 +186,10 @@ def edit(item_id: int):
     utils.set_form_field_default(request, form.itemtype, itemtypes,
                                  default=itemtypes.get_value(current_item.get('itemtype_id')))
 
-    if form.validate_on_submit():
+    if form.is_submitted():
+        print(f"action was: {request.form}")
+
+    elif form.validate_on_submit():
         date = request.form['date']
         amount = request.form['amount']
         category = request.form['category']
