@@ -23,10 +23,10 @@ class ItemsForm(FlaskForm):
     payment_type = SelectField('Payment', coerce=int, validators=[InputRequired()])
     amount = DecimalField('Amount', places=2, validators=[InputRequired(), NumberRange(min=0.01)])
     category = SelectField('Category', coerce=int, validators=[InputRequired()])
-    itemtype = RadioField('ItemType', coerce=int, validators=[InputRequired()])
+    itemtype = SelectField('ItemType', coerce=int, validators=[InputRequired()])
     description = StringField('Description', validators=[
         InputRequired(),
-        Length(6, 255)
+        Length(5, 255)
     ])
 
 
