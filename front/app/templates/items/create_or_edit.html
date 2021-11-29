@@ -21,35 +21,35 @@
         method="post" action="{{ form_action }}">
     {{ form.hidden_tag() }}
     <div class="form-row justify-content-center my-2">
-      {{ form.itemtype.label(class_="") }}
+<!--      {{ form.itemtype.label() }}-->
       <div class="mb-3 input-group">
         <span class="input-group-text">
-          <i class="bi bi-card-list"></i>
+          <i class="bi bi-arrow-left-right"></i>
         </span>
         {{ form.itemtype(class_="form-control") }}
       </div>
-      {{ form.date.label() }}
+<!--      {{ form.date.label() }}-->
       <div class="mb-3 input-group">
         <span class="input-group-text">
           <i class="bi bi-calendar2-date"></i>
         </span>
         {{ form.date(class_="form-control") }}
       </div>
-      {{ form.payment_type.label() }}
+<!--      {{ form.payment_type.label() }}-->
       <div class="mb-3 input-group">
         <span class="input-group-text">
-          <i class="bi bi-wallet2"></i>
+          <i class="bi bi-cash-coin"></i>
         </span>
         {{ form.payment_type(class_="form-control") }}
       </div>
-      {{ form.category.label() }}
+<!--      {{ form.category.label() }}-->
       <div class="mb-3 input-group">
         <span class="input-group-text">
           <i class="bi bi-tags"></i>
         </span>
         {{ form.category(class_="form-control") }}
       </div>
-      {{ form.amount.label() }}
+<!--      {{ form.amount.label() }}-->
       <div class="mb-3 input-group">
         <span class="input-group-text">
           <i class="bi bi-currency-euro"></i>
@@ -61,10 +61,10 @@
           {% endfor %}
         {% endif %}
       </div>
-      {{ form.description.label() }}
+<!--      {{ form.description.label() }}-->
       <div class="mb-3 input-group">
         <span class="input-group-text">
-          <i class="bi bi-bag"></i>
+          <i class="bi bi-pencil"></i>
         </span>
         {{ form.description(class_="form-control", placeholder="e.g. Coop: bread, butter, milk") }}
         {% if form.description.errors %}
