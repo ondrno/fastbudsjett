@@ -2,23 +2,22 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session,
 )
 from flask_wtf import FlaskForm
-from wtforms.fields import HiddenField
 from wtforms import DecimalField, SelectMultipleField, StringField, SubmitField, RadioField, DateField
 from wtforms.validators import ValidationError, NumberRange, Optional
 import json
 import jsonpickle
-from functools import lru_cache
 
 from .auth import login_required
-from . import items, utils, rest
+from front.app import items, utils, rest
 
 
 bp = Blueprint('search', __name__)
 
 
 class SearchForm(FlaskForm):
-    start_date = DateField('From', validators=[Optional()])
-    end_date = DateField('To', validators=[Optional()])
+
+    start_date = DateField('From', validators=[Optional()], default=utils.start_of_month, format="%Y-%m-%d")
+    end_date = DateField('Until', validators=[Optional()], default=utils.end_of_month)
     description = StringField('Description', validators=[Optional()])
     min_val = DecimalField('Amount min', validators=[Optional()])
     max_val = DecimalField('Amount max', validators=[Optional()])

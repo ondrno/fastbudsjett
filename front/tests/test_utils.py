@@ -3,27 +3,29 @@ from front.app.rest import iface
 from front.app import app
 import mock
 import pytest
+import datetime
+from freezegun import freeze_time
 
 # to be used for functions which use the @login_required decorator
 # app.config['LOGIN_DISABLED'] = True
 
 
 class TestBaseTypes:
-    @mock.patch('front.app.utils.utils.get_and_resolve')
-    def test_init_calls_nothing(self, mock_get):
+    @mock.patch('front.app.utils.BaseTypes.fetch')
+    def test_init_calls_nothing(self, mock_fetch):
         b = utils.BaseTypes()
-        mock_get.assert_not_called()
+        mock_fetch.assert_not_called()
 
     def callback(self):
         pass
 
-    @mock.patch('front.app.utils.utils.get_and_resolve')
-    def test_init_calls_callback(self, mock_get):
+    @mock.patch('front.app.utils.BaseTypes.fetch')
+    def test_init_calls_callback(self, mock_fetch):
         items = {1: 'a'}
-        mock_get.return_value = items
+        mock_fetch.return_value = items
         b = utils.BaseTypes(callback=self.callback)
         assert b.items == items
-        mock_get.assert_called_once()
+        mock_fetch.assert_called_once()
 
     def test_get_key_returns_key(self):
         items = {1: 'a'}
@@ -67,19 +69,34 @@ def clear_lru_cache():
     iface.get_itemtypes.cache_clear()
 
 
-@mock.patch('front.app.utils.utils.get_and_resolve')
-def test_init_category_types_class(mock_get):
-    utils.CategoryTypes()
-    mock_get.assert_called_once_with(iface.get_categories)
+@mock.patch('front.app.utils.BaseTypes.fetch')
+def test_init_category_types_class(mock_fetch):
+    c = utils.CategoryTypes()
+    assert c.rest_callback == iface.get_categories
 
 
-@mock.patch('front.app.utils.utils.get_and_resolve')
-def test_init_payment_types_class(mock_get):
-    utils.PaymentTypes()
-    mock_get.assert_called_once_with(iface.get_payments)
+@mock.patch('front.app.utils.BaseTypes.fetch')
+def test_init_payment_types_class(mock_fetch):
+    c = utils.PaymentTypes()
+    assert c.rest_callback == iface.get_payments
 
 
-@mock.patch('front.app.utils.utils.get_and_resolve')
-def test_init_item_types_class(mock_get):
-    utils.ItemTypes()
-    mock_get.assert_called_once_with(iface.get_itemtypes)
+@mock.patch('front.app.utils.BaseTypes.fetch')
+def test_init_item_types_class(mock_fetch):
+    c = utils.ItemTypes()
+    assert c.rest_callback == iface.get_itemtypes
+
+
+@pytest.mark.parametrize("year, month, exp_day", [(2021, 1, 31), (2021, 2, 28), (2021, 4, 30)])
+def test_end_of_month(year, month, exp_day):
+    exp_date = datetime.date(year, month, exp_day)
+    with freeze_time(f"{year}-{month}-15"):
+        d = utils.end_of_month(month)
+    assert d.day == exp_day
+
+
+@pytest.mark.parametrize("year, month, day", [(2021, 1, 31), (2021, 2, 28), (2021, 4, 15)])
+def test_start_of_month(year, month, day):
+    with freeze_time(f"{year}-{month}-{day}"):
+        d = utils.start_of_month()
+    assert d.day == 1

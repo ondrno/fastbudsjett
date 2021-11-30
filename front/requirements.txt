@@ -8,3 +8,6 @@ wtforms[email]
 requests==2.26.0
 email-validator
 jsonpickle
+# development only
+freezegun
+pytest

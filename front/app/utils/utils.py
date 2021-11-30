@@ -1,3 +1,5 @@
+import datetime
+from dateutil.relativedelta import relativedelta
 from front.app.auth import login_required
 from front.app import rest
 
@@ -78,3 +80,17 @@ def set_form_field_default(request, field, lookup: BaseTypes, default: str):
     if default_value:
         field.default = default_value[0]
         field.process(request.form)
+
+
+def end_of_month(month: int = None):
+    today = datetime.datetime.today()
+    if month is None:
+        month = today.month
+    d = (datetime.date(today.year, month, 1) + relativedelta(day=31))
+    return d
+
+
+def start_of_month():
+    today = datetime.datetime.today()
+    d = datetime.date(today.year, today.month, 1)
+    return d
