@@ -45,8 +45,8 @@ def resolve_items(raw,
                   payment_types: utils.PaymentTypes,
                   categories: utils.CategoryTypes):
     payments = {}
-    payments['sum_expenditures'] = 0
-    payments['sum_revenues'] = 0
+    payments['sum_expenses'] = 0
+    payments['sum_income'] = 0
     for i in raw:
 
         cat_id = i['category_id']
@@ -55,36 +55,36 @@ def resolve_items(raw,
 
         payment = i
         payment['itemtype'] = itemtypes.get_value(itemtype_id)
-        payment['is_revenue'] = payment['itemtype'].lower() == 'revenue'
+        payment['is_income'] = payment['itemtype'].lower() == 'revenue'
         payment['payment'] = payment_types.get_value(payment_id)
         payment['category'] = categories.get_value(cat_id)
         year, month, day = [int(i) for i in str(payment['date']).split('-')]
         if year not in payments:
             payments[year] = {}
-            payments[year]['sum_revenues'] = 0
-            payments[year]['sum_expenditures'] = 0
+            payments[year]['sum_income'] = 0
+            payments[year]['sum_expenses'] = 0
         if month not in payments[year]:
             payments[year][month] = {}
-            payments[year][month]['sum_revenues'] = 0
-            payments[year][month]['sum_expenditures'] = 0
+            payments[year][month]['sum_income'] = 0
+            payments[year][month]['sum_expenses'] = 0
         if day not in payments[year][month]:
             payments[year][month][day] = {}
             now = datetime.date(year, month, day)
             payments[year][month][day]['weekday'] = calendar.day_abbr[now.weekday()]
             payments[year][month][day]['entries'] = []
-            payments[year][month][day]['sum_expenditures'] = 0
-            payments[year][month][day]['sum_revenues'] = 0
+            payments[year][month][day]['sum_expenses'] = 0
+            payments[year][month][day]['sum_income'] = 0
         payments[year][month][day]['entries'].append(payment)
-        if payment['is_revenue']:
-            payments[year][month][day]['sum_revenues'] += payment['amount']
-            payments[year][month]['sum_revenues'] += payment['amount']
-            payments[year]['sum_revenues'] += payment['amount']
-            payments['sum_revenues'] += payment['amount']
+        if payment['is_income']:
+            payments[year][month][day]['sum_income'] += payment['amount']
+            payments[year][month]['sum_income'] += payment['amount']
+            payments[year]['sum_income'] += payment['amount']
+            payments['sum_income'] += payment['amount']
         else:
-            payments[year][month][day]['sum_expenditures'] += payment['amount']
-            payments[year][month]['sum_expenditures'] += payment['amount']
-            payments[year]['sum_expenditures'] += payment['amount']
-            payments['sum_expenditures'] += payment['amount']
+            payments[year][month][day]['sum_expenses'] += payment['amount']
+            payments[year][month]['sum_expenses'] += payment['amount']
+            payments[year]['sum_expenses'] += payment['amount']
+            payments['sum_expenses'] += payment['amount']
 
     return payments
 
@@ -136,6 +136,7 @@ def get_year_month_from_url(sub_url: str = None) -> (int, int):
 
 def format_suburl(year: int, month: int) -> str:
     return f"{year}/{month}"
+
 
 
 @bp.route('/', methods=['GET'])

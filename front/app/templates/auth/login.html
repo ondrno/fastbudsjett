@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container p-5">
   <form method="post">
     {{ form.hidden_tag() }}
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
@@ -32,17 +32,11 @@
         <div id="alert-password" class="alert alert-danger">{{ error }}</div>
       {% endfor %}
     {% endif %}
-    <div class="p-2"></div>
+    <div class="p-1"></div>
     {{ form.submit(class_="btn btn-lg btn-success btn-block") }}
   </form>
 </div>
 {% endblock %}
 
 {% block script %}
-<script type="text/javascript">
-        setTimeout(function () {
-            $('#alert-email').alert('close');
-            $('#alert-password').alert('close');
-        }, 4000);
-</script>
 {% endblock %}

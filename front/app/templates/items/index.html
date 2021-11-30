@@ -15,14 +15,14 @@
 <div class="container-xl">
   <div class="row">
     <div class="col text-start">
-      <a class="" href="{{ url_for('items.create') }}">
+      <a class="" href="{{ url_for('items.create') }}"
+         data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create new">
         <i class="bi bi-cart-plus" style="font-size: 2rem"></i>
       </a>
     </div>
     <div class="col offset-1 text-end">
       <a class="" href="{{ url_for('items.show', year=prev_year, month=prev_month) }}">
-        <i class="bi bi-arrow-left-square" style="font-size: 2rem"></i>
-      </a>
+        <i class="bi bi-arrow-left-square" style="font-size: 2rem"></i></a>
     </div>
     <div class="col">
       <input class="form-control" id="date-month-selector" required type="month"
@@ -32,8 +32,7 @@
     </div>
     <div class="col">
       <a class="" href="{{ url_for('items.show', year=next_year, month=next_month) }}">
-        <i class="bi bi-arrow-right-square" style="font-size: 2rem"></i>
-      </a>
+        <i class="bi bi-arrow-right-square" style="font-size: 2rem"></i></a>
     </div>
     <div class="col-3"></div>
   </div>
@@ -42,25 +41,25 @@
 
 {% block content %}
 {% if items and this_year in items %}
-  {% set sum_revenues = items[this_year][this_month]['sum_revenues'] %}
-  {% set sum_expenditures = items[this_year][this_month]['sum_expenditures'] %}
-  {% set saldo = sum_revenues - sum_expenditures %}
+  {% set sum_income = items[this_year][this_month]['sum_income'] %}
+  {% set sum_expenses = items[this_year][this_month]['sum_expenses'] %}
+  {% set saldo = sum_income - sum_expenses %}
 {% else %}
-  {% set sum_revenues = 0 %}
-  {% set sum_expenditures = 0 %}
+  {% set sum_income = 0 %}
+  {% set sum_expenses = 0 %}
   {% set saldo = 0 %}
 {% endif %}
 <div class="container-xl mt-3">
   <div class="card">
     <div class="card-body">
       <div class="row">
-        <div class="col offset-1">Revenues</div>
-        <div class="col">Expenditures</div>
+        <div class="col offset-1">Income</div>
+        <div class="col">Expenses</div>
         <div class="col">Saldo</div>
       </div>
       <div class="row justify-content-center">
-        <div class="col offset-1 text-success">&euro; {{ "%.2f"|format(sum_revenues) }}</div>
-        <div class="col text-danger">&euro; {{ "%.2f"|format(sum_expenditures) }}</div>
+        <div class="col offset-1 text-success">&euro; {{ "%.2f"|format(sum_income) }}</div>
+        <div class="col text-danger">&euro; {{ "%.2f"|format(sum_expenses) }}</div>
         <div class="col text-secondary">&euro; {{ "%.2f"|format(saldo) }}</div>
       </div>
     </div>

@@ -6,6 +6,7 @@ from wtforms.fields import HiddenField
 from wtforms import DecimalField, SelectMultipleField, StringField, SubmitField, RadioField, DateField
 from wtforms.validators import ValidationError, NumberRange, Optional
 import json
+import jsonpickle
 from functools import lru_cache
 
 from .auth import login_required
@@ -21,21 +22,24 @@ class SearchForm(FlaskForm):
     description = StringField('Description', validators=[Optional()])
     min_val = DecimalField('Amount min', validators=[Optional()])
     max_val = DecimalField('Amount max', validators=[Optional()])
-    category = HiddenField('Category', validators=[Optional()])
-    payment = HiddenField('Payment', validators=[Optional()])
+    # category = SelectMultipleField('Category', validators=[Optional()])
+    # payment = SelectMultipleField('Payment', validators=[Optional()])
     submit = SubmitField('Search')
 
 
 @bp.route('/search', methods=['GET', 'POST'])
 @login_required
 def index():
-    categories_lookup = utils.get_categories()
-    payments_lookup = utils.get_payments()
-    itemtypes_lookup = utils.get_itemtypes()
+    categories = jsonpickle.decode(session["categories"])
+    payments = jsonpickle.decode(session["payments"])
+    itemtypes = jsonpickle.decode(session["itemtypes"])
+
+    year, month = items.get_year_month_from_url(session["selected_month"])
 
     form = SearchForm()
+    form.start_date.default = f"{year}-{month:02}-01"
 
-    payments = {}
+    resolved_items = {}
     print(request.form)
     for key in request.form.keys():
         print(key, request.form[key])
@@ -54,17 +58,15 @@ def index():
             # if no start and no end is given, limit the search to start from the current month
             year, month = items.get_year_month_from_url(session["selected_month"])
             data['start_date'] = f"{year}-{month:02}-01"
-            # FIXME: last day of month must be calculated
-            # data['end_date'] = f"{year}-{month:02}-30"
         data['order_by'] = 'date'
 
         print(data)
         raw = rest.iface.get_items(data)
-        payments = items.resolve_items(raw, itemtypes_lookup, payments_lookup, categories_lookup)
+        resolved_items = items.resolve_items(raw, itemtypes, payments, categories)
 
         redirect(url_for('search.index'))
 
-    return render_template('search/search.html', items=payments, form=form)
+    return render_template('search/search.html', items=resolved_items, form=form)
 
 
 @bp.route('/search/get_categories', methods=['POST'])

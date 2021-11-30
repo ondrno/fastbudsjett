@@ -10,13 +10,23 @@
               <div class="row">
                 <div class="col-1 font-weight-bold h4">{{ day }}</div>
                 <div class="col-2">
-                  <button class="btn btn-secondary btn-sm px-1 disabled">{{ items[year][month][day]['weekday'] }}</button>
+                  {% if items[year][month][day]['weekday'] == "Sun" %}
+                    {% set btn_class = "btn btn-danger btn-sm disabled" %}
+                  {% else %}
+                    {% set btn_class = "btn btn-secondary btn-sm disabled" %}
+                  {% endif %}
+                  <button class="{{ btn_class }}">{{ items[year][month][day]['weekday'] }}</button>
                 </div>
-                <div class="col-4 text-right text-success">{% if items[year][month][day]['sum_revenues'] %}
-                  &euro; {{ "%.2f"|format(items[year][month][day]['sum_revenues']) }}{% endif %}
+                <div class="col-4 text-right text-success">
+                  {% if items[year][month][day]['sum_income'] %}
+                    {% set amount = items[year][month][day]['sum_income'] %}
+                  {% else %}
+                    {% set amount = 0 %}
+                  {% endif %}
+                  &euro; {{ "%.2f"|format(amount) }}
                 </div>
-                <div class="col-2 offset-2 text-right text-danger">{% if items[year][month][day]['sum_expenditures'] %}
-                  &euro; {{ "%.2f"|format(items[year][month][day]['sum_expenditures']) }} {% endif %}
+                <div class="col-2 offset-2 text-right text-danger">{% if items[year][month][day]['sum_expenses'] %}
+                  &euro; {{ "%.2f"|format(items[year][month][day]['sum_expenses']) }} {% endif %}
                 </div>
               </div>
             </div>
@@ -27,7 +37,7 @@
                 <a href="{{ url_for('items.edit',item_id=item.id) }}" class="text-secondary">{{ item.description }}</a>
               </div>
               <div class="col-2 text-right
-              {% if item['is_revenue'] %} text-success {% else %} text-danger {% endif %}">&euro; {{ "%.2f"|format(item.amount) }}</div>
+              {% if item['is_income'] %} text-success {% else %} text-danger {% endif %}">&euro; {{ "%.2f"|format(item.amount) }}</div>
             </div>
             {% endfor %}
           </div>

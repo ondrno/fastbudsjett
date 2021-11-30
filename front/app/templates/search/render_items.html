@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-xl mt-3">
   {% for year in items.keys() -%}
   {% if not year is string %}
     {% for month in items[year].keys() -%}
@@ -6,14 +6,14 @@
       {% for day in items[year][month].keys() -%}
         {% if not day is string %}
           {% for item in items[year][month][day]['entries'] %}
-            <div class="row pl-2">
+            <div class="row p-1">
               <div class="col-2 font-weight-light">{{ year }}-{{ month }}-{{ "%02d"|format(day) }}</div>
               <div class="col font-weight-light">{{ item.category|capitalize }}</div>
               <div class="col-6 text-truncate">
                 <a href="{{ url_for('items.edit',item_id=item.id) }}" class="text-secondary">{{ item.description }}</a>
               </div>
               <div class="col text-right pr-5
-                {% if item['is_revenue'] %} text-primary {% else %} text-danger {% endif %}">&euro; {{ "%.2f"|format(item.amount) }}
+                {% if item['is_income'] %} text-primary {% else %} text-danger {% endif %}">&euro; {{ "%.2f"|format(item.amount) }}
               </div>
             </div>
           {% endfor %}
