@@ -17,12 +17,13 @@
     <div class="col text-start">
       <a class="" href="{{ url_for('items.create') }}"
          data-bs-toggle="tooltip" data-bs-placement="bottom" title="Create new">
-        <i class="bi bi-cart-plus" style="font-size: 2rem"></i>
+        <i data-feather="file-plus" width="28" height="28"></i>
       </a>
     </div>
     <div class="col offset-1 text-end">
       <a class="" href="{{ url_for('items.show', year=prev_year, month=prev_month) }}">
-        <i class="bi bi-arrow-left-square" style="font-size: 2rem"></i></a>
+        <i data-feather="skip-back" width="28" height="28"></i>
+      </a>
     </div>
     <div class="col">
       <input class="form-control" id="date-month-selector" required type="month"
@@ -32,7 +33,7 @@
     </div>
     <div class="col">
       <a class="" href="{{ url_for('items.show', year=next_year, month=next_month) }}">
-        <i class="bi bi-arrow-right-square" style="font-size: 2rem"></i></a>
+        <i data-feather="skip-forward" width="28" height="28"></i></a>
     </div>
     <div class="col-3"></div>
   </div>
