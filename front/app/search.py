@@ -2,7 +2,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session,
 )
 from flask_wtf import FlaskForm
-from wtforms import DecimalField, SelectMultipleField, StringField, SubmitField, RadioField, DateField
+from wtforms import DecimalField, SelectField, StringField, SubmitField, RadioField, DateField
 from wtforms.validators import ValidationError, NumberRange, Optional
 import json
 import jsonpickle
@@ -15,14 +15,14 @@ bp = Blueprint('search', __name__)
 
 
 class SearchForm(FlaskForm):
-
     start_date = DateField('From', validators=[Optional()], default=utils.start_of_month, format="%Y-%m-%d")
-    end_date = DateField('Until', validators=[Optional()], default=utils.end_of_month)
+    end_date = DateField('Until', validators=[Optional()])
     description = StringField('Description', validators=[Optional()])
     min_val = DecimalField('Amount min', validators=[Optional()])
     max_val = DecimalField('Amount max', validators=[Optional()])
-    # category = SelectMultipleField('Category', validators=[Optional()])
-    # payment = SelectMultipleField('Payment', validators=[Optional()])
+    itemtype = SelectField('ItemType', validators=[Optional()],
+                           # FIXME: use values from backend not static ones
+                           choices=[(0, ""), (1, "income"), (2, "expenses")])
     submit = SubmitField('Search')
 
 
@@ -43,7 +43,7 @@ def index():
     for key in request.form.keys():
         print(key, request.form[key])
     if form.validate_on_submit():
-        data_keys = ["description", "min_val", "max_val", "category", "payment", "start_date", "end_date"]
+        data_keys = ["description", "min_val", "max_val", "itemtype", "payment", "start_date", "end_date"]
         data = {}
         for key in request.form.keys():
             if key not in data_keys:
@@ -53,10 +53,6 @@ def index():
                 if key in ["category", 'payment']:
                     val = json.loads(val)
                 data[key] = val
-        if 'start_date' not in data and 'end_date' not in data:
-            # if no start and no end is given, limit the search to start from the current month
-            year, month = items.get_year_month_from_url(session["selected_month"])
-            data['start_date'] = f"{year}-{month:02}-01"
         data['order_by'] = 'date'
 
         print(data)

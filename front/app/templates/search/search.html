@@ -16,24 +16,56 @@
 <div class="container-xl mt-2">
   <form class="inputform" method="post" action="{{ url_for('search.index') }}">
     {{ form.hidden_tag() }}
+    <div class="row">
+      <div class="col mb-2">
+        <div class="input-group">
+          <span class="input-group-text">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </span>
+          {{ form.start_date(class_="form-control") }}
+        </div>
+      </div>
+      <div class="col mb-2">
+        <div class="input-group">
+          <span class="input-group-text">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+          </span>
+          {{ form.end_date(class_="form-control") }}
+        </div>
+      </div>
+      <div class="col mb-2">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="bi bi-arrow-left-right"></i>
+          </span>
+          {{ form.itemtype(class_="form-control") }}
+        </div>
+      </div>
+    </div>
+    <div class="row mb-2">
+      <div class="col">
+        <div class="mb-2 input-group">
+          <span class="input-group-text">
+            min &euro;
+          </span>
+          {{ form.min_val(class_="form-control") }}
+        </div>
+      </div>
+      <div class="col">
+        <div class="mb-2 input-group">
+          <span class="input-group-text">
+            max &euro;
+          </span>
+          {{ form.max_val(class_="form-control") }}
+        </div>
+      </div>
+    </div>
     <div class="form-row justify-content-center my-2">
       <div class="mb-3 input-group">
         <span class="input-group-text">
           <i class="bi bi-pencil"></i>
         </span>
         {{ form.description(class_="form-control", placeholder="Coop: bread, butter, milk") }}
-      </div>
-      <div class="mb-3 input-group">
-        <span class="input-group-text">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        </span>
-        {{ form.start_date(class_="form-control") }}
-      </div>
-      <div class="mb-3 input-group">
-        <span class="input-group-text">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-        </span>
-        {{ form.end_date(class_="form-control") }}
       </div>
       <div class="mb-3">
           {{ form.submit(class_="btn btn-outline-success") }}
