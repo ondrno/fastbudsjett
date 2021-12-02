@@ -90,7 +90,7 @@ def end_of_month(month: int = None):
     return d
 
 
-def start_of_month():
+def start_of_year():
     today = datetime.datetime.today()
-    d = datetime.date(today.year, today.month, 1)
+    d = datetime.date(today.year, 1, 1)
     return d

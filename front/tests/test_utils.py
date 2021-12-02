@@ -98,5 +98,5 @@ def test_end_of_month(year, month, exp_day):
 @pytest.mark.parametrize("year, month, day", [(2021, 1, 31), (2021, 2, 28), (2021, 4, 15)])
 def test_start_of_month(year, month, day):
     with freeze_time(f"{year}-{month}-{day}"):
-        d = utils.start_of_month()
+        d = utils.start_of_year()
     assert d.day == 1

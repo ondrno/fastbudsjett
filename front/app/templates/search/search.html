@@ -13,7 +13,7 @@
   </div>
 </div>
 
-<div class="container-xl mt-2">
+<div class="container-xl mt-2 mb-3">
   <form class="inputform" method="post" action="{{ url_for('search.index') }}">
     {{ form.hidden_tag() }}
     <div class="row">
@@ -33,32 +33,6 @@
           {{ form.end_date(class_="form-control") }}
         </div>
       </div>
-      <div class="col mb-2">
-        <div class="input-group">
-          <span class="input-group-text">
-            <i class="bi bi-arrow-left-right"></i>
-          </span>
-          {{ form.itemtype(class_="form-control") }}
-        </div>
-      </div>
-    </div>
-    <div class="row mb-2">
-      <div class="col">
-        <div class="mb-2 input-group">
-          <span class="input-group-text">
-            min &euro;
-          </span>
-          {{ form.min_val(class_="form-control") }}
-        </div>
-      </div>
-      <div class="col">
-        <div class="mb-2 input-group">
-          <span class="input-group-text">
-            max &euro;
-          </span>
-          {{ form.max_val(class_="form-control") }}
-        </div>
-      </div>
     </div>
     <div class="form-row justify-content-center my-2">
       <div class="mb-3 input-group">
@@ -67,7 +41,7 @@
         </span>
         {{ form.description(class_="form-control", placeholder="Coop: bread, butter, milk") }}
       </div>
-      <div class="mb-3">
+      <div>
           {{ form.submit(class_="btn btn-outline-success") }}
       </div>
     </div>
@@ -77,14 +51,6 @@
 
 {% block content %}
 {% if items %}
-  {% set sum_income = items['sum_income'] %}
-  {% set sum_expenses = items['sum_expenses'] %}
-  {% set saldo = sum_income - sum_expenses %}
-{% else %}
-  {% set sum_income = 0 %}
-  {% set sum_expenses = 0 %}
-  {% set saldo = 0 %}
-{% endif %}
 <div class="container-xl mb-3 mt-3">
   <div class="card">
     <div class="card-body">
@@ -94,16 +60,89 @@
         <div class="col">Saldo</div>
       </div>
       <div class="row justify-content-center">
-        <div class="col offset-1 text-primary">&euro; {{ "%.2f"|format(sum_income) }}</div>
-        <div class="col text-danger">&euro; {{ "%.2f"|format(sum_expenses) }}</div>
-        <div class="col text-secondary">&euro; {{ "%.2f"|format(saldo) }}</div>
+        <div class="col offset-1 text-primary" id="sum_income">&euro; </div>
+        <div class="col text-danger" id="sum_expenses">&euro; </div>
+        <div class="col text-secondary" id="saldo">&euro; </div>
       </div>
     </div>
   </div>
 </div>
+{% endif %}
+<div class="container-xl mt-3" {%if not items %}style="visibility: hidden"{% endif %}>
+  <table id="data" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Payment</th>
+        <th>Description</th>
+        <th>Category</th>
+      </tr>
+    </thead>
+    {% if items %}
+    <tbody>
+      {% for i in items %}
+        <tr>
+          <td>{{ i.date }}</td>
+          <td>{{ i.itemtype }}</td>
+          <td {%if i.itemtype=="revenue" %}class="success"{% else %}class=""{% endif %}>{{ i.amount }}</td>
+          <td>{{ i.payment }}</td>
+          <td><a href="{{ url_for('items.edit',item_id=i.id) }}" class="text-secondary">{{ i.description }}</a></td>
+          <td>{{ i.category }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    {% endif %}
+  </table>
+</div>
 
-{% include 'search/render_items.html' %}
 {% endblock %}
 
 {% block script %}
+<script>
+  jQuery.fn.dataTable.Api.register( 'sum2()', function ( ) {
+    return this.flatten().reduce( function ( a, b ) {
+        var x = parseFloat(a) || 0;
+        var y = parseFloat(b) || 0;
+        return x + y
+    }, 0 );
+  } );
+  // https://datatables.net/plug-ins/api/sum()
+  jQuery.fn.dataTable.Api.register( 'sum()', function ( ) {
+    return this.flatten().reduce( function ( a, b ) {
+        if ( typeof a === 'string' ) {
+            a = a.replace(/[^\d.-]/g, '') * 1;
+        }
+        if ( typeof b === 'string' ) {
+            b = b.replace(/[^\d.-]/g, '') * 1;
+        }
+
+        return a + b;
+    }, 0 );
+} );
+
+  $(document).ready(function () {
+      $('#data').DataTable({
+          responsive: true,
+          pageLength: 25,
+          columns: [
+              null,
+              null,
+              {searchable: false},
+              {orderable: false, searchable: false},
+              null,
+              null
+          ],
+          footerCallBack: function () {
+            var api = this.api();
+            // $( '#sum_expenses' ).html(
+            //   api.column( 2, {page:'current'} ).data().sum()
+            // );
+            $( this.footer()).html("foo");
+          }
+      });
+  });
+</script>
 {% endblock %}
+
