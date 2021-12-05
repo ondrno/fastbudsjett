@@ -66,8 +66,10 @@
       //
       $('.btn-action').click(function(){
           var url = $(this).data("url");
+          var modal_target_name = $(this).data("bs-target")
           var modal_title = $(this).data("title");
-          var button_title = $(this).data("button-title")
+          var button_title = $(this).data("submit-button-title")
+          var submit_button_class = $(this).data("submit-button-class")
           $.ajax({
               type: "GET",
               url: url,
@@ -75,17 +77,28 @@
               success: function(res) {
                   // get the ajax response data
                   var data = res.body;
-                  // update modal content
-                  $('.modal-body').html(res.html_form);
-                  $('.modal-title').text(modal_title);
-                  if (button_title) {
-                      $('#submit').val(button_title);
+                  var modal_target = $(modal_target_name);
+                  if (modal_target) {
+                      // update modal content
+                      $(modal_target).find('.modal-body').html(res.html_form);
+                      $(modal_target).find('.modal-title').text(modal_title);
+                      if (button_title) {
+                          $(modal_target).find('#submit').val(button_title);
+                      }
+                      if (submit_button_class) {
+                          $(modal_target).find('#submit').removeClass("btn-outline-success");
+                          $(modal_target).find('#submit').addClass(submit_button_class);
+                      }
+                      console.log("submit button" + button_title)
+                      // show modal
+                      $(modal_target).modal('show');
+                      // $('#myModal').modal('show');
                   }
-                  console.log("submit button" + button_title)
-                  // show modal
-                  $('#myModal').modal('show');
+                  else {
+                     console.log("Could not find: " + modal_target_name);
+                  }
               },
-              error:function(request, status, error) {
+              error: function(request, status, error) {
                   console.log("ajax call went wrong:" + request.responseText + " error:" + error);
               }
           });

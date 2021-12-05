@@ -29,15 +29,7 @@ class ItemsForm(FlaskForm):
         InputRequired(),
         Length(5, 255)
     ])
-
-
-class ItemsCreateForm(ItemsForm):
     submit = SubmitField('Create')
-
-
-class ItemsUpdateForm(ItemsForm):
-    submit = SubmitField('Update')
-    submit_copy = SubmitField('Copy')
 
 
 def resolve_items(raw,
@@ -180,7 +172,8 @@ def show(year: int, month: int):
     session["payments"] = jsonpickle.encode(payments)
     session["itemtypes"] = jsonpickle.encode(itemtypes)
 
-    form = ItemsCreateForm()
+    form = ItemsForm()
+    form.submit.name = "Create"
     utils.set_form_field_default(request, form.payment_type, payments, 'cash')
     utils.set_form_field_default(request, form.category, categories, 'food')
     utils.set_form_field_default(request, form.itemtype, itemtypes, 'expenditure')
@@ -202,10 +195,10 @@ def edit(item_id: int):
     current_item = rest.iface.get_item_by_id(item_id)
     (year, month, day) = current_item.get('date').split("-")
 
-    form = ItemsUpdateForm(amount=current_item.get('amount'),
-                           description=current_item.get('description'),
-                           date=datetime.date(year=int(year), month=int(month), day=int(day))
-                           )
+    form = ItemsForm(amount=current_item.get('amount'),
+                     description=current_item.get('description'),
+                     date=datetime.date(year=int(year), month=int(month), day=int(day))
+                     )
     utils.set_form_field_default(request, form.payment_type, payments,
                                  default=payments.get_value(current_item.get('payment_id')))
     utils.set_form_field_default(request, form.category, categories,
@@ -213,10 +206,7 @@ def edit(item_id: int):
     utils.set_form_field_default(request, form.itemtype, itemtypes,
                                  default=itemtypes.get_value(current_item.get('itemtype_id')))
 
-    if form.is_submitted():
-        print(f"action was: {request.form}")
-
-    elif form.validate_on_submit():
+    if form.validate_on_submit():
         date = request.form['date']
         amount = request.form['amount']
         category = request.form['category']
@@ -232,7 +222,7 @@ def edit(item_id: int):
         return redirect(url_for('index'))
 
     if form_only:
-        html_form = render_template('items/item_form.html', form=form, form_action=url_for('items.edit', item_id=item_id))
+        html_form = render_template('items/item_edit_form.html', form=form, form_action=url_for('items.edit', item_id=item_id))
         return json.dumps({'html_form': html_form})
 
     return render_template('items/create_or_edit.html', form=form, form_action=url_for('items.edit', item_id=item_id))
@@ -246,7 +236,7 @@ def create():
     payments = jsonpickle.decode(session["payments"])
     itemtypes = jsonpickle.decode(session["itemtypes"])
 
-    form = ItemsCreateForm()
+    form = ItemsForm()
     utils.set_form_field_default(request, form.payment_type, payments, 'cash')
     utils.set_form_field_default(request, form.category, categories, 'food')
     utils.set_form_field_default(request, form.itemtype, itemtypes, 'expenditure')
@@ -267,7 +257,57 @@ def create():
         return redirect(url_for('index'))
 
     if form_only:
-        html_form = render_template('items/item_form.html', form=form, form_action=url_for('items.create'))
+        html_form = render_template('items/item_edit_form.html', form=form, form_action=url_for('items.create'))
         return json.dumps({'html_form': html_form})
 
     return render_template('items/create_or_edit.html', form=form, form_action=url_for('items.create'))
+
+
+@bp.route('/remove/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def remove(item_id: int):
+    form_only = 'form_only' in request.args and request.method == 'GET'
+    categories = jsonpickle.decode(session["categories"])
+    payments = jsonpickle.decode(session["payments"])
+    itemtypes = jsonpickle.decode(session["itemtypes"])
+
+    current_item = rest.iface.get_item_by_id(item_id)
+    (year, month, day) = current_item.get('date').split("-")
+
+    form = ItemsForm(amount=current_item.get('amount'),
+                     description=current_item.get('description'),
+                     date=datetime.date(year=int(year), month=int(month), day=int(day))
+                     )
+    form.submit._value = "Yes"
+    print(f"remove form submit: {form.submit}")
+
+    utils.set_form_field_default(request, form.payment_type, payments,
+                                 default=payments.get_value(current_item.get('payment_id')))
+    utils.set_form_field_default(request, form.category, categories,
+                                 default=categories.get_value(current_item.get('category_id')))
+    utils.set_form_field_default(request, form.itemtype, itemtypes,
+                                 default=itemtypes.get_value(current_item.get('itemtype_id')))
+    for k in form.__dict__['_fields'].keys():
+        if k == "submit" or k == "crsf_token":
+            continue
+        form.__dict__['_fields'][k].render_kw = {'readonly': 'readonly'}
+
+    if form.validate_on_submit():
+        date = request.form['date']
+        amount = request.form['amount']
+        category = request.form['category']
+        payment = request.form['payment_type']
+        description = request.form['description']
+        itemtype = request.form['itemtype']
+        data = {'date': date, 'amount': amount, 'category_id': category, 'deleted': True,
+                'payment_id': payment, 'description': description, 'itemtype_id': itemtype}
+        rest.iface.purge_item(item_id, data)
+
+        return redirect(url_for('index'))
+
+    if form_only:
+        html_form = render_template('items/item_remove_form.html',
+                                    form=form, form_action=url_for('items.remove', item_id=item_id))
+        return json.dumps({'html_form': html_form})
+
+    return render_template('items/remove.html', form=form, form_action=url_for('items.remove', item_id=item_id))

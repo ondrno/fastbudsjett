@@ -30,8 +30,6 @@ def index():
 
     form = SearchForm()
     resolved_items = []
-    for key in request.form.keys():
-        print(key, request.form[key])
     if form.validate_on_submit():
         data_keys = ["description", "start_date", "end_date"]
         data = {}
@@ -47,8 +45,6 @@ def index():
 
         raw = rest.iface.get_items(data)
         resolved_items = items.resolve_items2(raw, itemtypes, payments, categories)
-        print(itemtypes.get_value(1))
-        print(resolved_items)
         redirect(url_for('search.index'))
 
     return render_template('search/search.html', items=resolved_items, form=form)

@@ -40,8 +40,13 @@
                 <tbody>
                 {% for item in items[year][month][day]['entries'] %}
                 <tr>
-                  <td>{{ item.category|capitalize }}</td>
-                  <td>{{ item.description }}</td>
+                  <td class=>{{ item.category|capitalize }}</td>
+                  <td><a href="#" class="btn-action"
+                                               data-url="{{ url_for('items.edit',item_id=item.id) }}?form_only"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#editItemModal"
+                                               data-title="Edit item">
+                                               {{ item.description }}</a></td>
                   <td class="text-success">
                     {% if item.is_income %}
                     &euro; {{ "%.2f"|format(item.amount) }}
@@ -54,18 +59,15 @@
                   </td>
                   <td>
                     <button class="btn btn-action" style="padding: 0px 1px;"
-                        data-url="{{ url_for('items.edit',item_id=item.id) }}?form_only"
-                        data-bs-toggle="modal" data-bs-target="#editItemModal" data-title="Edit item">
-                      <i data-feather="edit" style="stroke-width: 1px; size: 10px;"></i>
-                    </button>
-                    <button class="btn btn-action" style="padding: 0px 1px;"
                             data-url="{{ url_for('items.edit',item_id=item.id) }}?form_only"
                             data-bs-toggle="modal" data-bs-target="#editItemModal"
-                            data-title="Create item" data-button-title="Create">
+                            data-title="Create item" data-submit-button-title="Create">
                       <i data-feather="copy" style="stroke-width: 1px; size: 10px;"></i>
                     </button>
-                    <button class="btn" style="padding: 0px;" data-bs-toggle="modal"
-                            data-bs-target="#deleteItemModal" title="delete">
+                    <button class="btn btn-action" style="padding: 0px;" data-bs-toggle="modal"
+                            data-url="{{ url_for('items.remove',item_id=item.id) }}?form_only"
+                            data-bs-target="#deleteItemModal" data-title="Confirm deletion"
+                            data-submit-button-title="Yes">
                       <i data-feather="trash-2" style="stroke-width: 1px; size: 10px;"></i>
                     </button>
                   </td>

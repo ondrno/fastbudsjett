@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Create/modify items{% endblock %}
+{% block title %}Remove item{% endblock %}
 
 {% block header %}
 <div class="container-xl">
   <div class="row">
     <div class="col">
-      <a class="" href="#" onclick="goBack()">
+      <a class="btn" href="{{ url_for('index') }}">
         <i data-feather="arrow-left-circle" width="28" height="28"></i>
       </a>
     </div>
@@ -16,7 +16,7 @@
 
 {% block content %}
 <div class="container-xl mt-2">
-  {% include 'items/item_edit_form.html' %}
+  {% include 'items/item_remove_form.html' %}
 </div>
 {% endblock %}
 

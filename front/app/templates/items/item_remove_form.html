@@ -1,0 +1,63 @@
+<div class="h3 text-danger text-center mb-2">Really delete it?</div>
+<form class="inputform"
+      style="border-color: #67b168"
+      method="post" action="{{ form_action }}">
+  {{ form.hidden_tag() }}
+  <div class="form-row justify-content-center my-2">
+    <div class="mb-3 input-group" hidden>
+      <span class="input-group-text">
+        <i class="bi bi-arrow-left-right"></i>
+      </span>
+      {{ form.itemtype(class_="form-control") }}
+    </div>
+    <div class="mb-3 input-group">
+      <span class="input-group-text">
+        <i class="bi bi-calendar2-date"></i>
+      </span>
+      {{ form.date(class_="form-control") }}
+    </div>
+    <div class="mb-3 input-group" hidden>
+      <span class="input-group-text">
+        <i class="bi bi-cash-coin"></i>
+      </span>
+      {{ form.payment_type(class_="form-control") }}
+    </div>
+    <div class="mb-3 input-group">
+      <span class="input-group-text">
+        <i class="bi bi-tags"></i>
+      </span>
+      {{ form.category(class_="form-control") }}
+    </div>
+    <div class="mb-3 input-group">
+      <span class="input-group-text">
+        <i class="bi bi-currency-euro"></i>
+      </span>
+      {{ form.amount(class_="form-control", placeholder="e.g. 12.00") }}
+      {% if form.amount.errors %}
+        {% for error in form.amount.errors %}
+           <div id="alert-amount" class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="mb-3 input-group">
+      <span class="input-group-text">
+        <i class="bi bi-pencil"></i>
+      </span>
+      {{ form.description(class_="form-control", placeholder="e.g. Coop: bread, butter, milk") }}
+      {% if form.description.errors %}
+        {% for error in form.description.errors %}
+           <div id="alert-description" class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+  <div class="text-center">
+    {{ form.submit(class_="btn btn-outline-danger") }}
+      <button type="button" class="btn btn-outline-secondary text-highlight" data-bs-dismiss="modal" aria-label="Close">No</button>
+  </div>
+</form>
+{% for field, errors in form.errors.items() %}
+  <small class="form-text text-muted ">
+    {{ field }} {{ ', '.join(errors) }}
+  </small>
+{% endfor %}

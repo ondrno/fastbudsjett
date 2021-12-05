@@ -180,6 +180,27 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not update item with id={item_id} and data={data} -> {r.content}")
 
+    def remove_item(self, item_id: int, data: dict):
+        # remove item only marks an entry as 'deleted' - only an admin can purge it
+        data['deleted'] = True
+        r = requests.put(self.BASE_ITEMS_URL + f"/{item_id}", headers=self.auth_token, json=data)
+        if r.ok:
+            item = r.json()
+            return item
+        else:
+            raise ApiException(f"Could not mark item as deleted with id={item_id} and data={data} -> {r.content}")
+
+    def purge_item(self, item_id: int, data: dict):
+        if data['deleted'] is not True:
+            raise ApiException(f"Could not purge item with id={item_id} and data={data} -> {r.content}. "
+                               f"It has to be marked as deleted, first.")
+        r = requests.delete(self.BASE_ITEMS_URL + f"/{item_id}", headers=self.auth_token)
+        if r.ok:
+            item = r.json()
+            return item
+        else:
+            raise ApiException(f"Could not purge item with id={item_id} and data={data} -> {r.content}")
+
     def create_category(self, name: str, itemtype_id: int):
         r = requests.post(self.BASE_CATEGORIES_URL, headers=self.auth_token,
                           json={'name': name, 'itemtype_id': itemtype_id})

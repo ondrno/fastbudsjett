@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, constr, Field, validator, PositiveFloat, PositiveInt
 
 
-description_constr = constr(min_length=6, max_length=300)
+description_constr = constr(min_length=3, max_length=300)
 
 
 def validate_date(v: str) -> str:
@@ -40,6 +40,7 @@ class ItemBase(BaseModel):
     category_id: Optional[PositiveInt] = None
     payment_id: Optional[PositiveInt] = None
     itemtype_id: Optional[PositiveInt] = None
+    deleted: Optional[bool] = False
 
 
 # Properties to receive on item creation
@@ -63,6 +64,7 @@ class ItemCreate(ItemBase):
 # Properties to receive on item update
 class ItemUpdate(ItemBase):
     description: Optional[description_constr]
+    deleted: Optional[bool]
 
     @validator("date", pre=True)
     def check_date(cls, date: str) -> str:
