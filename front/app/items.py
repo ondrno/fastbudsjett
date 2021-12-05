@@ -7,6 +7,7 @@ from wtforms.validators import InputRequired, Length, NumberRange
 import datetime
 import calendar
 from dateutil.relativedelta import relativedelta
+import json
 import jsonpickle
 
 from .auth import login_required
@@ -36,7 +37,6 @@ class ItemsCreateForm(ItemsForm):
 
 class ItemsUpdateForm(ItemsForm):
     submit = SubmitField('Update')
-    submit_delete = SubmitField('Delete')
     submit_copy = SubmitField('Copy')
 
 
@@ -180,14 +180,21 @@ def show(year: int, month: int):
     session["payments"] = jsonpickle.encode(payments)
     session["itemtypes"] = jsonpickle.encode(itemtypes)
 
+    form = ItemsCreateForm()
+    utils.set_form_field_default(request, form.payment_type, payments, 'cash')
+    utils.set_form_field_default(request, form.category, categories, 'food')
+    utils.set_form_field_default(request, form.itemtype, itemtypes, 'expenditure')
+
     payments = get_items_and_resolve(itemtypes, payments, categories)
 
-    return render_template('items/index.html', items=payments, search_form=search_form)
+    return render_template('items/index.html', items=payments, search_form=search_form, form=form)
 
 
 @bp.route('/edit/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def edit(item_id: int):
+    form_only = 'form_only' in request.args and request.method == 'GET'
+
     categories = jsonpickle.decode(session["categories"])
     payments = jsonpickle.decode(session["payments"])
     itemtypes = jsonpickle.decode(session["itemtypes"])
@@ -224,12 +231,17 @@ def edit(item_id: int):
         session["selected_month"] = "/".join(date.split("-")[0:2])
         return redirect(url_for('index'))
 
+    if form_only:
+        html_form = render_template('items/item_form.html', form=form, form_action=url_for('items.edit', item_id=item_id))
+        return json.dumps({'html_form': html_form})
+
     return render_template('items/create_or_edit.html', form=form, form_action=url_for('items.edit', item_id=item_id))
 
 
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
+    form_only = 'form_only' in request.args and request.method == 'GET'
     categories = jsonpickle.decode(session["categories"])
     payments = jsonpickle.decode(session["payments"])
     itemtypes = jsonpickle.decode(session["itemtypes"])
@@ -253,5 +265,9 @@ def create():
         # show the same month as the date of the item which was created/modified
         session["selected_month"] = "/".join(date.split("-")[0:2])
         return redirect(url_for('index'))
+
+    if form_only:
+        html_form = render_template('items/item_form.html', form=form, form_action=url_for('items.create'))
+        return json.dumps({'html_form': html_form})
 
     return render_template('items/create_or_edit.html', form=form, form_action=url_for('items.create'))

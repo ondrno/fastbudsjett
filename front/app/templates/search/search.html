@@ -51,33 +51,47 @@
 
 {% block content %}
 {% if items %}
-<div class="container-xl mb-3 mt-3">
+<div class="container-xl mt-3">
   <div class="card">
-    <div class="card-body">
-      <div class="row">
-        <div class="col offset-1">Income</div>
-        <div class="col">Expenses</div>
-        <div class="col">Saldo</div>
-      </div>
-      <div class="row justify-content-center">
-        <div class="col offset-1 text-primary" id="sum_income">&euro; </div>
-        <div class="col text-danger" id="sum_expenses">&euro; </div>
-        <div class="col text-secondary" id="saldo">&euro; </div>
-      </div>
+    <div class="card-header">
+      <table class="table table-responsive">
+        <thead>
+          <th style="width:10%;">Summary</th>
+          <th style="width:15%;"></th>
+          <th style="width:20%;">Saldo</th>
+          <th style="width:5%;"></th>
+          <th style="width:10%;">Income</th>
+          <th style="width:10%;">Expenses</th>
+          <th style="width:15%;"></th>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td id="saldo" class="">&euro; </td>
+            <td></td>
+            <td id="sum_income" class="text-success">&euro;</td>
+            <td id="sum_expenses" class="text-danger">&euro;</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
+
 {% endif %}
 <div class="container-xl mt-3" {%if not items %}style="visibility: hidden"{% endif %}>
   <table id="data" class="table table-striped">
     <thead>
       <tr>
         <th>Date</th>
-        <th>Type</th>
-        <th>Amount</th>
-        <th>Payment</th>
-        <th>Description</th>
         <th>Category</th>
+        <th>Amount</th>
+        <th>Description</th>
+        <th>Payment</th>
+        <th>Type</th>
+        <th>Actions</th>
       </tr>
     </thead>
     {% if items %}
@@ -85,11 +99,15 @@
       {% for i in items %}
         <tr>
           <td>{{ i.date }}</td>
-          <td>{{ i.itemtype }}</td>
-          <td {%if i.itemtype=="revenue" %}class="success"{% else %}class=""{% endif %}>{{ i.amount }}</td>
-          <td>{{ i.payment }}</td>
-          <td><a href="{{ url_for('items.edit',item_id=i.id) }}" class="text-secondary">{{ i.description }}</a></td>
           <td>{{ i.category }}</td>
+          <td {%if i.itemtype=="revenue" %}class="success"{% else %}class=""{% endif %}>{{ i.amount }}</td>
+
+          <td><a href="{{ url_for('items.edit',item_id=i.id) }}" class="text-secondary">{{ i.description }}</a></td>
+          <td>{{ i.payment }}</td>
+          <td>{{ i.itemtype }}</td>
+          <td>
+            <a href="{{ url_for('items.edit',item_id=i.id) }}" class="text-secondary"><i class="bi bi-pencil"></i></a>
+          </td>
         </tr>
       {% endfor %}
     </tbody>
@@ -117,32 +135,31 @@
         if ( typeof b === 'string' ) {
             b = b.replace(/[^\d.-]/g, '') * 1;
         }
-
         return a + b;
     }, 0 );
 } );
 
-  $(document).ready(function () {
-      $('#data').DataTable({
-          responsive: true,
-          pageLength: 25,
-          columns: [
-              null,
-              null,
-              {searchable: false},
-              {orderable: false, searchable: false},
-              null,
-              null
-          ],
-          footerCallBack: function () {
-            var api = this.api();
-            // $( '#sum_expenses' ).html(
-            //   api.column( 2, {page:'current'} ).data().sum()
-            // );
-            $( this.footer()).html("foo");
-          }
-      });
-  });
+$(document).ready(function () {
+    $('#data').DataTable({
+        responsive: true,
+        pageLength: 25,
+        columns: [
+            null,
+            null,
+            {searchable: false},
+            {orderable: false, searchable: false},
+            null,
+            null
+        ],
+        footerCallBack: function () {
+          var api = this.api();
+          // $( '#sum_expenses' ).html(
+          //   api.column( 2, {page:'current'} ).data().sum()
+          // );
+          $( this.footer()).html("foo");
+        }
+    });
+});
 </script>
 {% endblock %}
 

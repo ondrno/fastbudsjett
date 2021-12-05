@@ -62,13 +62,34 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
-
-
-<!--  <script>-->
-<!--    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))-->
-<!--    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {-->
-<!--      return new bootstrap.Tooltip(tooltipTriggerEl)-->
-<!--    })-->
-<!--  </script>-->
+  <script>
+      //
+      $('.btn-action').click(function(){
+          var url = $(this).data("url");
+          var modal_title = $(this).data("title");
+          var button_title = $(this).data("button-title")
+          $.ajax({
+              type: "GET",
+              url: url,
+              dataType: 'json',
+              success: function(res) {
+                  // get the ajax response data
+                  var data = res.body;
+                  // update modal content
+                  $('.modal-body').html(res.html_form);
+                  $('.modal-title').text(modal_title);
+                  if (button_title) {
+                      $('#submit').val(button_title);
+                  }
+                  console.log("submit button" + button_title)
+                  // show modal
+                  $('#myModal').modal('show');
+              },
+              error:function(request, status, error) {
+                  console.log("ajax call went wrong:" + request.responseText + " error:" + error);
+              }
+          });
+      });
+  </script>
   {% block script %}{% endblock %}
 </html>
