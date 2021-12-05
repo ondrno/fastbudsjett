@@ -100,7 +100,7 @@
         <tr>
           <td>{{ i.date }}</td>
           <td>{{ i.category }}</td>
-          <td {%if i.itemtype=="revenue" %}class="success"{% else %}class=""{% endif %}>{{ i.amount }}</td>
+          <td class="{%if i.is_revenue %}success{% else %}danger{% endif %}">&euro;{{ i.amount }}</td>
 
           <td><a href="{{ url_for('items.edit',item_id=i.id) }}" class="text-secondary">{{ i.description }}</a></td>
           <td>{{ i.payment }}</td>
@@ -143,20 +143,14 @@ $(document).ready(function () {
     $('#data').DataTable({
         responsive: true,
         pageLength: 25,
-        columns: [
-            null,
-            null,
-            {searchable: false},
-            {orderable: false, searchable: false},
-            null,
-            null
-        ],
-        footerCallBack: function () {
+        "drawCallback": function (settings) {
           var api = this.api();
-          // $( '#sum_expenses' ).html(
-          //   api.column( 2, {page:'current'} ).data().sum()
-          // );
-          $( this.footer()).html("foo");
+          $( '#sum_expenses' ).text(
+            api.column( 2, {page:'current'} ).data().sum()
+          );
+          $( '#sum_income' ).text(
+            api.column( 2, {page:'current'} ).data().sum2()
+          );
         }
     });
 });
