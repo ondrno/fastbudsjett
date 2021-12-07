@@ -16,7 +16,7 @@ class BaseTypes:
     def fetch(self) -> dict:
         """
         Get the name and id from the database using the callback from rest.iface.xxx
-        and return a dictionary, e.g. itemtypes = { 2: 'revenue', 3: 'expenditure' }
+        and return a dictionary, e.g. itemtypes = { '2': 'revenue', '3': 'expenditure' }
 
         Example: categories_lookup = get_and_resolve(rest.iface.get_categories)
         """
@@ -26,11 +26,11 @@ class BaseTypes:
         for p in raw:
             id = p['id']
             name = p['name']
-            items[id] = name
+            items[str(id)] = name
         return items
 
     def get_tuples_as_list(self):
-        """ return a list of (key, value) pairs, e.g. [(1, 'a'), (2, 'b')] """
+        """ return a list of (key, value) pairs, e.g. [('1', 'a'), ('2', 'b')] """
         return [(k, v) for k, v in self.items.items()]
 
     def get_key(self, val: str) -> int:
@@ -40,10 +40,13 @@ class BaseTypes:
         return 0
 
     def get_value(self, key: int) -> str:
+        result = ''
         if key in self.items:
-            return self.items[key]
+            result = self.items[key]
         else:
-            return ''
+            key = str(key)
+            result = self.items.get(key, '')
+        return result
 
 
 class CategoryTypes(BaseTypes):
@@ -77,6 +80,9 @@ def set_form_field_default(request, field, lookup: BaseTypes, default: str):
     """
     field.choices = lookup.get_tuples_as_list()
     default_value = [k for (k, v) in field.choices if v == default]
+    if not default_value:
+        default_value = str(default)
+    # print(f"set_form_field_default={field} lu={lookup} default={default} choices={field.choices} -> default_value={default_value}")
     if default_value:
         field.default = default_value[0]
         field.process(request.form)

@@ -68,6 +68,7 @@
           var url = $(this).data("url");
           var modal_target_name = $(this).data("bs-target")
           var modal_title = $(this).data("title");
+          var form_action = $(this).data("form-action")
           var button_title = $(this).data("submit-button-title")
           var submit_button_class = $(this).data("submit-button-class")
           $.ajax({
@@ -79,7 +80,6 @@
                   var data = res.body;
                   var modal_target = $(modal_target_name);
                   if (modal_target) {
-                      // update modal content
                       $(modal_target).find('.modal-body').html(res.html_form);
                       $(modal_target).find('.modal-title').text(modal_title);
                       if (button_title) {
@@ -89,10 +89,12 @@
                           $(modal_target).find('#submit').removeClass("btn-outline-success");
                           $(modal_target).find('#submit').addClass(submit_button_class);
                       }
-                      console.log("submit button" + button_title)
+                      if (form_action) {
+                          $(modal_target).find('.inputform').attr('action', form_action)
+                      }
+                      //console.log("submit button" + button_title)
                       // show modal
                       $(modal_target).modal('show');
-                      // $('#myModal').modal('show');
                   }
                   else {
                      console.log("Could not find: " + modal_target_name);

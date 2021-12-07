@@ -45,7 +45,7 @@
                                                data-url="{{ url_for('items.edit',item_id=item.id) }}?form_only"
                                                data-bs-toggle="modal"
                                                data-bs-target="#editItemModal"
-                                               data-title="Edit item">
+                                               data-title="Edit item" data-submit-button-title="Update">
                                                {{ item.description }}</a></td>
                   <td class="text-success">
                     {% if item.is_income %}
@@ -59,9 +59,10 @@
                   </td>
                   <td>
                     <button class="btn btn-action" style="padding: 0px 1px;"
-                            data-url="{{ url_for('items.edit',item_id=item.id) }}?form_only"
+                            data-url="{{ url_for('items.edit', item_id=item.id) }}?form_only"
+                            data-form-action="{{ url_for('items.create') }}"
                             data-bs-toggle="modal" data-bs-target="#editItemModal"
-                            data-title="Create item" data-submit-button-title="Create">
+                            data-title="Copy item" data-submit-button-title="Create">
                       <i data-feather="copy" style="stroke-width: 1px; size: 10px;"></i>
                     </button>
                     <button class="btn btn-action" style="padding: 0px;" data-bs-toggle="modal"

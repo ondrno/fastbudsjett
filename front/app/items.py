@@ -2,7 +2,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session
 )
 from flask_wtf import FlaskForm
-from wtforms import DecimalField, SelectField, StringField, SubmitField, RadioField, DateField
+from wtforms import DecimalField, SelectField, StringField, SubmitField, DateField
 from wtforms.validators import InputRequired, Length, NumberRange
 import datetime
 import calendar
@@ -13,7 +13,6 @@ import jsonpickle
 from .auth import login_required
 from . import rest
 from front.app.utils import utils
-from . import search
 
 
 bp = Blueprint('items', __name__)
@@ -149,6 +148,34 @@ def format_suburl(year: int, month: int) -> str:
     return f"{year}/{month}"
 
 
+def prepare_data(r: request):
+    data = {'date': r.form['date'],
+            'amount': r.form['amount'],
+            'category_id': r.form['category'],
+            'payment_id': r.form['payment_type'],
+            'description': r.form['description'],
+            'itemtype_id': r.form['itemtype']
+            }
+    return data
+
+
+def types_to_session(categories, payments, itemtypes):
+    session["categories"] = jsonpickle.encode(categories)
+    session["payments"] = jsonpickle.encode(payments)
+    session["itemtypes"] = jsonpickle.encode(itemtypes)
+
+
+def types_from_session() -> dict:
+    return {
+        'categories': jsonpickle.decode(session["categories"]),
+        'payments': jsonpickle.decode(session["payments"]),
+        'itemtypes': jsonpickle.decode(session["itemtypes"]),
+    }
+
+
+def is_form_only(r: request):
+    return 'form_only' in request.args and request.method == 'GET'
+
 
 @bp.route('/', methods=['GET'])
 @login_required
@@ -161,36 +188,31 @@ def index():
 @login_required
 def show(year: int, month: int):
     now = datetime.date(year, month, 1)
-
-    search_form = search.SearchForm()
     calc_next_and_prev_month(now)
 
     categories = utils.CategoryTypes()
     payments = utils.PaymentTypes()
     itemtypes = utils.ItemTypes()
-    session["categories"] = jsonpickle.encode(categories)
-    session["payments"] = jsonpickle.encode(payments)
-    session["itemtypes"] = jsonpickle.encode(itemtypes)
+    types_to_session(categories, payments, itemtypes)
 
     form = ItemsForm()
-    form.submit.name = "Create"
     utils.set_form_field_default(request, form.payment_type, payments, 'cash')
     utils.set_form_field_default(request, form.category, categories, 'food')
     utils.set_form_field_default(request, form.itemtype, itemtypes, 'expenditure')
 
     payments = get_items_and_resolve(itemtypes, payments, categories)
 
-    return render_template('items/index.html', items=payments, search_form=search_form, form=form)
+    return render_template('items/index.html', items=payments, form=form)
 
 
 @bp.route('/edit/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def edit(item_id: int):
-    form_only = 'form_only' in request.args and request.method == 'GET'
-
-    categories = jsonpickle.decode(session["categories"])
-    payments = jsonpickle.decode(session["payments"])
-    itemtypes = jsonpickle.decode(session["itemtypes"])
+    form_only = is_form_only(request)
+    t = types_from_session()
+    categories = t["categories"]
+    payments = t["payments"]
+    itemtypes = t["itemtypes"]
 
     current_item = rest.iface.get_item_by_id(item_id)
     (year, month, day) = current_item.get('date').split("-")
@@ -207,18 +229,11 @@ def edit(item_id: int):
                                  default=itemtypes.get_value(current_item.get('itemtype_id')))
 
     if form.validate_on_submit():
-        date = request.form['date']
-        amount = request.form['amount']
-        category = request.form['category']
-        payment = request.form['payment_type']
-        description = request.form['description']
-        itemtype = request.form['itemtype']
-        data = {'date': date, 'amount': amount, 'category_id': category,
-                'payment_id': payment, 'description': description, 'itemtype_id': itemtype}
+        data = prepare_data(request)
         rest.iface.update_item(item_id, data)
 
         # show the same month as the date of the item which was created/modified
-        session["selected_month"] = "/".join(date.split("-")[0:2])
+        session["selected_month"] = "/".join(data['date'].split("-")[0:2])
         return redirect(url_for('index'))
 
     if form_only:
@@ -231,29 +246,20 @@ def edit(item_id: int):
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
-    form_only = 'form_only' in request.args and request.method == 'GET'
-    categories = jsonpickle.decode(session["categories"])
-    payments = jsonpickle.decode(session["payments"])
-    itemtypes = jsonpickle.decode(session["itemtypes"])
+    form_only = is_form_only(request)
+    t = types_from_session()
 
     form = ItemsForm()
-    utils.set_form_field_default(request, form.payment_type, payments, 'cash')
-    utils.set_form_field_default(request, form.category, categories, 'food')
-    utils.set_form_field_default(request, form.itemtype, itemtypes, 'expenditure')
+    utils.set_form_field_default(request, form.payment_type, t['payments'], 'cash')
+    utils.set_form_field_default(request, form.category, t['categories'], 'food')
+    utils.set_form_field_default(request, form.itemtype, t['itemtypes'], 'expenditure')
 
     if form.validate_on_submit():
-        date = request.form['date']
-        amount = request.form['amount']
-        category = request.form['category']
-        payment = request.form['payment_type']
-        itemtype = request.form['itemtype']
-        description = request.form['description']
-        data = {'date': date, 'amount': amount, 'category_id': category,
-                'payment_id': payment, 'description': description, 'itemtype_id': itemtype}
+        data = prepare_data(request)
         rest.iface.create_item(data)
 
         # show the same month as the date of the item which was created/modified
-        session["selected_month"] = "/".join(date.split("-")[0:2])
+        session["selected_month"] = "/".join(data['date'].split("-")[0:2])
         return redirect(url_for('index'))
 
     if form_only:
@@ -266,7 +272,7 @@ def create():
 @bp.route('/remove/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def remove(item_id: int):
-    form_only = 'form_only' in request.args and request.method == 'GET'
+    form_only = is_form_only(request)
     categories = jsonpickle.decode(session["categories"])
     payments = jsonpickle.decode(session["payments"])
     itemtypes = jsonpickle.decode(session["itemtypes"])
@@ -278,8 +284,6 @@ def remove(item_id: int):
                      description=current_item.get('description'),
                      date=datetime.date(year=int(year), month=int(month), day=int(day))
                      )
-    form.submit._value = "Yes"
-    print(f"remove form submit: {form.submit}")
 
     utils.set_form_field_default(request, form.payment_type, payments,
                                  default=payments.get_value(current_item.get('payment_id')))
@@ -293,14 +297,7 @@ def remove(item_id: int):
         form.__dict__['_fields'][k].render_kw = {'readonly': 'readonly'}
 
     if form.validate_on_submit():
-        date = request.form['date']
-        amount = request.form['amount']
-        category = request.form['category']
-        payment = request.form['payment_type']
-        description = request.form['description']
-        itemtype = request.form['itemtype']
-        data = {'date': date, 'amount': amount, 'category_id': category, 'deleted': True,
-                'payment_id': payment, 'description': description, 'itemtype_id': itemtype}
+        data = prepare_data(request)
         rest.iface.purge_item(item_id, data)
 
         return redirect(url_for('index'))

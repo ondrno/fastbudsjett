@@ -47,14 +47,21 @@ class TestBaseTypes:
         assert b.get_value(1) == 'a'
 
     def test_get_value_returns_empty_string(self):
-        items = {1: 'a'}
+        items = {'1': 'a'}
         b = utils.BaseTypes(callback=None, items=items)
-        assert b.get_value(2) == ''
+        assert b.get_value('2') == ''
+
+    def test_get_value_returns_str_if_int_not_found(self):
+        def produce():
+            return [{'id': 1, 'name': 'a'}, {'id': 2, 'name': 'b'}]
+        b = utils.BaseTypes(callback=produce)
+        assert b.get_value(2) == 'b'
+        assert b.get_value('2') == 'b'
 
     def test_get_tuples_as_list(self):
-        items = {1: 'a', 2: "b"}
+        items = {'1': 'a', '2': "b"}
         b = utils.BaseTypes(callback=None, items=items)
-        assert b.get_tuples_as_list() == [(1, 'a'), (2, 'b')]
+        assert b.get_tuples_as_list() == [('1', 'a'), ('2', 'b')]
 
 
 @pytest.fixture(autouse=True)
