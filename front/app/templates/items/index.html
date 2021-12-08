@@ -58,18 +58,14 @@
     <div class="card-header">
       <div class="">
         <div class="row border-bottom p-1">
-          <div class="col fw-bold" >Summary</div>
-          <div class="col text-end fw-bold">Saldo</div>
-          <div class="col text-end fw-bold">Income</div>
-          <div class="col text-end fw-bold">Expenses</div>
-          <div class="col"></div>
+          <div class="col text-center fw-bold">Saldo</div>
+          <div class="col text-center fw-bold">Income</div>
+          <div class="col text-center fw-bold">Expenses</div>
         </div>
           <div class="row pt-1">
-            <div class="col"></div>
-            <div class="col text-end {% if saldo < 0 %}text-danger{% else %}text-success{% endif %}">&euro; {{ "%.2f"|format(saldo) }}</div>
-            <div class="col text-success text-end">&euro; {{ "%.2f"|format(sum_income) }}</div>
-            <div class="col text-danger text-end">&euro; {{ "%.2f"|format(sum_expenses) }}</div>
-            <div class="col"></div>
+            <div class="col text-center {% if saldo < 0 %}text-danger{% else %}text-success{% endif %}">&euro; {{ "%.2f"|format(saldo) }}</div>
+            <div class="col text-center text-success">&euro; {{ "%.2f"|format(sum_income) }}</div>
+            <div class="col text-center text-danger">&euro; {{ "%.2f"|format(sum_expenses) }}</div>
           </div>
       </div>
     </div>

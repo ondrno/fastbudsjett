@@ -19,46 +19,19 @@
                       {% endif %}
                       <button class="{{ btn_class }}">{{ items[year][month][day]['weekday'] }}</button>
                     </div>
-                    <div class="col"></div>
-                    <div class="col text-success text-end">
-                      {% if items[year][month][day]['sum_income'] %}
-                        {% set amount = items[year][month][day]['sum_income'] %}
-                        &euro; {{ "%.2f"|format(amount) }}
-                      {% else %}
-                        {% set amount = 0 %}
-                      {% endif %}
-                    </div>
-                    <div class="col text-danger text-end">
-                      {% if items[year][month][day]['sum_expenses'] %}
-                        {% set amount = items[year][month][day]['sum_expenses'] %}
-                        &euro; {{ "%.2f"|format(amount) }}
-                      {% else %}
-                        {% set amount = 0 %}
-                      {% endif %}
-                    </div>
-                    <div class="col"></div>
                   </div>
                 </div>
                 <div>
                   {% for item in items[year][month][day]['entries'] %}
                   <div class="row zebra p-1">
-                    <div class="col text-truncate">{{ item.category|capitalize }}</div>
-                    <div class="col truncate"><a href="#" class="btn-action"
+                    <div class="col text-truncate fadeshow">{{ item.category|capitalize }}</div>
+                    <div class="col text-truncate"><a href="#" class="btn-action"
                                                  data-url="{{ url_for('items.edit',item_id=item.id) }}?form_only"
                                                  data-bs-toggle="modal"
                                                  data-bs-target="#editItemModal"
                                                  data-title="Edit item" data-submit-button-title="Update">
                                                  {{ item.description }}</a></div>
-                    <div class="col text-success text-end">
-                      {% if item.is_income %}
-                      &euro; {{ "%.2f"|format(item.amount) }}
-                      {% endif %}
-                    </div>
-                    <div class="col text-danger text-end">
-                      {% if not item['is_income'] %}
-                        &euro; {{ "%.2f"|format(item.amount) }}
-                      {% endif %}
-                    </div>
+                    <div class="col text-end {% if item.is_income %}text-success{% else %}text-danger{% endif %}">&euro; {{ "%.2f"|format(item.amount) }}</div>
                     <div class="col text-end">
                       <button class="btn btn-action" style="padding: 0px 1px;"
                               data-url="{{ url_for('items.edit', item_id=item.id) }}?form_only"
