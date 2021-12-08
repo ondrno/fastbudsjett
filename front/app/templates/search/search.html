@@ -3,16 +3,6 @@
 {% block title %}Search{% endblock %}
 
 {% block header %}
-<div class="container-xl">
-  <div class="row">
-    <div class="col">
-      <a class="" href="{{ url_for('index') }}">
-        <i data-feather="arrow-left-circle" width="28" height="28"></i>
-      </a>
-    </div>
-  </div>
-</div>
-
 <div class="container-xl mt-2 mb-3">
   <form class="inputform" method="post" action="{{ url_for('search.index') }}">
     {{ form.hidden_tag() }}
@@ -47,113 +37,36 @@
     </div>
   </form>
 </div>
+{% include 'items/item_modal_stub.html' %}
 {% endblock %}
 
 {% block content %}
 {% if items %}
+{% set saldo = items['sum_income'] - items['sum_expenses'] %}
 <div class="container-xl mt-3">
   <div class="card">
     <div class="card-header">
-      <table class="table table-responsive">
-        <thead>
-          <th style="width:10%;">Summary</th>
-          <th style="width:15%;"></th>
-          <th style="width:20%;">Saldo</th>
-          <th style="width:5%;"></th>
-          <th style="width:10%;">Income</th>
-          <th style="width:10%;">Expenses</th>
-          <th style="width:15%;"></th>
-        </thead>
-        <tbody>
-          <tr>
-            <td></td>
-            <td></td>
-            <td id="saldo" class="">&euro; </td>
-            <td></td>
-            <td id="sum_income" class="text-success">&euro;</td>
-            <td id="sum_expenses" class="text-danger">&euro;</td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="">
+        <div class="row border-bottom p-1">
+          <div class="col text-center fw-bold">Saldo</div>
+          <div class="col text-center fw-bold">Income</div>
+          <div class="col text-center fw-bold">Expenses</div>
+        </div>
+          <div class="row pt-1">
+            <div class="col text-center {% if saldo < 0 %}text-danger{% else %}text-success{% endif %}">&euro; {{ "%.2f"|format(items.sum_income - items.sum_expenses) }}</div>
+            <div class="col text-center text-success">&euro; {{ "%.2f"|format(items.sum_income) }}</div>
+            <div class="col text-center text-danger">&euro; {{ "%.2f"|format(items.sum_expenses) }}</div>
+          </div>
+      </div>
     </div>
   </div>
 </div>
-
 {% endif %}
-<div class="container-xl mt-3" {%if not items %}style="visibility: hidden"{% endif %}>
-  <table id="data" class="table table-striped">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Category</th>
-        <th>Amount</th>
-        <th>Description</th>
-        <th>Payment</th>
-        <th>Type</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    {% if items %}
-    <tbody>
-      {% for i in items %}
-        <tr>
-          <td>{{ i.date }}</td>
-          <td>{{ i.category }}</td>
-          <td class="{%if i.is_revenue %}success{% else %}danger{% endif %}">&euro;{{ i.amount }}</td>
 
-          <td><a href="{{ url_for('items.edit',item_id=i.id) }}" class="text-secondary">{{ i.description }}</a></td>
-          <td>{{ i.payment }}</td>
-          <td>{{ i.itemtype }}</td>
-          <td>
-            <a href="{{ url_for('items.edit',item_id=i.id) }}" class="text-secondary"><i class="bi bi-pencil"></i></a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-    {% endif %}
-  </table>
-</div>
+{% include 'search/render_items.html' %}
 
 {% endblock %}
 
 {% block script %}
-<script>
-  jQuery.fn.dataTable.Api.register( 'sum2()', function ( ) {
-    return this.flatten().reduce( function ( a, b ) {
-        var x = parseFloat(a) || 0;
-        var y = parseFloat(b) || 0;
-        return x + y
-    }, 0 );
-  } );
-  // https://datatables.net/plug-ins/api/sum()
-  jQuery.fn.dataTable.Api.register( 'sum()', function ( ) {
-    return this.flatten().reduce( function ( a, b ) {
-        if ( typeof a === 'string' ) {
-            a = a.replace(/[^\d.-]/g, '') * 1;
-        }
-        if ( typeof b === 'string' ) {
-            b = b.replace(/[^\d.-]/g, '') * 1;
-        }
-        return a + b;
-    }, 0 );
-} );
-
-$(document).ready(function () {
-    $('#data').DataTable({
-        responsive: true,
-        pageLength: 25,
-        "drawCallback": function (settings) {
-          var api = this.api();
-          $( '#sum_expenses' ).text(
-            api.column( 2, {page:'current'} ).data().sum()
-          );
-          $( '#sum_income' ).text(
-            api.column( 2, {page:'current'} ).data().sum2()
-          );
-        }
-    });
-});
-</script>
 {% endblock %}
 

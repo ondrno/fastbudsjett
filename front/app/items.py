@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, session
+    Blueprint, g, redirect, render_template, request, url_for, session
 )
 from flask_wtf import FlaskForm
 from wtforms import DecimalField, SelectField, StringField, SubmitField, DateField
@@ -49,7 +49,6 @@ def resolve_items(raw,
         payment['is_income'] = payment['itemtype'].lower() == 'revenue'
         payment['payment'] = payment_types.get_value(payment_id)
         payment['category'] = categories.get_value(cat_id)
-        print(payment)
         year, month, day = [int(i) for i in str(payment['date']).split('-')]
         if year not in payments:
             payments[year] = {}
@@ -78,24 +77,6 @@ def resolve_items(raw,
             payments[year]['sum_expenses'] += payment['amount']
             payments['sum_expenses'] += payment['amount']
 
-    return payments
-
-
-def resolve_items2(raw,
-                  itemtypes: utils.ItemTypes,
-                  payment_types: utils.PaymentTypes,
-                  categories: utils.CategoryTypes):
-    payments = []
-    for i in raw:
-        cat_id = i['category_id']
-        payment_id = i['payment_id']
-        itemtype_id = i['itemtype_id']
-
-        payment = i
-        payment['itemtype'] = itemtypes.get_value(itemtype_id)
-        payment['payment'] = payment_types.get_value(payment_id)
-        payment['category'] = categories.get_value(cat_id)
-        payments.append(payment)
     return payments
 
 

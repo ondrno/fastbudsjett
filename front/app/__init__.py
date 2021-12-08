@@ -3,6 +3,7 @@ from flask_caching import Cache
 from flask_login import LoginManager
 from . import auth, items, search
 from .config import AppConfig, cache_config
+import calendar
 
 
 def create_app():
@@ -20,6 +21,10 @@ def create_app():
     return app
 
 
+app = create_app()
+app.config['FLASK_ENV'] = 'development'
+
+
 def format_datetime(value, format="%Y-%M-%D"):
     """Format a date time to (Default): YYYY-MM-DD"""
     if value is None:
@@ -27,12 +32,6 @@ def format_datetime(value, format="%Y-%M-%D"):
     return value.strftime(format)
 
 
-app = create_app()
-app.config['FLASK_ENV'] = 'development'
-
-# Register the template filter with the Jinja Environment
-app.jinja_env.filters['formatdatetime'] = format_datetime
-
-
-
-
+@app.template_global()
+def month_name(month):
+    return calendar.month_name[month]
