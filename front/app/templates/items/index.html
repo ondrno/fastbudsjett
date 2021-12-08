@@ -56,23 +56,22 @@
 <div class="container-xl mt-3">
   <div class="card">
     <div class="card-header">
-      <table class="table table-responsive">
-        <thead>
-          <th style="width:20%;">Summary</th>
-          <th style="width:25%;" colspan="2">Saldo</th>
-          <th style="width:10%;">Income</th>
-          <th style="width:10%;">Expenses</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td></td>
-            <td colspan="2" class="{% if saldo < 0 %}text-danger{% else %}text-success{% endif %}">&euro; {{ "%.2f"|format(saldo) }}</td>
-            <td class="text-success">&euro; {{ "%.2f"|format(sum_income) }}</td>
-            <td class="text-danger">&euro; {{ "%.2f"|format(sum_expenses) }}</td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="">
+        <div class="row border-bottom p-1">
+          <div class="col fw-bold" >Summary</div>
+          <div class="col text-end fw-bold">Saldo</div>
+          <div class="col text-end fw-bold">Income</div>
+          <div class="col text-end fw-bold">Expenses</div>
+          <div class="col"></div>
+        </div>
+          <div class="row pt-1">
+            <div class="col"></div>
+            <div class="col text-end {% if saldo < 0 %}text-danger{% else %}text-success{% endif %}">&euro; {{ "%.2f"|format(saldo) }}</div>
+            <div class="col text-success text-end">&euro; {{ "%.2f"|format(sum_income) }}</div>
+            <div class="col text-danger text-end">&euro; {{ "%.2f"|format(sum_expenses) }}</div>
+            <div class="col"></div>
+          </div>
+      </div>
     </div>
   </div>
 </div>

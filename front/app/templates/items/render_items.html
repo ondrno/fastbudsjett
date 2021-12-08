@@ -7,75 +7,77 @@
         {% if not day is string %}
           <div class="card mb-1">
             <div class="card-header">
-              <table class="table table-striped table-responsive">
-                <thead>
-                  <th style="width:10%;">
-                    {{ day }}&nbsp;
-                    {% if items[year][month][day]['weekday'] == "Sun" %}
-                      {% set btn_class = "btn btn-danger btn-sm disabled" %}
-                    {% else %}
-                      {% set btn_class = "btn btn-secondary btn-sm disabled" %}
-                    {% endif %}
-                    <button class="{{ btn_class }}">{{ items[year][month][day]['weekday'] }}</button>
-                  </th>
-                  <th style="width:40%;"></th>
-                  <th class="text-success" style="width: 10%;">
-                    {% if items[year][month][day]['sum_income'] %}
-                      {% set amount = items[year][month][day]['sum_income'] %}
-                      &euro; {{ "%.2f"|format(amount) }}
-                    {% else %}
-                      {% set amount = 0 %}
-                    {% endif %}
-                  </th>
-                  <th class="text-danger" style="width: 10%;">
-                    {% if items[year][month][day]['sum_expenses'] %}
-                      {% set amount = items[year][month][day]['sum_expenses'] %}
-                      &euro; {{ "%.2f"|format(amount) }}
-                    {% else %}
-                      {% set amount = 0 %}
-                    {% endif %}
-                  </th>
-                  <th style="width: 15%;"></th>
-                </thead>
-                <tbody>
-                {% for item in items[year][month][day]['entries'] %}
-                <tr>
-                  <td class=>{{ item.category|capitalize }}</td>
-                  <td><a href="#" class="btn-action"
-                                               data-url="{{ url_for('items.edit',item_id=item.id) }}?form_only"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#editItemModal"
-                                               data-title="Edit item" data-submit-button-title="Update">
-                                               {{ item.description }}</a></td>
-                  <td class="text-success">
-                    {% if item.is_income %}
-                    &euro; {{ "%.2f"|format(item.amount) }}
-                    {% endif %}
-                  </td>
-                  <td class="text-danger">
-                    {% if not item['is_income'] %}
+              <div class="table-striped">
+                <div class="">
+                  <div class="row mb-2">
+                    <div class="col">
+                      {{ day }}&nbsp;
+                      {% if items[year][month][day]['weekday'] == "Sun" %}
+                        {% set btn_class = "btn btn-danger btn-sm disabled" %}
+                      {% else %}
+                        {% set btn_class = "btn btn-secondary btn-sm disabled" %}
+                      {% endif %}
+                      <button class="{{ btn_class }}">{{ items[year][month][day]['weekday'] }}</button>
+                    </div>
+                    <div class="col"></div>
+                    <div class="col text-success text-end">
+                      {% if items[year][month][day]['sum_income'] %}
+                        {% set amount = items[year][month][day]['sum_income'] %}
+                        &euro; {{ "%.2f"|format(amount) }}
+                      {% else %}
+                        {% set amount = 0 %}
+                      {% endif %}
+                    </div>
+                    <div class="col text-danger text-end">
+                      {% if items[year][month][day]['sum_expenses'] %}
+                        {% set amount = items[year][month][day]['sum_expenses'] %}
+                        &euro; {{ "%.2f"|format(amount) }}
+                      {% else %}
+                        {% set amount = 0 %}
+                      {% endif %}
+                    </div>
+                    <div class="col"></div>
+                  </div>
+                </div>
+                <div>
+                  {% for item in items[year][month][day]['entries'] %}
+                  <div class="row zebra p-1">
+                    <div class="col text-truncate">{{ item.category|capitalize }}</div>
+                    <div class="col truncate"><a href="#" class="btn-action"
+                                                 data-url="{{ url_for('items.edit',item_id=item.id) }}?form_only"
+                                                 data-bs-toggle="modal"
+                                                 data-bs-target="#editItemModal"
+                                                 data-title="Edit item" data-submit-button-title="Update">
+                                                 {{ item.description }}</a></div>
+                    <div class="col text-success text-end">
+                      {% if item.is_income %}
                       &euro; {{ "%.2f"|format(item.amount) }}
-                    {% endif %}
-                  </td>
-                  <td>
-                    <button class="btn btn-action" style="padding: 0px 1px;"
-                            data-url="{{ url_for('items.edit', item_id=item.id) }}?form_only"
-                            data-form-action="{{ url_for('items.create') }}"
-                            data-bs-toggle="modal" data-bs-target="#editItemModal"
-                            data-title="Copy item" data-submit-button-title="Create">
-                      <i data-feather="copy" style="stroke-width: 1px; size: 10px;"></i>
-                    </button>
-                    <button class="btn btn-action" style="padding: 0px;" data-bs-toggle="modal"
-                            data-url="{{ url_for('items.remove',item_id=item.id) }}?form_only"
-                            data-bs-target="#deleteItemModal" data-title="Confirm deletion"
-                            data-submit-button-title="Yes">
-                      <i data-feather="trash-2" style="stroke-width: 1px; size: 10px;"></i>
-                    </button>
-                  </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-              </table>
+                      {% endif %}
+                    </div>
+                    <div class="col text-danger text-end">
+                      {% if not item['is_income'] %}
+                        &euro; {{ "%.2f"|format(item.amount) }}
+                      {% endif %}
+                    </div>
+                    <div class="col text-end">
+                      <button class="btn btn-action" style="padding: 0px 1px;"
+                              data-url="{{ url_for('items.edit', item_id=item.id) }}?form_only"
+                              data-form-action="{{ url_for('items.create') }}"
+                              data-bs-toggle="modal" data-bs-target="#editItemModal"
+                              data-title="Copy item" data-submit-button-title="Create">
+                        <i data-feather="copy" style="stroke-width: 1px; size: 10px;"></i>
+                      </button>
+                      <button class="btn btn-action" style="padding: 0px;" data-bs-toggle="modal"
+                              data-url="{{ url_for('items.remove',item_id=item.id) }}?form_only"
+                              data-bs-target="#deleteItemModal" data-title="Confirm deletion"
+                              data-submit-button-title="Yes">
+                        <i data-feather="trash-2" style="stroke-width: 1px; size: 10px;"></i>
+                      </button>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
           </div>
             </div>
         {% endif %}
