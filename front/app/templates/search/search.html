@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Search{% endblock %}
+
+{% block header %}
+<div class="container-xl mt-2 mb-3">
+  <form class="inputform" method="post" action="{{ url_for('search.index') }}">
+    {{ form.hidden_tag() }}
+    <div class="row">
+      <div class="col mb-2">
+        <div class="input-group">
+          <span class="input-group-text">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </span>
+          {{ form.start_date(class_="form-control") }}
+        </div>
+      </div>
+      <div class="col mb-2">
+        <div class="input-group">
+          <span class="input-group-text">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+          </span>
+          {{ form.end_date(class_="form-control") }}
+        </div>
+      </div>
+    </div>
+    <div class="form-row justify-content-center my-2">
+      <div class="mb-3 input-group">
+        <span class="input-group-text">
+          <i class="bi bi-pencil"></i>
+        </span>
+        {{ form.description(class_="form-control", placeholder="Coop: bread, butter, milk") }}
+      </div>
+      <div>
+          {{ form.submit(class_="btn btn-outline-success") }}
+      </div>
+    </div>
+  </form>
+</div>
+{% include 'items/item_modal_stub.html' %}
+{% endblock %}
+
+{% block content %}
+{% if items %}
+{% set saldo = items['sum_income'] - items['sum_expenses'] %}
+<div class="container-xl mt-3">
+  <div class="card">
+    <div class="card-header">
+      <div class="">
+        <div class="row border-bottom p-1">
+          <div class="col text-center fw-bold">Saldo</div>
+          <div class="col text-center fw-bold">Income</div>
+          <div class="col text-center fw-bold">Expenses</div>
+        </div>
+          <div class="row pt-1">
+            <div class="col text-center {% if saldo < 0 %}text-danger{% else %}text-success{% endif %}">&euro; {{ "%.2f"|format(items.sum_income - items.sum_expenses) }}</div>
+            <div class="col text-center text-success">&euro; {{ "%.2f"|format(items.sum_income) }}</div>
+            <div class="col text-center text-danger">&euro; {{ "%.2f"|format(items.sum_expenses) }}</div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% include 'search/render_items.html' %}
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}
+

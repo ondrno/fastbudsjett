@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.css">
+    <link href="static/selectize/css/selectize.css">
+    <link rel="stylesheet" href="/static/app.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <title>{% block title %}{% endblock %} - FastBudsjett</title>
+  </head>
+  <body>
+  {% if g.user %}
+    <nav class="navbar navbar-expand-sm navbar-light">
+      <div class="container-xl">
+        <a href="{{ url_for('index') }}" class="navbar-brand">fastBudsjett <img src="/static/img/piggy-bank-svgrepo-com.svg" width="28px" height="28px" style="border-width: 3px;"></img></a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navmenu"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navmenu">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('search.index') }}"
+                 data-bs-toggle="tooltip" data-bs-placement="bottom" title="search">
+                <i data-feather="search"></i></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                 data-bs-toggle="tooltip" data-bs-placement="bottom" title="statistics">
+                <i data-feather="pie-chart"></i></a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i data-feather="settings"></i></a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <li><h5 class="dropdown-header">user administration</h5></li>
+                <li><a class="dropdown-item disabled" href="#">users</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h5 class="dropdown-header">item configuration</h5></li>
+                <li><a class="dropdown-item" href="{{ url_for('categories.index') }}">modify categories</a></li>
+                <li><a class="dropdown-item disabled" href="#">modify itemtypes</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('auth.logout') }}"
+                 data-bs-toggle="tooltip" data-bs-placement="bottom" title="logout">
+              <i data-feather="log-out"></i></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  {% endif %}
+{% block header %}{% endblock %}
+{% block content %}{% endblock %}
+    <script>
+      feather.replace()
+    </script>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+  <script>
+      //
+      $('.btn-action').click(function(){
+          var url = $(this).data("url");
+          var modal_target_name = $(this).data("bs-target")
+          var modal_title = $(this).data("title");
+          var form_action = $(this).data("form-action")
+          var button_title = $(this).data("submit-button-title")
+          var submit_button_class = $(this).data("submit-button-class")
+          $.ajax({
+              type: "GET",
+              url: url,
+              dataType: 'json',
+              success: function(res) {
+                  // get the ajax response data
+                  var data = res.body;
+                  var modal_target = $(modal_target_name);
+                  if (modal_target) {
+                      $(modal_target).find('.modal-body').html(res.html_form);
+                      $(modal_target).find('.modal-title').text(modal_title);
+                      if (button_title) {
+                          $(modal_target).find('#submit').val(button_title);
+                      }
+                      if (submit_button_class) {
+                          $(modal_target).find('#submit').removeClass("btn-outline-success");
+                          $(modal_target).find('#submit').addClass(submit_button_class);
+                      }
+                      if (form_action) {
+                          $(modal_target).find('.inputform').attr('action', form_action)
+                      }
+                      //console.log("submit button" + button_title)
+                      // show modal
+                      $(modal_target).modal('show');
+                  }
+                  else {
+                     console.log("Could not find: " + modal_target_name);
+                  }
+              },
+              error: function(request, status, error) {
+                  console.log("ajax call went wrong:" + request.responseText + " error:" + error);
+              }
+          });
+      });
+  </script>
+  {% block script %}{% endblock %}
+</html>

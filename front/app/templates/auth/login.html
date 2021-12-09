@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block header %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    {% for message in messages %}
+      <div class="container">
+        <div class="alert alert-danger" role="alert">{{ message }}</div>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="container p-5">
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    {{ form.email(class_="form-control", placeholder="Email") }}
+    {% if form.email.errors %}
+      {% for error in form.email.errors %}
+        <div id="alert-email" class="alert alert-danger">{{ error }}</div>
+      {% endfor %}
+    {% endif %}
+    <div class="p-1"></div>
+    {{ form.password(class_="form-control", placeholder="Password") }}
+    {% if form.password.errors %}
+      {% for error in form.password.errors %}
+        <div id="alert-password" class="alert alert-danger">{{ error }}</div>
+      {% endfor %}
+    {% endif %}
+    <div class="p-1"></div>
+    {{ form.submit(class_="btn btn-lg btn-success btn-block") }}
+  </form>
+</div>
+{% endblock %}
+
+{% block script %}
+{% endblock %}

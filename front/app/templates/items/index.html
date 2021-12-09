@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% set this_year, this_month = g.curr_month.split("/") %}
+{% set this_year = this_year | int %}
+{% set this_month = this_month | int %}
+{% if this_month < 10 %}
+  {% set this_month_padded = "0" ~ this_month %}
+{% else %}
+  {% set this_month_padded = this_month %}
+{% endif %}
+{% set next_year, next_month = g.next_month.split("/") %}
+{% set prev_year, prev_month = g.prev_month.split("/") %}
+
+{% block header %}
+<div class="container-xl">
+  <div class="row">
+    <div class="col text-start">
+        <button class="btn btn-action"
+                data-url="{{ url_for('items.create') }}?form_only"
+                data-bs-toggle="modal" data-bs-target="#editItemModal" data-title="Create item">
+          <i data-feather="file-plus" width="28" height="28"></i>
+        </button>
+    </div>
+    <div class="col offset-1 text-end">
+      <a class="" href="{{ url_for('items.show', year=prev_year, month=prev_month) }}">
+        <i data-feather="skip-back" width="28" height="28"></i>
+      </a>
+    </div>
+    <div class="col">
+      <input class="form-control" id="date-month-selector" required type="month"
+             value="{{ this_year }}-{{ this_month_padded }}"
+             onchange="redirect_to_month(event)"
+      >
+    </div>
+    <div class="col">
+      <a class="" href="{{ url_for('items.show', year=next_year, month=next_month) }}">
+        <i data-feather="skip-forward" width="28" height="28"></i></a>
+    </div>
+    <div class="col-3"></div>
+  </div>
+</div>
+
+{% include 'items/item_modal_stub.html' %}
+{% endblock %}
+
+{% block content %}
+{% if items and this_year in items %}
+  {% set sum_income = items[this_year][this_month]['sum_income'] %}
+  {% set sum_expenses = items[this_year][this_month]['sum_expenses'] %}
+  {% set saldo = sum_income - sum_expenses %}
+{% else %}
+  {% set sum_income = 0 %}
+  {% set sum_expenses = 0 %}
+  {% set saldo = 0 %}
+{% endif %}
+<div class="container-xl mt-3">
+  <div class="card">
+    <div class="card-header">
+      <div class="">
+        <div class="row border-bottom p-1">
+          <div class="col text-center fw-bold">Saldo</div>
+          <div class="col text-center fw-bold">Income</div>
+          <div class="col text-center fw-bold">Expenses</div>
+        </div>
+          <div class="row pt-1">
+            <div class="col text-center {% if saldo < 0 %}text-danger{% else %}text-success{% endif %}">&euro; {{ "%.2f"|format(saldo) }}</div>
+            <div class="col text-center text-success">&euro; {{ "%.2f"|format(sum_income) }}</div>
+            <div class="col text-center text-danger">&euro; {{ "%.2f"|format(sum_expenses) }}</div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include 'items/render_items.html' %}
+{% endblock %}
+
+
+{% block script %}
+<script type="text/javascript">
+    function redirect_to_month(e) {
+      const items = e.target.value.split("-");
+      const selected_year = items[0];
+      const selected_month = items[1].replace(/^0/g, '');
+      const new_base_path = '../' + selected_year + '/' + selected_month;
+      const url = new URL(new_base_path, window.location.href);
+      window.location.href=url;
+    }
+</script>
+{% endblock %}
