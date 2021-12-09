@@ -38,10 +38,16 @@
                  data-bs-toggle="tooltip" data-bs-placement="bottom" title="statistics">
                 <i data-feather="pie-chart"></i></a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#"
-                 data-bs-toggle="tooltip" data-bs-placement="bottom" title="settings">
-                <i data-feather="settings"></i></a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i data-feather="settings"></i></a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <li><h5 class="dropdown-header">user administration</h5></li>
+                <li><a class="dropdown-item disabled" href="#">users</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h5 class="dropdown-header">item configuration</h5></li>
+                <li><a class="dropdown-item" href="{{ url_for('categories.index') }}">modify categories</a></li>
+                <li><a class="dropdown-item disabled" href="#">modify itemtypes</a></li>
+              </ul>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('auth.logout') }}"
