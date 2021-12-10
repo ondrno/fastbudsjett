@@ -15,7 +15,7 @@ class ItemType(Base):
     ItemType class, it differentiates between revenues and expenditures
     """
     id = Column(Integer, primary_key=True, index=True)
-    title_en = Column(String, index=True, unique=True, nullable=False)
-    title_de = Column(String, index=True, unique=True, nullable=True)
+    title_en = Column(String, index=True, nullable=True)
+    title_de = Column(String, index=True, nullable=True)
     items = relationship("Item", back_populates="itemtype")
     category = relationship("Category", back_populates="itemtype")
