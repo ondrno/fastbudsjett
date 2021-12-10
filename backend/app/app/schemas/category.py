@@ -25,7 +25,7 @@ class CategoryUpdate(CategoryBase):
     @root_validator(pre=True)
     def check_any_of(cls, values):
         if not values.keys():
-            raise ValueError("Either 'name' or 'itemtype_id' has to be given")
+            raise ValueError("Either 'title_en' or 'itemtype_id' has to be given")
         else:
             return values
 

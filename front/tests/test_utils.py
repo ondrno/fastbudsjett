@@ -53,7 +53,7 @@ class TestBaseTypes:
 
     def test_get_value_returns_str_if_int_not_found(self):
         def produce():
-            return [{'id': 1, 'name': 'a'}, {'id': 2, 'name': 'b'}]
+            return [{'id': 1, 'title_en': 'a'}, {'id': 2, 'title_en': 'b'}]
         b = utils.BaseTypes(callback=produce)
         assert b.get_value(2) == 'b'
         assert b.get_value('2') == 'b'

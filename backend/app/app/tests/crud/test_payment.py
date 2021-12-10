@@ -21,7 +21,7 @@ def _create_payment(db: Session, name: str):
 
 
 def _compare_entries(a, b):
-    assert a.name == b.name
+    assert a.title_en == b.title_en
     assert a.id == b.id
     assert a.items == b.items
 
@@ -29,14 +29,14 @@ def _compare_entries(a, b):
 def test_create_payment(db: Session) -> None:
     name = random_string(length=randint(3, 30))
     payment = _create_payment(db, name=name)
-    assert payment.name == name
+    assert payment.title_en == name
     assert payment.items == []
 
 
 def test_payment_items_field_is_propagated_by_items(db: Session, test_category) -> None:
     name = random_string(length=randint(3, 30))
     payment = _create_payment(db, name=name)
-    assert payment.name == name
+    assert payment.title_en == name
     assert payment.items == []
 
     itemtype = mock.MagicMock()

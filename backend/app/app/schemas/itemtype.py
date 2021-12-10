@@ -8,7 +8,7 @@ name_constr = constr(min_length=3, max_length=30)
 # Shared properties
 class ItemTypeBase(BaseModel):
     """
-    ItemType base class, the name describes the item type, i.e. revenue or expenditures
+    ItemType base class, the title_en describes the item type, i.e. revenue or expenditures
     """
     name: Optional[str] = None
 

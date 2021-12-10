@@ -21,7 +21,7 @@ def _create_category(db: Session, name: str, itemtype_id: int):
 
 
 def _compare_entries(a, b):
-    assert a.name == b.name
+    assert a.title_en == b.title_en
     assert a.itemtype_id == b.itemtype_id
     assert a.id == b.id
     assert a.items == b.items
@@ -30,7 +30,7 @@ def _compare_entries(a, b):
 def test_create_category(db: Session, test_itemtype) -> None:
     name = random_string(length=randint(3, 30))
     category = _create_category(db, name=name, itemtype_id=test_itemtype.id)
-    assert category.name == name
+    assert category.title_en == name
     assert category.itemtype_id == test_itemtype.id
     assert category.items == []
 
@@ -39,7 +39,7 @@ def test_category_items_field_is_propagated_by_items(db: Session, test_payment) 
     name = random_string(length=randint(3, 30))
     itemtype = mock.MagicMock()
     category = _create_category(db, name=name, itemtype_id=itemtype.id)
-    assert category.name == name
+    assert category.title_en == name
     assert category.items == []
 
     user = create_random_user(db)

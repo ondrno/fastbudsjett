@@ -190,28 +190,28 @@ class RestApiInterface:
 
     def create_category(self, name: str, itemtype_id: int):
         r = requests.post(self.BASE_CATEGORIES_URL, headers=self.auth_token,
-                          json={'name': name, 'itemtype_id': itemtype_id})
+                          json={'title_en': name, 'itemtype_id': itemtype_id})
         if r.ok:
             item = r.json()
             return item
         else:
-            raise ApiException(f"Could not create category with name={name}, itemtype={itemtype_id} -> {r.content}")
+            raise ApiException(f"Could not create category with title_en={name}, itemtype={itemtype_id} -> {r.content}")
 
     def create_payment(self, name: str):
-        r = requests.post(self.BASE_PAYMENTS_URL, headers=self.auth_token, json={'name': name})
+        r = requests.post(self.BASE_PAYMENTS_URL, headers=self.auth_token, json={'title_en': name})
         if r.ok:
             item = r.json()
             return item
         else:
-            raise ApiException(f"Could not create payment_type with name={name} -> {r.content}")
+            raise ApiException(f"Could not create payment_type with title_en={name} -> {r.content}")
 
     def create_itemtype(self, name: str):
-        r = requests.post(self.BASE_ITEMTYPES_URL, headers=self.auth_token, json={'name': name})
+        r = requests.post(self.BASE_ITEMTYPES_URL, headers=self.auth_token, json={'title_en': name})
         if r.ok:
             item = r.json()
             return item
         else:
-            raise ApiException(f"Could not create itemtype with name={name} -> {r.content}")
+            raise ApiException(f"Could not create itemtype with title_en={name} -> {r.content}")
 
     @lru_cache
     def get_itemtypes(self):

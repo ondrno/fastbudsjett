@@ -8,7 +8,7 @@ name_constr = constr(min_length=2, max_length=30)
 # Shared properties
 class PaymentBase(BaseModel):
     """
-    Payment base class, the name describes the payment method, e.g. debit_card, cash, transfer
+    Payment base class, the title_en describes the payment method, e.g. debit_card, cash, transfer
     """
     name: Optional[str] = None
 

@@ -42,7 +42,7 @@ def create_category(
     try:
         category = crud.category.create(db=db, obj_in=category_in)
     except sqlalchemy.exc.IntegrityError:
-        raise HTTPException(status_code=400, detail="The category with this name already exists.")
+        raise HTTPException(status_code=400, detail="The category with this title_en already exists.")
 
     return category
 
@@ -63,7 +63,7 @@ def update_category(
     try:
         category = crud.category.update(db=db, db_obj=category, obj_in=category_in)
     except sqlalchemy.exc.IntegrityError:
-        raise HTTPException(status_code=400, detail="The category with this name already exists.")
+        raise HTTPException(status_code=400, detail="The category with this title_en already exists.")
     return category
 
 

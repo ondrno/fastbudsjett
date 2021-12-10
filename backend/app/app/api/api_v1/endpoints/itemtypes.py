@@ -42,7 +42,7 @@ def create_itemtype(
     try:
         itemtype = crud.itemtype.create(db=db, obj_in=itemtype_in)
     except sqlalchemy.exc.IntegrityError:
-        raise HTTPException(status_code=400, detail="The itemtype with this name already exists.")
+        raise HTTPException(status_code=400, detail="The itemtype with this title_en already exists.")
 
     return itemtype
 
@@ -63,7 +63,7 @@ def update_itemtype(
     try:
         itemtype = crud.itemtype.update(db=db, db_obj=itemtype, obj_in=itemtype_in)
     except sqlalchemy.exc.IntegrityError:
-        raise HTTPException(status_code=400, detail="The itemtype with this name already exists.")
+        raise HTTPException(status_code=400, detail="The itemtype with this title_en already exists.")
     return itemtype
 
 

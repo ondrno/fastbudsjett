@@ -15,17 +15,17 @@ class BaseTypes:
 
     def fetch(self) -> dict:
         """
-        Get the name and id from the database using the callback from rest.iface.xxx
+        Get the title_en and id from the database using the callback from rest.iface.xxx
         and return a dictionary, e.g. itemtypes = { '2': 'revenue', '3': 'expenditure' }
 
         Example: categories_lookup = get_and_resolve(rest.iface.get_categories)
         """
         raw = self.rest_callback()
         items = {}
-        raw = sorted(raw, key=lambda i: i['name'])
+        raw = sorted(raw, key=lambda i: i['title_en'])
         for p in raw:
             id = p['id']
-            name = p['name']
+            name = p['title_en']
             items[str(id)] = name
         return items
 
