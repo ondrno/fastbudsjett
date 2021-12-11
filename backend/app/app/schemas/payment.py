@@ -10,22 +10,26 @@ class PaymentBase(BaseModel):
     """
     Payment base class, the title_en describes the payment method, e.g. debit_card, cash, transfer
     """
-    name: Optional[str] = None
+    title_en: Optional[str] = None
+    title_de: Optional[str] = None
 
 
 # Properties to receive via API on creation
 class PaymentCreate(PaymentBase):
-    name: name_constr
+    title_en: name_constr
+    title_de: name_constr
 
 
 # Properties to receive via API on update
 class PaymentUpdate(PaymentBase):
-    name: name_constr
+    title_en: name_constr
+    title_de: name_constr
 
 
 class PaymentInDBBase(PaymentBase):
     id: PositiveInt
-    name: name_constr
+    title_en: name_constr
+    title_de: name_constr
 
     class Config:
         orm_mode = True
