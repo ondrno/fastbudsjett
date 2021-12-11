@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 class ItemType(Base):
     """
-    ItemType class, it differentiates between revenues and expenditures
+    ItemType class, it differentiates between income and expense
     """
     id = Column(Integer, primary_key=True, index=True)
     title_en = Column(String, index=True, nullable=True)

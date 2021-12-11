@@ -46,7 +46,7 @@ def resolve_items(raw,
 
         payment = i
         payment['itemtype'] = itemtypes.get_value(itemtype_id)
-        payment['is_income'] = payment['itemtype'].lower() == 'revenue'
+        payment['is_income'] = payment['itemtype'].lower() == 'income'
         payment['payment'] = payment_types.get_value(payment_id)
         payment['category'] = categories.get_value(cat_id)
         year, month, day = [int(i) for i in str(payment['date']).split('-')]

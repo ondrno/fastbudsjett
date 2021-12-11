@@ -16,7 +16,7 @@ class BaseTypes:
     def fetch(self) -> dict:
         """
         Get the title_en and id from the database using the callback from rest.iface.xxx
-        and return a dictionary, e.g. itemtypes = { '2': 'revenue', '3': 'expenditure' }
+        and return a dictionary, e.g. itemtypes = { '2': 'income', '3': 'expense' }
 
         Example: categories_lookup = get_and_resolve(rest.iface.get_categories)
         """
