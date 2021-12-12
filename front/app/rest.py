@@ -16,6 +16,22 @@ class User:
         self._is_anonymous = False
 
     @property
+    def default_locale(self):
+        return self._default_locale is not None
+
+    @default_locale.setter
+    def default_locale(self, token):
+        self._default_locale = token
+
+    @property
+    def email(self):
+        return self._email is not None
+
+    @email.setter
+    def email(self, new_email):
+        self._email = new_email
+
+    @property
     def is_authenticated(self):
         return self._auth_token is not None
 
@@ -49,6 +65,9 @@ class User:
 
     def get_id(self):
         return self._email
+
+    def get_user_id(self):
+        return self._user_id
 
 
 class RestApiInterface:
@@ -118,6 +137,15 @@ class RestApiInterface:
                         api_user['is_active'], api_user['is_superuser'], api_user["default_locale"])
         else:
             raise ApiException(f"Could not add user, {r.content}")
+
+    def update_user(self, user_id: int, data: dict) -> User:
+        r = requests.put(self.BASE_USERS_URL + f"/me", headers=self.auth_token, json=data)
+        if r.ok:
+            api_user = r.json()
+            return User(api_user['email'], api_user['id'], self.auth_token,
+                        api_user['is_active'], api_user['is_superuser'], api_user["default_locale"])
+        else:
+            raise ApiException(f"Could not modify user, {r.content}")
 
     def get_items_for_month(self, year: int, month: int):
         start_date = f"{year}-{month:02d}-01"

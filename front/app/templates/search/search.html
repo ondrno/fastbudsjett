@@ -3,7 +3,7 @@
 {% block title %}Search{% endblock %}
 
 {% block header %}
-<div class="container-xl mt-2 mb-3">
+<div class="container-xxl mt-2 mb-3">
   <form class="inputform" method="post" action="{{ url_for('search.index') }}">
     {{ form.hidden_tag() }}
     <div class="row">
@@ -43,19 +43,19 @@
 {% block content %}
 {% if items %}
 {% set saldo = items['sum_income'] - items['sum_expenses'] %}
-<div class="container-xl mt-3">
+<div class="container-xxl mt-3">
   <div class="card">
     <div class="card-header">
       <div class="">
         <div class="row border-bottom p-1">
-          <div class="col text-center fw-bold">Saldo</div>
           <div class="col text-center fw-bold">Income</div>
           <div class="col text-center fw-bold">Expenses</div>
+          <div class="col text-center fw-bold">Total</div>
         </div>
           <div class="row pt-1">
-            <div class="col text-center {% if saldo < 0 %}text-danger{% else %}text-success{% endif %}">&euro; {{ "%.2f"|format(items.sum_income - items.sum_expenses) }}</div>
-            <div class="col text-center text-success">&euro; {{ "%.2f"|format(items.sum_income) }}</div>
+            <div class="col text-center text-primary">&euro; {{ "%.2f"|format(items.sum_income) }}</div>
             <div class="col text-center text-danger">&euro; {{ "%.2f"|format(items.sum_expenses) }}</div>
+            <div class="col text-center {% if saldo < 0 %}text-danger{% else %}text-primary{% endif %}">&euro; {{ "%.2f"|format(items.sum_income - items.sum_expenses) }}</div>
           </div>
       </div>
     </div>

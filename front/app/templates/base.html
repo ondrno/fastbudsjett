@@ -16,7 +16,7 @@
   <body>
   {% if g.user %}
     <nav class="navbar navbar-expand-sm navbar-light">
-      <div class="container-xl">
+      <div class="container-xxl">
         <a href="{{ url_for('index') }}" class="navbar-brand">fastBudsjett <img src="/static/img/piggy-bank-svgrepo-com.svg" width="28px" height="28px" style="border-width: 3px;"></img></a>
         <button
             class="navbar-toggler"
@@ -42,7 +42,7 @@
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i data-feather="settings"></i></a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                 <li><h5 class="dropdown-header">user administration</h5></li>
-                <li><a class="dropdown-item disabled" href="#">users</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('users.index')}}">user settings</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><h5 class="dropdown-header">item configuration</h5></li>
                 <li><a class="dropdown-item" href="{{ url_for('categories.index') }}">modify categories</a></li>
@@ -69,7 +69,6 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
   <script>
-      //
       $('.btn-action').click(function(){
           var url = $(this).data("url");
           var modal_target_name = $(this).data("bs-target")

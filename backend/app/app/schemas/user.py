@@ -7,8 +7,8 @@ from pydantic import BaseModel, EmailStr, constr
 class UserBase(BaseModel):
     email: Optional[EmailStr] = None
     is_active: Optional[bool] = True
-    is_superuser: bool = False
-    default_locale: str = 'en'
+    is_superuser: Optional[bool] = False
+    default_locale: Optional[str] = 'en'
     full_name: Optional[str] = None
 
 

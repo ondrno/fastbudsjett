@@ -12,7 +12,7 @@
 {% set prev_year, prev_month = g.prev_month.split("/") %}
 
 {% block header %}
-<div class="container-xl">
+<div class="container-xxl">
   <div class="row">
     <div class="col text-start">
         <button class="btn btn-action"
@@ -53,19 +53,19 @@
   {% set sum_expenses = 0 %}
   {% set saldo = 0 %}
 {% endif %}
-<div class="container-xl mt-3">
+<div class="container-xxl mt-3">
   <div class="card">
     <div class="card-header">
       <div class="">
         <div class="row border-bottom p-1">
-          <div class="col text-center fw-bold">Saldo</div>
           <div class="col text-center fw-bold">Income</div>
           <div class="col text-center fw-bold">Expenses</div>
+          <div class="col text-center fw-bold">Total</div>
         </div>
           <div class="row pt-1">
-            <div class="col text-center {% if saldo < 0 %}text-danger{% else %}text-success{% endif %}">&euro; {{ "%.2f"|format(saldo) }}</div>
-            <div class="col text-center text-success">&euro; {{ "%.2f"|format(sum_income) }}</div>
+            <div class="col text-center text-primary">&euro; {{ "%.2f"|format(sum_income) }}</div>
             <div class="col text-center text-danger">&euro; {{ "%.2f"|format(sum_expenses) }}</div>
+            <div class="col text-center {% if saldo < 0 %}text-danger{% else %}text-primary{% endif %}">&euro; {{ "%.2f"|format(saldo) }}</div>
           </div>
       </div>
     </div>
