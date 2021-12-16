@@ -1,34 +1,17 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, url_for, session
 )
-from flask_wtf import FlaskForm
-from wtforms import DecimalField, SelectField, StringField, SubmitField, DateField
-from wtforms.validators import InputRequired, Length, NumberRange
 import datetime
 import calendar
 from dateutil.relativedelta import relativedelta
 import json
 import jsonpickle
 
-from .auth import login_required
-from . import rest
-from front.app.utils import utils
+from ..auth.controllers import login_required
+from ..utils import utils, rest
+from .forms import ItemsForm
 
-
-bp = Blueprint('items', __name__)
-
-
-class ItemsForm(FlaskForm):
-    date = DateField('Date', format="%Y-%m-%d", default=datetime.date.today, validators=[InputRequired()])
-    payment_type = SelectField('Payment', coerce=int, validators=[InputRequired()])
-    amount = DecimalField('Amount', places=2, validators=[InputRequired(), NumberRange(min=0.01)])
-    category = SelectField('Category', coerce=int, validators=[InputRequired()])
-    itemtype = SelectField('ItemType', coerce=int, validators=[InputRequired()])
-    description = StringField('Description', validators=[
-        InputRequired(),
-        Length(5, 255)
-    ])
-    submit = SubmitField('Create')
+mod_items = Blueprint('items', __name__, url_prefix="/items")
 
 
 def resolve_items(raw,
@@ -129,43 +112,33 @@ def format_suburl(year: int, month: int) -> str:
     return f"{year}/{month}"
 
 
-def prepare_data(r: request):
-    data = {'date': r.form['date'],
-            'amount': r.form['amount'],
-            'category_id': r.form['category'],
-            'payment_id': r.form['payment_type'],
-            'description': r.form['description'],
-            'itemtype_id': r.form['itemtype']
-            }
-    return data
-
-
-def types_to_session(categories, payments, itemtypes):
-    session["categories"] = jsonpickle.encode(categories)
-    session["payments"] = jsonpickle.encode(payments)
-    session["itemtypes"] = jsonpickle.encode(itemtypes)
-
-
-def types_from_session() -> dict:
-    return {
-        'categories': jsonpickle.decode(session["categories"]),
-        'payments': jsonpickle.decode(session["payments"]),
-        'itemtypes': jsonpickle.decode(session["itemtypes"]),
-    }
-
-
 def is_form_only(r: request):
     return 'form_only' in request.args and request.method == 'GET'
 
 
-@bp.route('/', methods=['GET'])
+# @babel.localeselector
+# def get_locale():
+#     # if a user is logged in, use the locale from the user settings
+#     user = getattr(g, 'user', None)
+#     if user is not None:
+#         print(f"found user={user} -> {user.locale}")
+#         return user.locale
+#     # otherwise try to guess the language from the user accept
+#     # header the browser transmits.  We support de/fr/en in this
+#     # example.  The best match wins.
+#     best_match = request.accept_languages.best_match(['de', 'en'])
+#     print(f"found no user -> best_match={best_match}")
+#     return best_match
+
+
+@mod_items.route('/', methods=['GET'])
 @login_required
 def index():
     year, month = get_year_month_from_url()
     return redirect(url_for('items.show', year=year, month=month))
 
 
-@bp.route('/show/<int:year>/<int:month>', methods=['GET'])
+@mod_items.route('/show/<int:year>/<int:month>', methods=['GET'])
 @login_required
 def show(year: int, month: int):
     now = datetime.date(year, month, 1)
@@ -174,7 +147,7 @@ def show(year: int, month: int):
     categories = utils.CategoryTypes()
     payments = utils.PaymentTypes()
     itemtypes = utils.ItemTypes()
-    types_to_session(categories, payments, itemtypes)
+    utils.types_to_session(categories, payments, itemtypes)
 
     form = ItemsForm()
     utils.set_form_field_default(request, form.payment_type, payments, 'cash')
@@ -189,11 +162,11 @@ def show(year: int, month: int):
     return render_template('items/index.html', items=payments, form=form)
 
 
-@bp.route('/edit/<int:item_id>', methods=['GET', 'POST'])
+@mod_items.route('/edit/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def edit(item_id: int):
     form_only = is_form_only(request)
-    t = types_from_session()
+    t = utils.types_from_session()
     categories = t["categories"]
     payments = t["payments"]
     itemtypes = t["itemtypes"]
@@ -213,12 +186,12 @@ def edit(item_id: int):
                                  default=itemtypes.get_value(current_item.get('itemtype_id')))
 
     if form.validate_on_submit():
-        data = prepare_data(request)
+        data = utils.prepare_data(request)
         rest.iface.update_item(item_id, data)
 
         # show the same month as the date of the item which was created/modified
         session["selected_month"] = "/".join(data['date'].split("-")[0:2])
-        return redirect(url_for('index'))
+        return redirect(url_for('items.index'))
 
     if form_only:
         html_form = render_template('items/item_edit_form.html', form=form, form_action=url_for('items.edit', item_id=item_id))
@@ -227,11 +200,11 @@ def edit(item_id: int):
     return render_template('items/create_or_edit.html', form=form, form_action=url_for('items.edit', item_id=item_id))
 
 
-@bp.route('/create', methods=['GET', 'POST'])
+@mod_items.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
     form_only = is_form_only(request)
-    t = types_from_session()
+    t = utils.types_from_session()
 
     form = ItemsForm()
     utils.set_form_field_default(request, form.payment_type, t['payments'], 'cash')
@@ -239,12 +212,12 @@ def create():
     utils.set_form_field_default(request, form.itemtype, t['itemtypes'], 'expenditure')
 
     if form.validate_on_submit():
-        data = prepare_data(request)
+        data = utils.prepare_data(request)
         rest.iface.create_item(data)
 
         # show the same month as the date of the item which was created/modified
         session["selected_month"] = "/".join(data['date'].split("-")[0:2])
-        return redirect(url_for('index'))
+        return redirect(url_for('items.index'))
 
     if form_only:
         html_form = render_template('items/item_edit_form.html', form=form, form_action=url_for('items.create'))
@@ -253,7 +226,7 @@ def create():
     return render_template('items/create_or_edit.html', form=form, form_action=url_for('items.create'))
 
 
-@bp.route('/remove/<int:item_id>', methods=['GET', 'POST'])
+@mod_items.route('/remove/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def remove(item_id: int):
     form_only = is_form_only(request)
@@ -281,10 +254,10 @@ def remove(item_id: int):
         form.__dict__['_fields'][k].render_kw = {'readonly': 'readonly'}
 
     if form.validate_on_submit():
-        data = prepare_data(request)
+        data = utils.prepare_data(request)
         rest.iface.purge_item(item_id, data)
 
-        return redirect(url_for('index'))
+        return redirect(url_for('items.index'))
 
     if form_only:
         html_form = render_template('items/item_remove_form.html',

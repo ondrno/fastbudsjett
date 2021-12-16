@@ -1,6 +1,5 @@
 from front.app.utils import utils
-from front.app.rest import iface
-from front.app import app
+from front.app.utils.rest import iface
 import mock
 import pytest
 import datetime

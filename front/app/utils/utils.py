@@ -1,7 +1,10 @@
+from flask import (
+    request, session
+)
 import datetime
 from dateutil.relativedelta import relativedelta
-from front.app.auth import login_required
-from front.app import rest
+import jsonpickle
+from ..utils import rest
 
 
 class BaseTypes:
@@ -100,3 +103,28 @@ def start_of_year():
     today = datetime.datetime.today()
     d = datetime.date(today.year, 1, 1)
     return d
+
+
+def prepare_data(r: request):
+    data = {'date': r.form['date'],
+            'amount': r.form['amount'],
+            'category_id': r.form['category'],
+            'payment_id': r.form['payment_type'],
+            'description': r.form['description'],
+            'itemtype_id': r.form['itemtype']
+            }
+    return data
+
+
+def types_to_session(categories, payments, itemtypes):
+    session["categories"] = jsonpickle.encode(categories)
+    session["payments"] = jsonpickle.encode(payments)
+    session["itemtypes"] = jsonpickle.encode(itemtypes)
+
+
+def types_from_session() -> dict:
+    return {
+        'categories': jsonpickle.decode(session["categories"]),
+        'payments': jsonpickle.decode(session["payments"]),
+        'itemtypes': jsonpickle.decode(session["itemtypes"]),
+    }

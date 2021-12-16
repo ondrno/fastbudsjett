@@ -1,22 +1,11 @@
 from flask import (
     Blueprint, render_template, redirect, session, url_for, request
 )
-from flask_wtf import FlaskForm
-from wtforms import SubmitField, EmailField, RadioField, SelectField
-from wtforms.validators import InputRequired, Email, DataRequired
+from ..auth.controllers import login_required
+from ..utils import rest
+from .forms import UsersForm
 
-from .auth import login_required
-from . import rest, utils
-
-
-bp = Blueprint('users', __name__)
-
-
-class UsersForm(FlaskForm):
-    email = EmailField('Email address', [DataRequired(), Email()])
-    default_locale = SelectField('Language', choices=[('en', 'English'), ('de', 'Deutsch')],
-                                 validators=[InputRequired()])
-    submit = SubmitField('Update')
+mod_users = Blueprint('users', __name__, url_prefix="/users")
 
 
 def prepare_data(r: request):
@@ -26,7 +15,7 @@ def prepare_data(r: request):
     return data
 
 
-@bp.route('/users', methods=['GET'])
+@mod_users.route('/', methods=['GET'])
 @login_required
 def index():
     current_user = rest.iface.whoami()
@@ -35,7 +24,7 @@ def index():
     return render_template('users/index.html', known_users=users)
 
 
-@bp.route('/users/edit/<int:user_id>', methods=['GET', 'POST'])
+@mod_users.route('/edit/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def edit(user_id: int):
     me = rest.iface.whoami()

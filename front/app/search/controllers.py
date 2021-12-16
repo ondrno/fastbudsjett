@@ -1,27 +1,16 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, session,
-)
-from flask_wtf import FlaskForm
-from wtforms import DecimalField, SelectField, StringField, SubmitField, RadioField, DateField
-from wtforms.validators import ValidationError, NumberRange, Optional
+    Blueprint, redirect, render_template, request, url_for, )
 import json
-import jsonpickle
-
-from .auth import login_required
-from front.app import items, utils, rest
-
-
-bp = Blueprint('search', __name__)
+from ..auth.controllers import login_required
+from .. import items, utils
+from ..utils import rest
+from .forms import SearchForm
 
 
-class SearchForm(FlaskForm):
-    start_date = DateField('From', validators=[Optional()], default=utils.start_of_year, format="%Y-%m-%d")
-    end_date = DateField('Until', validators=[Optional()])
-    description = StringField('Description', validators=[Optional()])
-    submit = SubmitField('Search')
+mod_search = Blueprint('search', __name__, url_prefix="/search")
 
 
-@bp.route('/search', methods=['GET', 'POST'])
+@mod_search.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
     categories = utils.CategoryTypes()
