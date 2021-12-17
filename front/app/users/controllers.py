@@ -1,9 +1,11 @@
 from flask import (
     Blueprint, render_template, redirect, session, url_for, request
 )
+from flask_babel import refresh
 from ..auth.controllers import login_required
 from ..utils import rest
 from .forms import UsersForm
+
 
 mod_users = Blueprint('users', __name__, url_prefix="/users")
 
@@ -36,6 +38,7 @@ def edit(user_id: int):
 
         # show the same month as the date of the item which was created/modified
         session["locale"] = data['default_locale']
+        refresh()
         return redirect(url_for('users.index'))
 
     return render_template('users/edit.html', form=form, known_users=[me])

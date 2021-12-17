@@ -20,8 +20,8 @@ class User:
         return self._default_locale is not None
 
     @default_locale.setter
-    def default_locale(self, token):
-        self._default_locale = token
+    def default_locale(self, locale):
+        self._default_locale = locale
 
     @property
     def email(self):

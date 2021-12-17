@@ -2,6 +2,7 @@ import functools
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
+from flask_babel import refresh
 from ..utils import rest
 from .forms import LoginForm
 
@@ -46,6 +47,8 @@ def load_logged_in_user():
     else:
         try:
             user = rest.iface.whoami()
+            session['locale'] = user._default_locale
+            refresh()
             g.user = user.get_id()
             g.is_superuser = user.is_superuser
         except rest.ApiException:

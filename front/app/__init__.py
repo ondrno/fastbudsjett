@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import (session, request, Flask)
 from flask_babel import Babel
 from flask_caching import Cache
 from flask_login import LoginManager
@@ -8,23 +8,41 @@ import calendar
 from .config import cache_config
 
 
-app = Flask(__name__)
-app.config.from_object(AppConfig)
+babel = Babel()
 
-app.register_blueprint(auth.mod_auth)
-app.register_blueprint(items.mod_items)
-app.register_blueprint(search.mod_search)
-app.register_blueprint(categories.mod_categories)
-app.register_blueprint(users.mod_users)
-app.add_url_rule('/', endpoint='items.index')
 
-app.cache = Cache(app, config=cache_config)
-app.login = LoginManager()
-app.login.login_view = 'auth.login'
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(AppConfig)
 
-app.config['FLASK_ENV'] = 'development'
-babel = Babel(app)
-cache = Cache(app, config=cache_config)
+    app.register_blueprint(auth.mod_auth)
+    app.register_blueprint(items.mod_items)
+    app.register_blueprint(search.mod_search)
+    app.register_blueprint(categories.mod_categories)
+    app.register_blueprint(users.mod_users)
+    app.add_url_rule('/', endpoint='entries.index')
+
+    app.cache = Cache(app, config=cache_config)
+    app.login = LoginManager()
+    app.login.login_view = 'auth.login'
+
+    app.config['FLASK_ENV'] = 'development'
+    babel.init_app(app)
+
+    return app
+
+
+app = create_app()
+
+
+@babel.localeselector
+def get_locale():
+    if 'locale' in session:
+        print(f"found session locale={session['locale']}")
+        return session['locale']
+    best_match = request.accept_languages.best_match(['de', 'en'])
+    print(f"found no user -> best_match={best_match}")
+    return best_match
 
 
 def format_datetime(value, format="%Y-%M-%D"):

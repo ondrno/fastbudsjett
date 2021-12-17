@@ -1,3 +1,4 @@
+from front.app import app
 from front.app.utils import utils
 from front.app.utils.rest import iface
 import mock
@@ -12,7 +13,7 @@ from freezegun import freeze_time
 class TestBaseTypes:
     @mock.patch('front.app.utils.BaseTypes.fetch')
     def test_init_calls_nothing(self, mock_fetch):
-        b = utils.BaseTypes()
+        b = utils.BaseTypes(locale='en')
         mock_fetch.assert_not_called()
 
     def callback(self):
@@ -20,47 +21,64 @@ class TestBaseTypes:
 
     @mock.patch('front.app.utils.BaseTypes.fetch')
     def test_init_calls_callback(self, mock_fetch):
-        items = {1: 'a'}
+        items = {'1': 'a'}
         mock_fetch.return_value = items
-        b = utils.BaseTypes(callback=self.callback)
-        assert b.items == items
+        b = utils.BaseTypes(callback=self.callback, locale='en')
+        assert b.entries == items
         mock_fetch.assert_called_once()
 
-    def test_get_key_returns_key(self):
-        items = {1: 'a'}
-        b = utils.BaseTypes(callback=None, items=items)
-        assert b.get_key('a') == 1
+    def test_get_id_for_title_returns_title(self):
+        items = {'1': {'title_en': 'a'}}
+        b = utils.BaseTypes(callback=None, entries=items, locale='en')
+        assert b.get_id_for_title('a') == 1
 
-    def test_get_key_returns_zero_if_no_key(self):
-        items = {1: 'a'}
-        b = utils.BaseTypes(callback=None, items=items)
-        assert b.get_key('b') == 0
+    def test_get_id_for_title_returns_title_for_all_locales(self):
+        items = {'1': {'title_en': 'english', 'title_de': 'german'}}
+        b = utils.BaseTypes(callback=None, entries=items, locale='en')
+        assert b.get_id_for_title('german') == 1
 
-    def test_get_key_returns_zero_if_no_key_and_no_init(self):
-        b = utils.BaseTypes()
-        assert b.get_key('b') == 0
+    def test_get_id_for_title_returns_zero_if_no_matching_title(self):
+        items = {'1': {'title_en': 'a'}}
+        b = utils.BaseTypes(callback=None, entries=items, locale='en')
+        assert b.get_id_for_title('b') == 0
 
-    def test_get_value_returns_value(self):
-        items = {1: 'a'}
-        b = utils.BaseTypes(callback=None, items=items)
-        assert b.get_value(1) == 'a'
+    def test_get_id_for_title_returns_zero_if_no_entries(self):
+        b = utils.BaseTypes(locale="en")
+        assert b.get_id_for_title('b') == 0
+
+    def test_get_title_for_id_returns_localized_en_title(self):
+        items = {'1': {'title_en': 'english', 'title_de': 'german'}}
+        b = utils.BaseTypes(callback=None, entries=items, locale="en")
+        assert b.get_title_for_id(1) == 'english'
+
+    def test_get_title_for_id_returns_localized_de_title(self):
+        items = {'1': {'title_en': 'english', 'title_de': 'german'}}
+        b = utils.BaseTypes(callback=None, entries=items, locale="de")
+        assert b.get_title_for_id(1) == 'german'
 
     def test_get_value_returns_empty_string(self):
-        items = {'1': 'a'}
-        b = utils.BaseTypes(callback=None, items=items)
-        assert b.get_value('2') == ''
+        items = {'1': {'title_en': 'english', 'title_de': 'german'}}
+        b = utils.BaseTypes(callback=None, entries=items, locale="en")
+        assert b.get_title_for_id(2) == ''
 
     def test_get_value_returns_str_if_int_not_found(self):
         def produce():
-            return [{'id': 1, 'title_en': 'a'}, {'id': 2, 'title_en': 'b'}]
-        b = utils.BaseTypes(callback=produce)
-        assert b.get_value(2) == 'b'
-        assert b.get_value('2') == 'b'
+            return [{'id': 1, 'title_en': 'a', 'title_de': 'ag'}, {'id': 2, 'title_en': 'b', 'title_de': 'bg'}]
+        b = utils.BaseTypes(callback=produce, locale="en")
+        assert b.get_title_for_id('2', locale="de") == 'bg'
+        assert b.get_title_for_id(2, locale="en") == 'b'
 
-    def test_get_tuples_as_list(self):
-        items = {'1': 'a', '2': "b"}
-        b = utils.BaseTypes(callback=None, items=items)
-        assert b.get_tuples_as_list() == [('1', 'a'), ('2', 'b')]
+    def test_get_tuples_as_list_default_locale(self):
+        items = {'1': {'title_en': 'uk', 'title_de': 'de'},
+                 '2': {'title_en': 'en', 'title_de': 'german'}}
+        b = utils.BaseTypes(callback=None, entries=items, locale="en")
+        assert b.get_tuples_as_list() == [('1', 'uk'), ('2', 'en')]
+
+    def test_get_tuples_as_list_specific_locale(self):
+        items = {'1': {'title_en': 'uk', 'title_de': 'de'},
+                 '2': {'title_en': 'en', 'title_de': 'german'}}
+        b = utils.BaseTypes(callback=None, entries=items, locale="en")
+        assert b.get_tuples_as_list(locale="de") == [('1', 'de'), ('2', 'german')]
 
 
 @pytest.fixture(autouse=True)
@@ -77,19 +95,19 @@ def clear_lru_cache():
 
 @mock.patch('front.app.utils.BaseTypes.fetch')
 def test_init_category_types_class(mock_fetch):
-    c = utils.CategoryTypes()
+    c = utils.CategoryTypes(locale="en")
     assert c.rest_callback == iface.get_categories
 
 
 @mock.patch('front.app.utils.BaseTypes.fetch')
 def test_init_payment_types_class(mock_fetch):
-    c = utils.PaymentTypes()
+    c = utils.PaymentTypes(locale="en")
     assert c.rest_callback == iface.get_payments
 
 
 @mock.patch('front.app.utils.BaseTypes.fetch')
 def test_init_item_types_class(mock_fetch):
-    c = utils.ItemTypes()
+    c = utils.ItemTypes(locale="en")
     assert c.rest_callback == iface.get_itemtypes
 
 

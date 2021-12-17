@@ -28,10 +28,10 @@ def resolve_items(raw,
         itemtype_id = i['itemtype_id']
 
         payment = i
-        payment['itemtype'] = itemtypes.get_value(itemtype_id)
+        payment['itemtype'] = itemtypes.get_title_for_id(itemtype_id)
         payment['is_income'] = payment['itemtype'].lower() == 'income'
-        payment['payment'] = payment_types.get_value(payment_id)
-        payment['category'] = categories.get_value(cat_id)
+        payment['payment'] = payment_types.get_title_for_id(payment_id)
+        payment['category'] = categories.get_title_for_id(cat_id)
         year, month, day = [int(i) for i in str(payment['date']).split('-')]
         if year not in payments:
             payments[year] = {}
@@ -116,21 +116,6 @@ def is_form_only(r: request):
     return 'form_only' in request.args and request.method == 'GET'
 
 
-# @babel.localeselector
-# def get_locale():
-#     # if a user is logged in, use the locale from the user settings
-#     user = getattr(g, 'user', None)
-#     if user is not None:
-#         print(f"found user={user} -> {user.locale}")
-#         return user.locale
-#     # otherwise try to guess the language from the user accept
-#     # header the browser transmits.  We support de/fr/en in this
-#     # example.  The best match wins.
-#     best_match = request.accept_languages.best_match(['de', 'en'])
-#     print(f"found no user -> best_match={best_match}")
-#     return best_match
-
-
 @mod_items.route('/', methods=['GET'])
 @login_required
 def index():
@@ -179,11 +164,11 @@ def edit(item_id: int):
                      date=datetime.date(year=int(year), month=int(month), day=int(day))
                      )
     utils.set_form_field_default(request, form.payment_type, payments,
-                                 default=payments.get_value(current_item.get('payment_id')))
+                                 default=payments.get_id_for_title(current_item.get('payment_id')))
     utils.set_form_field_default(request, form.category, categories,
-                                 default=categories.get_value(current_item.get('category_id')))
+                                 default=categories.get_id_for_title(current_item.get('category_id')))
     utils.set_form_field_default(request, form.itemtype, itemtypes,
-                                 default=itemtypes.get_value(current_item.get('itemtype_id')))
+                                 default=itemtypes.get_id_for_title(current_item.get('itemtype_id')))
 
     if form.validate_on_submit():
         data = utils.prepare_data(request)
