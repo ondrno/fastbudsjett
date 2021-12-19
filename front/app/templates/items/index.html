@@ -17,7 +17,7 @@
     <div class="col text-start">
         <button class="btn btn-action"
                 data-url="{{ url_for('items.create') }}?form_only"
-                data-bs-toggle="modal" data-bs-target="#editItemModal" data-title="Create item">
+                data-bs-toggle="modal" data-bs-target="#editItemModal" data-title="{{_('Create item')}}">
           <i data-feather="file-plus" width="28" height="28"></i>
         </button>
     </div>
@@ -58,9 +58,9 @@
     <div class="card-header">
       <div class="">
         <div class="row border-bottom p-1">
-          <div class="col text-center fw-bold">Income</div>
-          <div class="col text-center fw-bold">Expenses</div>
-          <div class="col text-center fw-bold">Total</div>
+          <div class="col text-center fw-bold">{{_('Income')}}</div>
+          <div class="col text-center fw-bold">{{_('Expenses')}}</div>
+          <div class="col text-center fw-bold">{{_('Total')}}</div>
         </div>
           <div class="row pt-1">
             <div class="col text-center text-primary">&euro; {{ "%.2f"|format(sum_income) }}</div>

@@ -15,11 +15,10 @@ def index():
     categories = {}
     for c in all_categories:
         itemtype_id = c['itemtype_id']
-        itemtype_name = itemtypes.get_value(itemtype_id)
+        itemtype_name = itemtypes.get_title_for_id(itemtype_id)
         c['itemtype_name'] = itemtype_name
         if itemtype_name not in categories:
             categories[itemtype_name] = []
         categories[itemtype_name].append(c)
 
     return render_template('categories/index.html', categories=categories)
-

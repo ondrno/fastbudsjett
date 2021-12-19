@@ -1,4 +1,4 @@
-<div class="h3 text-danger text-center mb-2">Really delete it?</div>
+<div class="h3 text-danger text-center mb-2">{{_('Really delete it?')}}</div>
 <form class="inputform"
       style="border-color: #DC143C"
       method="post" action="{{ form_action }}">
@@ -32,7 +32,7 @@
       <span class="input-group-text">
         <i class="bi bi-currency-euro"></i>
       </span>
-      {{ form.amount(class_="form-control", placeholder="e.g. 12.00") }}
+      {{ form.amount(class_="form-control") }}
       {% if form.amount.errors %}
         {% for error in form.amount.errors %}
            <div id="alert-amount" class="alert alert-danger">{{ error }}</div>
@@ -43,7 +43,7 @@
       <span class="input-group-text">
         <i class="bi bi-pencil"></i>
       </span>
-      {{ form.description(class_="form-control", placeholder="e.g. Coop: bread, butter, milk") }}
+      {{ form.description(class_="form-control") }}
       {% if form.description.errors %}
         {% for error in form.description.errors %}
            <div id="alert-description" class="alert alert-danger">{{ error }}</div>
@@ -53,7 +53,7 @@
   </div>
   <div class="text-center">
     {{ form.submit(class_="btn btn-outline-danger") }}
-      <button type="button" class="btn btn-outline-secondary text-highlight" data-bs-dismiss="modal" aria-label="Close">No</button>
+      <button type="button" class="btn btn-outline-secondary text-highlight" data-bs-dismiss="modal" aria-label="Close">{{_('No')}}</button>
   </div>
 </form>
 {% for field, errors in form.errors.items() %}

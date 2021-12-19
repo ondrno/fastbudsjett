@@ -10,22 +10,26 @@ class User:
         self._email = email
         self._user_id = user_id
         self._auth_token = auth_token
-        self._default_locale = default_locale
+        self._locale = default_locale
         self._is_active = is_active
         self._is_superuser = is_superuser
         self._is_anonymous = False
 
-    @property
-    def default_locale(self):
-        return self._default_locale is not None
+    def __str__(self):
+        return f"email={self._email} id={self._user_id} locale={self._locale} active={self._is_active} " \
+               f"su={self.is_superuser}"
 
-    @default_locale.setter
-    def default_locale(self, locale):
-        self._default_locale = locale
+    @property
+    def locale(self):
+        return self._locale
+
+    @locale.setter
+    def locale(self, locale):
+        self._locale = locale
 
     @property
     def email(self):
-        return self._email is not None
+        return self._email
 
     @email.setter
     def email(self, new_email):

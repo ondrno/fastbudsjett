@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import DecimalField, SelectField, StringField, SubmitField, DateField
 from wtforms.validators import InputRequired, Length, NumberRange
 import datetime
+from flask_babel import lazy_gettext
 
 
 class ItemsForm(FlaskForm):
@@ -14,4 +15,4 @@ class ItemsForm(FlaskForm):
         InputRequired(),
         Length(5, 255)
     ])
-    submit = SubmitField('Create')
+    submit = SubmitField(lazy_gettext('Create'))

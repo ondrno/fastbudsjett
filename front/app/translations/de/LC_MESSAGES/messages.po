@@ -1,0 +1,104 @@
+# German translations for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-12-18 21:42+0100\n"
+"PO-Revision-Date: 2021-12-18 21:31+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: auth/forms.py:10
+msgid "Not a valid email address."
+msgstr "Das ist keine gültige E-Mail-Adresse"
+
+#: auth/forms.py:16
+msgid "Sign In"
+msgstr "Anmelden"
+
+#: items/forms.py:18 templates/items/render_items.html:40
+msgid "Create"
+msgstr "Anlegen"
+
+#: templates/base.html:44
+msgid "user administration"
+msgstr "Benutzerverwaltung"
+
+#: templates/base.html:45
+msgid "user settings"
+msgstr "Einstellungen"
+
+#: templates/base.html:47
+msgid "item configuration"
+msgstr ""
+
+#: templates/base.html:48
+msgid "modify categories"
+msgstr "Kategorien bearbeiten"
+
+#: templates/base.html:49
+msgid "modify itemtypes"
+msgstr ""
+
+#: templates/auth/login.html:3
+msgid "Sign in"
+msgstr ""
+
+#: templates/auth/login.html:21
+msgid "Please sign in"
+msgstr ""
+
+#: templates/items/index.html:20
+msgid "Create item"
+msgstr "Eintrag anlegen"
+
+#: templates/items/index.html:61
+msgid "Income"
+msgstr "Einnahmen"
+
+#: templates/items/index.html:62
+msgid "Expenses"
+msgstr "Ausgaben"
+
+#: templates/items/index.html:63
+msgid "Total"
+msgstr "Gesamt"
+
+#: templates/items/item_remove_form.html:1
+msgid "Really delete it?"
+msgstr "Eintrag wirklich löschen"
+
+#: templates/items/item_remove_form.html:56
+msgid "No"
+msgstr "Nein"
+
+#: templates/items/render_items.html:32
+msgid "Edit item"
+msgstr "Eintrag bearbeiten"
+
+#: templates/items/render_items.html:32
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: templates/items/render_items.html:40
+msgid "Copy item"
+msgstr "Eintrag kopieren"
+
+#: templates/items/render_items.html:45
+msgid "Confirm deletion"
+msgstr "Löschen bestätigen"
+
+#: templates/items/render_items.html:46
+msgid "Yes"
+msgstr "Ja"
+

@@ -47,7 +47,7 @@ def load_logged_in_user():
     else:
         try:
             user = rest.iface.whoami()
-            session['locale'] = user._default_locale
+            user.locale = session['locale'] = user._locale
             refresh()
             g.user = user.get_id()
             g.is_superuser = user.is_superuser

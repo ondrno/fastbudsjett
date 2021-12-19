@@ -21,7 +21,7 @@ def prepare_data(r: request):
 @login_required
 def index():
     current_user = rest.iface.whoami()
-    me = {'id': current_user._user_id, 'email': current_user._email, 'default_locale': current_user._default_locale}
+    me = {'id': current_user._user_id, 'email': current_user._email, 'locale': current_user._locale}
     users = [me]
     return render_template('users/index.html', known_users=users)
 
@@ -30,7 +30,7 @@ def index():
 @login_required
 def edit(user_id: int):
     me = rest.iface.whoami()
-    form = UsersForm(default_locale=me._default_locale, email=me._email)
+    form = UsersForm(default_locale=me._locale, email=me._email)
     if form.validate_on_submit():
 
         data = prepare_data(request)

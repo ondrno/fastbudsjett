@@ -31,7 +31,7 @@
       <span class="input-group-text">
         <i class="bi bi-currency-euro"></i>
       </span>
-      {{ form.amount(class_="form-control", placeholder="e.g. 12.00") }}
+      {{ form.amount(class_="form-control", placeholder="12.00") }}
       {% if form.amount.errors %}
         {% for error in form.amount.errors %}
            <div id="alert-amount" class="alert alert-danger">{{ error }}</div>
@@ -42,7 +42,7 @@
       <span class="input-group-text">
         <i class="bi bi-pencil"></i>
       </span>
-      {{ form.description(class_="form-control", placeholder="e.g. Coop: bread, butter, milk") }}
+      {{ form.description(class_="form-control", placeholder='e.g. Coop: bread, butter, milk') }}
       {% if form.description.errors %}
         {% for error in form.description.errors %}
            <div id="alert-description" class="alert alert-danger">{{ error }}</div>

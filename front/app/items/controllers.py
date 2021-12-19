@@ -1,6 +1,7 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, url_for, session
 )
+from flask_babel import _
 import datetime
 import calendar
 from dateutil.relativedelta import relativedelta
