@@ -13,15 +13,8 @@
 
 {% block header %}
 <div class="container-xxl">
-  <div class="row">
-    <div class="col text-start">
-        <button class="btn btn-action"
-                data-url="{{ url_for('items.create') }}?form_only"
-                data-bs-toggle="modal" data-bs-target="#editItemModal" data-title="{{_('Create item')}}">
-          <i data-feather="file-plus" width="28" height="28"></i>
-        </button>
-    </div>
-    <div class="col offset-1 text-end">
+  <div class="row text-center">
+    <div class="col text-end">
       <a class="" href="{{ url_for('items.show', year=prev_year, month=prev_month) }}">
         <i data-feather="skip-back" width="28" height="28"></i>
       </a>
@@ -32,15 +25,19 @@
              onchange="redirect_to_month(event)"
       >
     </div>
-    <div class="col">
+    <div class="col text-start">
       <a class="" href="{{ url_for('items.show', year=next_year, month=next_month) }}">
         <i data-feather="skip-forward" width="28" height="28"></i></a>
     </div>
-    <div class="col-3"></div>
   </div>
 </div>
 
 {% include 'items/item_modal_stub.html' %}
+<i class="br-icon btn-action"
+          data-url="{{ url_for('items.create') }}?form_only"
+          data-bs-toggle="modal" data-bs-target="#editItemModal" data-title="{{_('Create item')}}"
+          data-feather="plus" width="28" height="28"></i>
+
 {% endblock %}
 
 {% block content %}

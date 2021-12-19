@@ -233,11 +233,11 @@ def remove(item_id: int):
                      )
 
     utils.set_form_field_default(request, form.payment_type, payments,
-                                 default=payments.get_value(current_item.get('payment_id')))
+                                 default=payments.get_id_for_title(current_item.get('payment_id')))
     utils.set_form_field_default(request, form.category, categories,
-                                 default=categories.get_value(current_item.get('category_id')))
+                                 default=categories.get_id_for_title(current_item.get('category_id')))
     utils.set_form_field_default(request, form.itemtype, itemtypes,
-                                 default=itemtypes.get_value(current_item.get('itemtype_id')))
+                                 default=itemtypes.get_id_for_title(current_item.get('itemtype_id')))
     for k in form.__dict__['_fields'].keys():
         if k == "submit" or k == "crsf_token":
             continue

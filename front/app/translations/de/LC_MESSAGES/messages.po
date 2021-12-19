@@ -45,11 +45,11 @@ msgstr "Benutzerverwaltung"
 
 #: templates/base.html:45
 msgid "user settings"
-msgstr "Einstellungen"
+msgstr "Benutzer bearbeiten"
 
 #: templates/base.html:47
 msgid "item configuration"
-msgstr ""
+msgstr "Konfiguration"
 
 #: templates/base.html:48
 msgid "modify categories"
@@ -81,7 +81,7 @@ msgstr "Gesamt"
 
 #: templates/items/item_remove_form.html:1
 msgid "Really delete it?"
-msgstr "Eintrag wirklich löschen"
+msgstr "Eintrag wirklich löschen?"
 
 #: templates/items/item_remove_form.html:56
 msgid "No"
