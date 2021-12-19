@@ -10,7 +10,7 @@ BASE_URL = f"{settings.API_V1_STR}/categories/"
 
 
 def _generate_valid_data(test_itemtype) -> dict:
-    return {"name": random_string(length=25), "itemtype_id": test_itemtype.id}
+    return {"title_en": random_string(length=25), "itemtype_id": test_itemtype.id}
 
 
 def _assert_error(response, code: int, detail: str) -> None:
@@ -25,7 +25,7 @@ def test_create_category(client: TestClient, test_itemtype, superuser_token_head
     response = client.post(BASE_URL, headers=superuser_token_headers, json=data)
     assert response.status_code == 200
     content = response.json()
-    assert content["name"] == data["name"]
+    assert content["title_en"] == data["title_en"]
     assert "id" in content
 
 
@@ -45,7 +45,7 @@ def test_create_category_with_existing_name_returns_422(client: TestClient,
 
 def test_create_category_with_too_short_name_returns_422(client: TestClient, superuser_token_headers: dict,
                                                          db: Session) -> None:
-    data = {"name": random_string(length=1)}
+    data = {"title_en": random_string(length=1)}
     response = client.post(BASE_URL, headers=superuser_token_headers, json=data)
     assert response.status_code == 422
     content = response.json()
@@ -54,7 +54,7 @@ def test_create_category_with_too_short_name_returns_422(client: TestClient, sup
 
 def test_create_category_with_too_long_name_returns_422(client: TestClient, superuser_token_headers: dict,
                                                         db: Session) -> None:
-    data = {"name": random_string(length=31)}
+    data = {"title_en": random_string(length=31)}
     response = client.post(BASE_URL, headers=superuser_token_headers, json=data)
     assert response.status_code == 422
     content = response.json()
@@ -66,29 +66,29 @@ def test_read_category(client: TestClient, test_itemtype, superuser_token_header
     response = client.get(BASE_URL + f"{category.id}", headers=superuser_token_headers)
     assert response.status_code == 200
     content = response.json()
-    assert content["name"] == category.name
+    assert content["title_en"] == category.title_en
     assert content["id"] == category.id
 
 
 def test_update_category(client: TestClient, test_itemtype, superuser_token_headers: dict, db: Session) -> None:
     category = create_random_category(db, test_itemtype)
 
-    update_data = {"name": random_string(length=25)}
+    update_data = {"title_en": random_string(length=25)}
     response = client.put(BASE_URL + f"{category.id}", headers=superuser_token_headers, json=update_data)
     assert response.status_code == 200
     content = response.json()
-    assert content["name"] == update_data["name"]
+    assert content["title_en"] == update_data["title_en"]
 
 
 def test_update_category_with_same_name(client: TestClient, test_itemtype,
                                         superuser_token_headers: dict, db: Session) -> None:
     category = create_random_category(db, test_itemtype)
 
-    update_data = {"name": category.name}
+    update_data = {"title_en": category.title_en}
     response = client.put(BASE_URL + f"{category.id}", headers=superuser_token_headers, json=update_data)
     assert response.status_code == 200
     content = response.json()
-    assert content["name"] == update_data["name"]
+    assert content["title_en"] == update_data["title_en"]
 
 
 def test_update_category_with_too_short_name_returns_422(client: TestClient, test_itemtype,
@@ -96,7 +96,7 @@ def test_update_category_with_too_short_name_returns_422(client: TestClient, tes
                                                          db: Session) -> None:
     category = create_random_category(db, test_itemtype)
 
-    update_data = {"name": random_string(length=2)}
+    update_data = {"title_en": random_string(length=2)}
     response = client.put(BASE_URL + f"{category.id}", headers=superuser_token_headers, json=update_data)
     assert response.status_code == 422
     content = response.json()
@@ -106,7 +106,7 @@ def test_update_category_with_too_short_name_returns_422(client: TestClient, tes
 def test_update_category_with_invalid_id_returns_404(client: TestClient, test_itemtype,
                                                      superuser_token_headers: dict,
                                                      db: Session) -> None:
-    data = {"name": random_string(length=25), "itemtype_id": test_itemtype.id}
+    data = {"title_en": random_string(length=25), "itemtype_id": test_itemtype.id}
     response = client.put(BASE_URL + "-1", headers=superuser_token_headers, json=data)
     assert response.status_code == 404
     content = response.json()
@@ -120,7 +120,7 @@ def test_remove_category_as_superuser_returns_200(client: TestClient, test_itemt
     response = client.delete(BASE_URL + f"{category.id}", headers=superuser_token_headers)
     assert response.status_code == 200
     content = response.json()
-    assert content["name"] == category.name
+    assert content["title_en"] == category.title_en
     assert content["id"] == category.id
     assert content["itemtype_id"] == test_itemtype.id
 

@@ -12,16 +12,9 @@
 {% set prev_year, prev_month = g.prev_month.split("/") %}
 
 {% block header %}
-<div class="container-xl">
-  <div class="row">
-    <div class="col text-start">
-        <button class="btn btn-action"
-                data-url="{{ url_for('items.create') }}?form_only"
-                data-bs-toggle="modal" data-bs-target="#editItemModal" data-title="Create item">
-          <i data-feather="file-plus" width="28" height="28"></i>
-        </button>
-    </div>
-    <div class="col offset-1 text-end">
+<div class="container-xxl">
+  <div class="row text-center">
+    <div class="col text-end">
       <a class="" href="{{ url_for('items.show', year=prev_year, month=prev_month) }}">
         <i data-feather="skip-back" width="28" height="28"></i>
       </a>
@@ -32,15 +25,19 @@
              onchange="redirect_to_month(event)"
       >
     </div>
-    <div class="col">
+    <div class="col text-start">
       <a class="" href="{{ url_for('items.show', year=next_year, month=next_month) }}">
         <i data-feather="skip-forward" width="28" height="28"></i></a>
     </div>
-    <div class="col-3"></div>
   </div>
 </div>
 
 {% include 'items/item_modal_stub.html' %}
+<i class="br-icon btn-action"
+          data-url="{{ url_for('items.create') }}?form_only"
+          data-bs-toggle="modal" data-bs-target="#editItemModal" data-title="{{_('Create item')}}"
+          data-feather="plus" width="28" height="28"></i>
+
 {% endblock %}
 
 {% block content %}
@@ -53,19 +50,19 @@
   {% set sum_expenses = 0 %}
   {% set saldo = 0 %}
 {% endif %}
-<div class="container-xl mt-3">
+<div class="container-xxl mt-3">
   <div class="card">
     <div class="card-header">
       <div class="">
         <div class="row border-bottom p-1">
-          <div class="col text-center fw-bold">Saldo</div>
-          <div class="col text-center fw-bold">Income</div>
-          <div class="col text-center fw-bold">Expenses</div>
+          <div class="col text-center fw-bold">{{_('Income')}}</div>
+          <div class="col text-center fw-bold">{{_('Expenses')}}</div>
+          <div class="col text-center fw-bold">{{_('Total')}}</div>
         </div>
           <div class="row pt-1">
-            <div class="col text-center {% if saldo < 0 %}text-danger{% else %}text-success{% endif %}">&euro; {{ "%.2f"|format(saldo) }}</div>
-            <div class="col text-center text-success">&euro; {{ "%.2f"|format(sum_income) }}</div>
+            <div class="col text-center text-primary">&euro; {{ "%.2f"|format(sum_income) }}</div>
             <div class="col text-center text-danger">&euro; {{ "%.2f"|format(sum_expenses) }}</div>
+            <div class="col text-center {% if saldo < 0 %}text-danger{% else %}text-primary{% endif %}">&euro; {{ "%.2f"|format(saldo) }}</div>
           </div>
       </div>
     </div>

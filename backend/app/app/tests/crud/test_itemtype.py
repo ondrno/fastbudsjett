@@ -21,7 +21,7 @@ def _create_itemtype(db: Session, name: str):
 
 
 def _compare_entries(a, b):
-    assert a.name == b.name
+    assert a.title_en == b.title_en
     assert a.id == b.id
     assert a.items == b.items
     assert a.category == b.category
@@ -30,7 +30,7 @@ def _compare_entries(a, b):
 def test_create_itemtype(db: Session) -> None:
     name = random_string(length=randint(3, 30))
     itemtype = _create_itemtype(db, name=name)
-    assert itemtype.name == name
+    assert itemtype.title_en == name
     assert itemtype.items == []
     assert itemtype.category == []
 
@@ -38,7 +38,7 @@ def test_create_itemtype(db: Session) -> None:
 def test_itemtype_items_field_is_propagated_by_category_and_items(db: Session, test_payment) -> None:
     name = random_string(length=randint(3, 30))
     itemtype = _create_itemtype(db, name=name)
-    assert itemtype.name == name
+    assert itemtype.title_en == name
     assert itemtype.items == []
     assert itemtype.category == []
 

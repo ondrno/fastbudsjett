@@ -1,74 +1,94 @@
+from flask import (
+    request, session
+)
 import datetime
+import calendar
 from dateutil.relativedelta import relativedelta
-from front.app.auth import login_required
-from front.app import rest
+import jsonpickle
+from ..utils import rest
 
 
 class BaseTypes:
-    def __init__(self, callback=None, items: dict = None):
-        if items is None:
-            items = {}
-        self.items = items
+    def __init__(self, callback=None, entries: dict = None, locale: str = None):
+        if entries is None:
+            entries = {}
+        if locale is None:
+            locale = session.get('locale', 'en')
+        self.entries = entries
+        self.locale = locale
+        self.default_locale = 'en'
         self.rest_callback = callback
-        if not items and callback:
-            self.items = self.fetch()
+        if not entries and callback:
+            self.entries = self.fetch()
 
     def fetch(self) -> dict:
         """
-        Get the name and id from the database using the callback from rest.iface.xxx
-        and return a dictionary, e.g. itemtypes = { '2': 'revenue', '3': 'expenditure' }
-
-        Example: categories_lookup = get_and_resolve(rest.iface.get_categories)
+        Get the title_en, title_de and id from the database using the callback from rest.iface.xxx
+        and return a dictionary, e.g. itemtypes = { '2': {title_en: 'income', title_de: 'Einnahme'},
+                                                    '3': {title_en: 'expense', title_de: 'Ausgabe'} }
         """
         raw = self.rest_callback()
-        items = {}
-        raw = sorted(raw, key=lambda i: i['name'])
+        entries = {}
         for p in raw:
-            id = p['id']
-            name = p['name']
-            items[str(id)] = name
-        return items
+            id_ = str(p['id'])
+            title_de = p['title_de']
+            title_en = p['title_en']
+            entries[id_] = {'title_de': title_de, 'title_en': title_en}
+        return entries
 
-    def get_tuples_as_list(self):
-        """ return a list of (key, value) pairs, e.g. [('1', 'a'), ('2', 'b')] """
-        return [(k, v) for k, v in self.items.items()]
+    def _get_title(self, all_titles: dict, locale: str = None) -> str:
+        if not locale:
+            locale = self.locale
+        localized_key = f"title_{locale}"
+        default_key = f"title_{self.default_locale}"
+        if localized_key in all_titles:
+            return all_titles[localized_key]
+        else:
+            return all_titles[default_key]
 
-    def get_key(self, val: str) -> int:
-        for key, value in self.items.items():
-            if val == value:
-                return key
+    def get_tuples_as_list(self, locale: str = None):
+        """ return a list of localized (id, title) pairs, e.g. [('1', 'income'), ('2', 'expense')] """
+        result = []
+        for _id, _all_titles in self.entries.items():
+            title = self._get_title(_all_titles, locale)
+            result.append((_id, title))
+        return result
+
+    def get_id_for_title(self, title: str) -> int:
+        for _id, _all_titles in self.entries.items():
+            if title in _all_titles.values():
+                return int(_id)
         return 0
 
-    def get_value(self, key: int) -> str:
+    def get_title_for_id(self, id_: str, locale: str = None) -> str:
+        id_ = str(id_)
         result = ''
-        if key in self.items:
-            result = self.items[key]
-        else:
-            key = str(key)
-            result = self.items.get(key, '')
+        if id_ in self.entries:
+            all_titles = self.entries[id_]
+            result = self._get_title(all_titles, locale)
         return result
 
 
 class CategoryTypes(BaseTypes):
     """ """
-    def __init__(self, callback=None, items: dict = None):
+    def __init__(self, callback=None, entries: dict = None, locale: str = None):
         if callback is None:
             callback = rest.iface.get_categories
-        super().__init__(callback, items)
+        super().__init__(callback, entries, locale)
 
 
 class ItemTypes(BaseTypes):
-    def __init__(self, callback=None, items: dict = None):
+    def __init__(self, callback=None, entries: dict = None, locale: str = None):
         if callback is None:
             callback = rest.iface.get_itemtypes
-        super().__init__(callback, items)
+        super().__init__(callback, entries, locale)
 
 
 class PaymentTypes(BaseTypes):
-    def __init__(self, callback=None, items: dict = None):
+    def __init__(self, callback=None, entries: dict = None, locale: str = None):
         if callback is None:
             callback = rest.iface.get_payments
-        super().__init__(callback, items)
+        super().__init__(callback, entries, locale)
 
 
 def set_form_field_default(request, field, lookup: BaseTypes, default: str):
@@ -100,3 +120,59 @@ def start_of_year():
     today = datetime.datetime.today()
     d = datetime.date(today.year, 1, 1)
     return d
+
+
+def prepare_data(r: request):
+    data = {'date': r.form['date'],
+            'amount': r.form['amount'],
+            'category_id': r.form['category'],
+            'payment_id': r.form['payment_type'],
+            'description': r.form['description'],
+            'itemtype_id': r.form['itemtype']
+            }
+    return data
+
+
+def types_to_session(categories, payments, itemtypes):
+    session["categories"] = jsonpickle.encode(categories)
+    session["payments"] = jsonpickle.encode(payments)
+    session["itemtypes"] = jsonpickle.encode(itemtypes)
+
+
+def types_from_session() -> dict:
+    return {
+        'categories': jsonpickle.decode(session["categories"]),
+        'payments': jsonpickle.decode(session["payments"]),
+        'itemtypes': jsonpickle.decode(session["itemtypes"]),
+    }
+
+
+def _get_full_locale(locale: str) -> str:
+    # make sure that these locales are installed on system you are running the web application
+    all_locale = {'en': 'en_GB.utf8', 'de': 'de_DE.utf8'}
+    if locale in all_locale:
+        return all_locale[locale]
+    else:
+        raise ValueError(f"Invalid locale={locale}")
+
+
+def month_name(month_no: int, abbr: bool = False, locale: str = None) -> str:
+    if locale is None:
+        locale = session['locale']
+    full_locale = _get_full_locale(locale)
+    with calendar.different_locale(full_locale):
+        if abbr:
+            return calendar.month_abbr[month_no]
+        else:
+            return calendar.month_name[month_no]
+
+
+def day_name(dow: int, abbr: bool = True, locale: str = None) -> str:
+    if locale is None:
+        locale = session['locale']
+    full_locale = _get_full_locale(locale)
+    with calendar.different_locale(full_locale):
+        if abbr:
+            return calendar.day_abbr[dow]
+        else:
+            return calendar.day_name[dow]

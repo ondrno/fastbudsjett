@@ -5,13 +5,35 @@ from functools import lru_cache
 
 
 class User:
-    def __init__(self, email: str, user_id: int, auth_token: str, is_active: bool = True, is_superuser: bool = False):
+    def __init__(self, email: str, user_id: int, auth_token: str, is_active: bool = True, is_superuser: bool = False,
+                 default_locale: str = "en"):
         self._email = email
         self._user_id = user_id
         self._auth_token = auth_token
+        self._locale = default_locale
         self._is_active = is_active
         self._is_superuser = is_superuser
         self._is_anonymous = False
+
+    def __str__(self):
+        return f"email={self._email} id={self._user_id} locale={self._locale} active={self._is_active} " \
+               f"su={self.is_superuser}"
+
+    @property
+    def locale(self):
+        return self._locale
+
+    @locale.setter
+    def locale(self, locale):
+        self._locale = locale
+
+    @property
+    def email(self):
+        return self._email
+
+    @email.setter
+    def email(self, new_email):
+        self._email = new_email
 
     @property
     def is_authenticated(self):
@@ -47,6 +69,9 @@ class User:
 
     def get_id(self):
         return self._email
+
+    def get_user_id(self):
+        return self._user_id
 
 
 class RestApiInterface:
@@ -90,7 +115,7 @@ class RestApiInterface:
         if r.status_code == 200:
             api_user = r.json()
             return User(api_user['email'], api_user['id'], self.auth_token,
-                        api_user['is_active'], api_user['is_superuser'])
+                        api_user['is_active'], api_user['is_superuser'], api_user["default_locale"])
         else:
             raise ApiException(f"Could not find user with id={id}")
 
@@ -105,17 +130,26 @@ class RestApiInterface:
 
         api_user = r.json()
         return User(api_user['email'], api_user['id'], self.auth_token,
-                    api_user['is_active'], api_user['is_superuser'])
+                    api_user['is_active'], api_user['is_superuser'], api_user["default_locale"])
 
-    def add_user(self, user_name: str, email: str, password: str) -> User:
-        data = {"user": user_name, "email": email, "password": password}
+    def add_user(self, user_name: str, email: str, password: str, locale: str ="en") -> User:
+        data = {"user": user_name, "email": email, "password": password, "default_locale": locale}
         r = requests.put(self.BASE_USERS_URL, headers=self.auth_token, json=data)
         if r.ok:
             api_user = r.json()
             return User(api_user['email'], api_user['id'], self.auth_token,
-                        api_user['is_active'], api_user['is_superuser'])
+                        api_user['is_active'], api_user['is_superuser'], api_user["default_locale"])
         else:
             raise ApiException(f"Could not add user, {r.content}")
+
+    def update_user(self, user_id: int, data: dict) -> User:
+        r = requests.put(self.BASE_USERS_URL + f"/me", headers=self.auth_token, json=data)
+        if r.ok:
+            api_user = r.json()
+            return User(api_user['email'], api_user['id'], self.auth_token,
+                        api_user['is_active'], api_user['is_superuser'], api_user["default_locale"])
+        else:
+            raise ApiException(f"Could not modify user, {r.content}")
 
     def get_items_for_month(self, year: int, month: int):
         start_date = f"{year}-{month:02d}-01"
@@ -188,30 +222,33 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not purge item with id={item_id} and data={data} -> {r.content}")
 
-    def create_category(self, name: str, itemtype_id: int):
+    def create_category(self, name_en: str, name_de: str, itemtype_id: int):
         r = requests.post(self.BASE_CATEGORIES_URL, headers=self.auth_token,
-                          json={'name': name, 'itemtype_id': itemtype_id})
+                          json={'title_en': name_en, 'title_de': name_de, 'itemtype_id': itemtype_id})
         if r.ok:
             item = r.json()
             return item
         else:
-            raise ApiException(f"Could not create category with name={name}, itemtype={itemtype_id} -> {r.content}")
+            raise ApiException(f"Could not create category with title_en={name_en}, "
+                               f"itemtype={itemtype_id}->{r.content}")
 
-    def create_payment(self, name: str):
-        r = requests.post(self.BASE_PAYMENTS_URL, headers=self.auth_token, json={'name': name})
+    def create_payment(self, name_en: str, name_de: str):
+        r = requests.post(self.BASE_PAYMENTS_URL, headers=self.auth_token, json={'title_en': name_en,
+                                                                                 'title_de': name_de})
         if r.ok:
             item = r.json()
             return item
         else:
-            raise ApiException(f"Could not create payment_type with name={name} -> {r.content}")
+            raise ApiException(f"Could not create payment_type with title_en={name_en} -> {r.content}")
 
-    def create_itemtype(self, name: str):
-        r = requests.post(self.BASE_ITEMTYPES_URL, headers=self.auth_token, json={'name': name})
+    def create_itemtype(self, name_en: str, name_de: str):
+        r = requests.post(self.BASE_ITEMTYPES_URL, headers=self.auth_token,
+                          json={'title_en': name_en, 'title_de': name_de})
         if r.ok:
             item = r.json()
             return item
         else:
-            raise ApiException(f"Could not create itemtype with name={name} -> {r.content}")
+            raise ApiException(f"Could not create itemtype with title_en={name_en} -> {r.content}")
 
     @lru_cache
     def get_itemtypes(self):

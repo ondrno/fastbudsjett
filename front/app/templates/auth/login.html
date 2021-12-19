@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Sign in{% endblock %}
+{% block title %}{{_('Sign in')}}{% endblock %}
 
 {% block header %}
 {% with messages = get_flashed_messages() %}
@@ -15,26 +15,44 @@
 {% endblock %}
 
 {% block content %}
-<div class="container p-5">
-  <form method="post">
-    {{ form.hidden_tag() }}
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    {{ form.email(class_="form-control", placeholder="Email") }}
-    {% if form.email.errors %}
-      {% for error in form.email.errors %}
-        <div id="alert-email" class="alert alert-danger">{{ error }}</div>
-      {% endfor %}
-    {% endif %}
-    <div class="p-1"></div>
-    {{ form.password(class_="form-control", placeholder="Password") }}
-    {% if form.password.errors %}
-      {% for error in form.password.errors %}
-        <div id="alert-password" class="alert alert-danger">{{ error }}</div>
-      {% endfor %}
-    {% endif %}
-    <div class="p-1"></div>
-    {{ form.submit(class_="btn btn-lg btn-success btn-block") }}
-  </form>
+
+<div class="container-sm p-5">
+  <div class="card p-2">
+    <div class="card-header">
+      <div class="p-2 text-center">
+        <span class="h3 m-2 font-weight-normal">fastBudsjett</span> <img class="m-2" src="/static/img/piggy-bank-svgrepo-com.svg" width="40px" height="40px" style="border-width: 5px;"></img>
+      </div>
+    </div>
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="mb-3 input-group">
+          <span class="input-group-text">
+            <i class="bi bi-person-circle"></i>
+          </span>
+          {{ form.email(class_="form-control", placeholder="bob@domain.com") }}
+          {% if form.email.errors %}
+            {% for error in form.email.errors %}
+              <div id="alert-email" class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <div class="mb-3 input-group">
+          <span class="input-group-text">
+            <i class="bi bi-key"></i>
+          </span>
+
+          {{ form.password(class_="form-control", placeholder="Password") }}
+          {% if form.password.errors %}
+            {% for error in form.password.errors %}
+              <div id="alert-password" class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+          {% endif %}
+        </div>
+        {{ form.submit(class_="btn btn-lg btn-outline-success") }}
+      </form>
+      </div>
+  </div>
 </div>
 {% endblock %}
 

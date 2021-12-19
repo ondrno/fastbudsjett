@@ -2,7 +2,7 @@ import datetime
 import re
 
 from typing import Optional
-from pydantic import BaseModel, constr, Field, validator, PositiveFloat, PositiveInt
+from pydantic import BaseModel, constr, Field, validator, PositiveFloat, PositiveInt, condecimal
 
 
 description_constr = constr(min_length=3, max_length=300)

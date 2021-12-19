@@ -7,7 +7,8 @@ from pydantic import BaseModel, EmailStr, constr
 class UserBase(BaseModel):
     email: Optional[EmailStr] = None
     is_active: Optional[bool] = True
-    is_superuser: bool = False
+    is_superuser: Optional[bool] = False
+    default_locale: Optional[str] = 'en'
     full_name: Optional[str] = None
 
 
@@ -15,6 +16,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     email: EmailStr
     password: constr(min_length=5, max_length=50)
+    default_locale: constr(min_length=2, max_length=2, to_lower=True)
 
 
 # Properties to receive via API on update

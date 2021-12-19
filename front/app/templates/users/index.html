@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="container-sm mt-3">
+    <div class="card p-1">
+      <div class="card-body">
+        {% for u in known_users -%}
+        <div class="row p-1">
+          <div class="col"><a href="{{ url_for('users.edit', user_id=u.id) }}">{{ u.email }}</a></div>
+          <div class="col">{{u.default_locale}}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+{% endblock %}

@@ -10,7 +10,7 @@ BASE_URL = f"{settings.API_V1_STR}/payments/"
 
 
 def _generate_valid_data() -> dict:
-    return {"name": random_string(length=25)}
+    return {"title_en": random_string(length=25)}
 
 
 def _assert_error(response, code: int, detail: str) -> None:
@@ -25,7 +25,7 @@ def test_create_payment(client: TestClient, superuser_token_headers: dict, db: S
     response = client.post(BASE_URL, headers=superuser_token_headers, json=data)
     assert response.status_code == 200
     content = response.json()
-    assert content["name"] == data["name"]
+    assert content["title_en"] == data["title_en"]
     assert "id" in content
 
 
@@ -43,7 +43,7 @@ def test_create_payment_with_existing_name_returns_422(client: TestClient, super
 
 def test_create_payment_with_too_short_name_returns_422(client: TestClient, superuser_token_headers: dict,
                                                          db: Session) -> None:
-    data = {"name": random_string(length=1)}
+    data = {"title_en": random_string(length=1)}
     response = client.post(BASE_URL, headers=superuser_token_headers, json=data)
     assert response.status_code == 422
     content = response.json()
@@ -52,7 +52,7 @@ def test_create_payment_with_too_short_name_returns_422(client: TestClient, supe
 
 def test_create_payment_with_too_long_name_returns_422(client: TestClient, superuser_token_headers: dict,
                                                         db: Session) -> None:
-    data = {"name": random_string(length=31)}
+    data = {"title_en": random_string(length=31)}
     response = client.post(BASE_URL, headers=superuser_token_headers, json=data)
     assert response.status_code == 422
     content = response.json()
@@ -64,35 +64,35 @@ def test_read_payment(client: TestClient, superuser_token_headers: dict, db: Ses
     response = client.get(BASE_URL + f"{payment.id}", headers=superuser_token_headers)
     assert response.status_code == 200
     content = response.json()
-    assert content["name"] == payment.name
+    assert content["title_en"] == payment.title_en
     assert content["id"] == payment.id
 
 
 def test_update_payment(client: TestClient, superuser_token_headers: dict, db: Session) -> None:
     payment = create_random_payment(db)
 
-    update_data = {"name": random_string(length=25)}
+    update_data = {"title_en": random_string(length=25)}
     response = client.put(BASE_URL + f"{payment.id}", headers=superuser_token_headers, json=update_data)
     assert response.status_code == 200
     content = response.json()
-    assert content["name"] == update_data["name"]
+    assert content["title_en"] == update_data["title_en"]
 
 
 def test_update_payment_with_same_name(client: TestClient, superuser_token_headers: dict, db: Session) -> None:
     payment = create_random_payment(db)
 
-    update_data = {"name": payment.name}
+    update_data = {"title_en": payment.title_en}
     response = client.put(BASE_URL + f"{payment.id}", headers=superuser_token_headers, json=update_data)
     assert response.status_code == 200
     content = response.json()
-    assert content["name"] == update_data["name"]
+    assert content["title_en"] == update_data["title_en"]
 
 
 def test_update_payment_with_too_short_name_returns_422(client: TestClient, superuser_token_headers: dict,
                                                          db: Session) -> None:
     payment = create_random_payment(db)
 
-    update_data = {"name": random_string(length=1)}
+    update_data = {"title_en": random_string(length=1)}
     response = client.put(BASE_URL + f"{payment.id}", headers=superuser_token_headers, json=update_data)
     assert response.status_code == 422
     content = response.json()
@@ -101,7 +101,7 @@ def test_update_payment_with_too_short_name_returns_422(client: TestClient, supe
 
 def test_update_payment_with_invalid_id_returns_404(client: TestClient, superuser_token_headers: dict,
                                                      db: Session) -> None:
-    data = {"name": random_string(length=25)}
+    data = {"title_en": random_string(length=25)}
     response = client.put(BASE_URL + "-1", headers=superuser_token_headers, json=data)
     assert response.status_code == 404
     content = response.json()
@@ -114,7 +114,7 @@ def test_remove_payment_as_superuser_returns_200(client: TestClient, superuser_t
     response = client.delete(BASE_URL + f"{payment.id}", headers=superuser_token_headers)
     assert response.status_code == 200
     content = response.json()
-    assert content["name"] == payment.name
+    assert content["title_en"] == payment.title_en
     assert content["id"] == payment.id
 
 

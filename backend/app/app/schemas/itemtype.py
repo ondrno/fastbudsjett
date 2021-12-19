@@ -8,24 +8,28 @@ name_constr = constr(min_length=3, max_length=30)
 # Shared properties
 class ItemTypeBase(BaseModel):
     """
-    ItemType base class, the name describes the item type, i.e. revenue or expenditures
+    ItemType base class, the title_en describes the item type, i.e. income or expense
     """
-    name: Optional[str] = None
+    title_en: Optional[str] = None
+    title_de: Optional[str] = None
 
 
 # Properties to receive via API on creation
 class ItemTypeCreate(ItemTypeBase):
-    name: name_constr
+    title_en: name_constr
+    title_de: name_constr
 
 
 # Properties to receive via API on update
 class ItemTypeUpdate(ItemTypeBase):
-    name: name_constr
+    title_en: name_constr
+    title_de: name_constr
 
 
 class ItemTypeInDBBase(ItemTypeBase):
     id: int
-    name: name_constr
+    title_en: name_constr
+    title_de: name_constr
 
     class Config:
         orm_mode = True

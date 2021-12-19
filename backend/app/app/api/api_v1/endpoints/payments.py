@@ -43,7 +43,7 @@ def create_payment(
     try:
         payment = crud.payment.create(db=db, obj_in=payment_in)
     except sqlalchemy.exc.IntegrityError:
-        raise HTTPException(status_code=400, detail="The payment with this name already exists.")
+        raise HTTPException(status_code=400, detail="The payment with this title_en already exists.")
 
     return payment
 
@@ -64,7 +64,7 @@ def update_payment(
     try:
         payment = crud.payment.update(db=db, db_obj=payment, obj_in=payment_in)
     except sqlalchemy.exc.IntegrityError:
-        raise HTTPException(status_code=400, detail="The payment with this name already exists.")
+        raise HTTPException(status_code=400, detail="The payment with this title_en already exists.")
     return payment
 
 
