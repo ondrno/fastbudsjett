@@ -29,7 +29,12 @@ def resolve_items(raw,
 
         payment = i
         payment['itemtype'] = itemtypes.get_title_for_id(itemtype_id)
-        payment['is_income'] = payment['itemtype'].lower() == 'income'
+
+        # this is hard-coded stuff depending on title of the itemtype
+        # better have a field in db indicating that this itemtype id is the income
+        itemtype_title_en = itemtypes.get_title_for_id(itemtype_id, 'en')
+        payment['is_income'] = itemtype_title_en.lower() == 'income'
+
         payment['payment'] = payment_types.get_title_for_id(payment_id)
         payment['category'] = categories.get_title_for_id(cat_id)
         year, month, day = [int(i) for i in str(payment['date']).split('-')]
@@ -44,7 +49,8 @@ def resolve_items(raw,
         if day not in payments[year][month]:
             payments[year][month][day] = {}
             now = datetime.date(year, month, day)
-            payments[year][month][day]['weekday'] = utils.day_name(now.weekday())
+            payments[year][month][day]['weekday'] = now.weekday()
+            payments[year][month][day]['weekday_abbr'] = utils.day_name(now.weekday())
             payments[year][month][day]['entries'] = []
             payments[year][month][day]['sum_expenses'] = 0
             payments[year][month][day]['sum_income'] = 0

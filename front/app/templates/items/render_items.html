@@ -12,12 +12,12 @@
                   <div class="row mb-2">
                     <div class="col">
                       {{ day }}&nbsp;
-                      {% if items[year][month][day]['weekday'] == "Sun" %}
+                      {% if items[year][month][day]['weekday'] == 6 %}
                         {% set btn_class = "btn btn-danger btn-sm disabled" %}
                       {% else %}
                         {% set btn_class = "btn btn-secondary btn-sm disabled" %}
                       {% endif %}
-                      <button class="{{ btn_class }}">{{ items[year][month][day]['weekday'] }}</button>
+                      <button class="{{ btn_class }}">{{ items[year][month][day]['weekday_abbr'] }}</button>
                     </div>
                   </div>
                 </div>
