@@ -23,7 +23,7 @@
                                              data-url="{{ url_for('items.edit',item_id=item.id) }}?form_only"
                                              data-bs-toggle="modal"
                                              data-bs-target="#editItemModal"
-                                             data-title="Edit item" data-submit-button-title="Update">
+                                             data-title="{{_('Edit item')}}" data-submit-button-title="{{_('Update')}}">
                                              {{ item.description }}</a></div>
                 <div class="col text-end {% if item.is_income %}text-primary{% else %}text-danger{% endif %}">&euro; {{ "%.2f"|format(item.amount) }}</div>
                 <div class="col text-end">
@@ -31,13 +31,13 @@
                           data-url="{{ url_for('items.edit', item_id=item.id) }}?form_only"
                           data-form-action="{{ url_for('items.create') }}"
                           data-bs-toggle="modal" data-bs-target="#editItemModal"
-                          data-title="Copy item" data-submit-button-title="Create">
+                          data-title="{{_('Copy item')}}" data-submit-button-title="{{_('Create new')}}">
                     <i data-feather="copy" style="stroke-width: 1px; size: 10px;"></i>
                   </button>
                   <button class="btn btn-action" style="padding: 0px;" data-bs-toggle="modal"
                           data-url="{{ url_for('items.remove',item_id=item.id) }}?form_only"
-                          data-bs-target="#deleteItemModal" data-title="Confirm deletion"
-                          data-submit-button-title="Yes">
+                          data-bs-target="#deleteItemModal" data-title="{{_('Confirm deletion')}}"
+                          data-submit-button-title="{{_('Copy item')}}">
                     <i data-feather="trash-2" style="stroke-width: 1px; size: 10px;"></i>
                   </button>
                 </div>

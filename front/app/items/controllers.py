@@ -1,9 +1,7 @@
 from flask import (
     Blueprint, g, redirect, render_template, request, url_for, session
 )
-from flask_babel import _
 import datetime
-import calendar
 from dateutil.relativedelta import relativedelta
 import json
 import jsonpickle
@@ -11,6 +9,7 @@ import jsonpickle
 from ..auth.controllers import login_required
 from ..utils import utils, rest
 from .forms import ItemsForm
+
 
 mod_items = Blueprint('items', __name__, url_prefix="/items")
 
@@ -45,7 +44,7 @@ def resolve_items(raw,
         if day not in payments[year][month]:
             payments[year][month][day] = {}
             now = datetime.date(year, month, day)
-            payments[year][month][day]['weekday'] = calendar.day_abbr[now.weekday()]
+            payments[year][month][day]['weekday'] = utils.day_name(now.weekday())
             payments[year][month][day]['entries'] = []
             payments[year][month][day]['sum_expenses'] = 0
             payments[year][month][day]['sum_income'] = 0
@@ -85,7 +84,6 @@ def calc_next_and_prev_month(now: datetime.date):
 
     g.curr_month = format_suburl(now.year, now.month)
     session["selected_month"] = g.curr_month
-    g.curr_month_abbr = calendar.month_abbr[now.month]
 
     g.prev_month = format_suburl(prev_month.year, prev_month.month)
     g.next_month = format_suburl(next_month.year, next_month.month)

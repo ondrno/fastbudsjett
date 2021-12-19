@@ -2,6 +2,7 @@ from flask import (
     request, session
 )
 import datetime
+import calendar
 from dateutil.relativedelta import relativedelta
 import jsonpickle
 from ..utils import rest
@@ -144,3 +145,34 @@ def types_from_session() -> dict:
         'payments': jsonpickle.decode(session["payments"]),
         'itemtypes': jsonpickle.decode(session["itemtypes"]),
     }
+
+
+def _get_full_locale(locale: str) -> str:
+    # make sure that these locales are installed on system you are running the web application
+    all_locale = {'en': 'en_GB.utf8', 'de': 'de_DE.utf8'}
+    if locale in all_locale:
+        return all_locale[locale]
+    else:
+        raise ValueError(f"Invalid locale={locale}")
+
+
+def month_name(month_no: int, abbr: bool = False, locale: str = None) -> str:
+    if locale is None:
+        locale = session['locale']
+    full_locale = _get_full_locale(locale)
+    with calendar.different_locale(full_locale):
+        if abbr:
+            return calendar.month_abbr[month_no]
+        else:
+            return calendar.month_name[month_no]
+
+
+def day_name(dow: int, abbr: bool = True, locale: str = None) -> str:
+    if locale is None:
+        locale = session['locale']
+    full_locale = _get_full_locale(locale)
+    with calendar.different_locale(full_locale):
+        if abbr:
+            return calendar.day_abbr[dow]
+        else:
+            return calendar.day_name[dow]

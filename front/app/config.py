@@ -3,6 +3,7 @@ import os
 
 class AppConfig(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+    LANGUAGES = ['de', 'en']
     BABEL_DEFAULT_LOCALE = 'de'
     # Statement for enabling the development environment
     DEBUG = True

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Search{% endblock %}
+{% block title %}{{ _('Search entries') }}{% endblock %}
 
 {% block header %}
 <div class="container-xxl mt-2 mb-3">
@@ -48,9 +48,9 @@
     <div class="card-header">
       <div class="">
         <div class="row border-bottom p-1">
-          <div class="col text-center fw-bold">Income</div>
-          <div class="col text-center fw-bold">Expenses</div>
-          <div class="col text-center fw-bold">Total</div>
+          <div class="col text-center fw-bold">{{_('Income')}}</div>
+          <div class="col text-center fw-bold">{{_('Expenses')}}</div>
+          <div class="col text-center fw-bold">{{_('Total')}}</div>
         </div>
           <div class="row pt-1">
             <div class="col text-center text-primary">&euro; {{ "%.2f"|format(items.sum_income) }}</div>

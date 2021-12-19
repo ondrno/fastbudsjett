@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-12-18 21:42+0100\n"
+"POT-Creation-Date: 2021-12-19 19:01+0100\n"
 "PO-Revision-Date: 2021-12-18 21:31+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -26,9 +26,13 @@ msgstr "Das ist keine gültige E-Mail-Adresse"
 msgid "Sign In"
 msgstr "Anmelden"
 
-#: items/forms.py:18 templates/items/render_items.html:40
+#: items/forms.py:18
 msgid "Create"
 msgstr "Anlegen"
+
+#: search/forms.py:12
+msgid "Search"
+msgstr "Suche"
 
 #: templates/base.html:44
 msgid "user administration"
@@ -48,29 +52,29 @@ msgstr "Kategorien bearbeiten"
 
 #: templates/base.html:49
 msgid "modify itemtypes"
-msgstr ""
+msgstr "Bezahlarten bearbeiten"
 
 #: templates/auth/login.html:3
 msgid "Sign in"
-msgstr ""
+msgstr "Anmelden"
 
-#: templates/auth/login.html:21
+#: templates/auth/login.html:23
 msgid "Please sign in"
-msgstr ""
+msgstr "Bitte anmelden"
 
 #: templates/items/index.html:20
 msgid "Create item"
 msgstr "Eintrag anlegen"
 
-#: templates/items/index.html:61
+#: templates/items/index.html:61 templates/search/search.html:51
 msgid "Income"
 msgstr "Einnahmen"
 
-#: templates/items/index.html:62
+#: templates/items/index.html:62 templates/search/search.html:52
 msgid "Expenses"
 msgstr "Ausgaben"
 
-#: templates/items/index.html:63
+#: templates/items/index.html:63 templates/search/search.html:53
 msgid "Total"
 msgstr "Gesamt"
 
@@ -82,23 +86,33 @@ msgstr "Eintrag wirklich löschen"
 msgid "No"
 msgstr "Nein"
 
-#: templates/items/render_items.html:32
+#: templates/items/render_items.html:32 templates/search/render_items.html:26
 msgid "Edit item"
 msgstr "Eintrag bearbeiten"
 
-#: templates/items/render_items.html:32
+#: templates/items/render_items.html:32 templates/search/render_items.html:26
 msgid "Update"
 msgstr "Aktualisieren"
 
-#: templates/items/render_items.html:40
+#: templates/items/render_items.html:40 templates/search/render_items.html:34
+#: templates/search/render_items.html:40
 msgid "Copy item"
 msgstr "Eintrag kopieren"
 
-#: templates/items/render_items.html:45
+#: templates/items/render_items.html:40 templates/search/render_items.html:34
+#, fuzzy
+msgid "Create new"
+msgstr "Eintrag anlegen"
+
+#: templates/items/render_items.html:45 templates/search/render_items.html:39
 msgid "Confirm deletion"
 msgstr "Löschen bestätigen"
 
 #: templates/items/render_items.html:46
 msgid "Yes"
 msgstr "Ja"
+
+#: templates/search/search.html:3
+msgid "Search entries"
+msgstr "Einträge suchen"
 
