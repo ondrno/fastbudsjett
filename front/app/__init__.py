@@ -20,9 +20,9 @@ def create_app():
     app.register_blueprint(search.mod_search)
     app.register_blueprint(categories.mod_categories)
     app.register_blueprint(users.mod_users)
-    app.add_url_rule('/', endpoint='entries.index')
+    app.add_url_rule('/', endpoint='items.index')
 
-    app.cache = Cache(app, config=cache_config)
+    # app.cache = Cache(app, config=cache_config)
     app.login = LoginManager()
     app.login.login_view = 'auth.login'
     babel.init_app(app)
