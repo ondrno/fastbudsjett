@@ -1,8 +1,8 @@
 from flask import (
-    Blueprint, render_template
+    Blueprint, render_template, session
 )
 from ..auth.controllers import login_required
-from ..utils import utils, rest
+from ..utils import rest
 
 mod_categories = Blueprint('categories', __name__, url_prefix="/categories")
 
@@ -10,15 +10,16 @@ mod_categories = Blueprint('categories', __name__, url_prefix="/categories")
 @mod_categories.route('/', methods=['GET'])
 @login_required
 def index():
-    all_categories = rest.iface.get_categories()
-    itemtypes = utils.ItemTypes()
-    categories = {}
-    for c in all_categories:
-        itemtype_id = c['itemtype_id']
-        itemtype_name = itemtypes.get_title_for_id(itemtype_id)
-        c['itemtype_name'] = itemtype_name
-        if itemtype_name not in categories:
-            categories[itemtype_name] = []
-        categories[itemtype_name].append(c)
+    all_categories = {}
+    all_itemtypes = rest.iface.get_itemtypes()
+    for i in all_itemtypes:
+        data = dict()
+        item_type_id = i['id']
+        data['itemtype_id'] = item_type_id
+        data['order_by'] = f'title_{session["locale"]}'
+        my_categories = rest.iface.get_categories(data=data)
+        all_categories[item_type_id] = my_categories
 
-    return render_template('categories/index.html', categories=categories)
+    print(f"categories={all_categories}")
+    print(f"itemtypes={all_itemtypes}")
+    return render_template('categories/index.html', itemtypes=all_itemtypes, categories=all_categories)

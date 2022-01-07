@@ -12,10 +12,13 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         self, db: Session, *,
             skip: int = 0, limit: int = 200,
             itemtype_id: Optional[List[int]] = None,
-            order_by: Optional[str] = 'itemtype_id',
+            parent_id: Optional[int] = None,
+            order_by: str = 'itemtype_id',
     ) -> List[Category]:
-        print(f"Category get_multi itemtype_id={itemtype_id}")
+        print(f"Category: locals={locals()}")
         filter_expr = ''
+        if parent_id:
+            filter_expr += f"Category.parent_id == {parent_id}"
         if itemtype_id:
             if filter_expr:
                 filter_expr += " AND "
@@ -24,10 +27,10 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         filter_expr = text(filter_expr)
 
         order_expr = 'Category.itemtype_id'
-        if order_by in ['id', 'title_en', 'title_de', 'created_at', 'modified_at', 'itemtype_id']:
-            order_expr = f"Category.{order_by} desc"
+        if order_by in ['id', 'title_en', 'title_de', 'created_at', 'modified_at', 'itemtype_id', 'parent_id']:
+            order_expr = f"Category.{order_by} asc"
         order_expr = text(order_expr)
-        print(f"Category get_multi filter_expr={filter_expr} skip={skip} limit={limit}")
+        print(f"Category: get_multi filter_expr={filter_expr} skip={skip} limit={limit}")
         return (
             db.query(self.model)
             .filter(filter_expr)

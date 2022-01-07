@@ -1,6 +1,6 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 import sqlalchemy
 
@@ -18,6 +18,12 @@ def _defined_or_http_exception_404(var, detail: str = "Category not found"):
 @router.get("/", response_model=List[schemas.Category])
 def read_categories(
     db: Session = Depends(deps.get_db),
+    itemtype_id: Optional[List[int]] = Query(None),
+    parent_id: Optional[int] = None,
+    order_by: Optional[str] = Query(
+        None,
+        regex=r'^(id|parent_id|itemtype_id|title_en|title_de|created_at|modified_at)$'
+    ),
     skip: int = 0,
     limit: int = 100,
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -25,7 +31,9 @@ def read_categories(
     """
     Retrieve categories.
     """
-    categories = crud.category.get_multi(db, skip=skip, limit=limit)
+    categories = crud.category.get_multi(db,
+                                         skip=skip, limit=limit, itemtype_id=itemtype_id,
+                                         parent_id=parent_id, order_by=order_by)
     return categories
 
 

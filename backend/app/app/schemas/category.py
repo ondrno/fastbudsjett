@@ -7,6 +7,7 @@ name_constr = constr(min_length=3, max_length=30)
 
 # Shared properties
 class CategoryBase(BaseModel):
+    parent_id: Optional[PositiveInt] = None
     title_en: Optional[str] = None
     title_de: Optional[str] = None
     itemtype_id: Optional[PositiveInt] = None
@@ -14,6 +15,7 @@ class CategoryBase(BaseModel):
 
 # Properties to receive on category creation
 class CategoryCreate(CategoryBase):
+    parent_id: Optional[PositiveInt] = None
     title_en: name_constr
     title_de: name_constr
     itemtype_id: PositiveInt
@@ -21,6 +23,7 @@ class CategoryCreate(CategoryBase):
 
 # Properties to receive on category update
 class CategoryUpdate(CategoryBase):
+    parent_id: Optional[PositiveInt]
     title_en: Optional[name_constr]
     title_de: Optional[name_constr]
     itemtype_id: Optional[PositiveInt]
@@ -28,7 +31,7 @@ class CategoryUpdate(CategoryBase):
     @root_validator(pre=True)
     def check_any_of(cls, values):
         if not values.keys():
-            raise ValueError("Either 'title_en', 'title_de' or 'itemtype_id' has to be given")
+            raise ValueError("Either title_en, title_de, itemtype_id or parent_id has to be given")
         else:
             return values
 
@@ -36,6 +39,7 @@ class CategoryUpdate(CategoryBase):
 # Properties shared by models stored in DB
 class CategoryInDBBase(CategoryBase):
     id: PositiveInt
+    # parent_id: PositiveInt
     title_en: name_constr
     title_de: name_constr
     itemtype_id: PositiveInt

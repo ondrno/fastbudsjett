@@ -5,33 +5,39 @@
 
 {% block content %}
 <div class="container-xxl mt-3">
-  <div>
-    <div class="row border-bottom p-1">
-      <div class="col fw-bold">Itemtype</div>
-      <div class="col fw-bold">Category</div>
-    </div>
-    {% for c_name in categories -%}
-    <div class="card p-1">
+  {% for i in itemtypes -%}
+    <div class="card mb-1">
       <div class="card-header">
-      <div class="row p-1 border-bottom">
-        <div class="col">{{c_name}}</div>
-        <div class="col">{% if categories[c_name]|length > 0 %}{{ categories[c_name][0].name }} {% endif %}</div>
+        <div class="row mb-2">
+          <div class="col text">
+            {% if session['locale'] == 'de' -%}
+              {{ i['title_de'] }}
+            {% else -%}
+              {{ i['title_de'] }}
+            {% endif -%}
+          </div>
+          <div class="row mt-2">
+            <div class="col">Parent</div>
+            <div class="col">Title (English)</div>
+            <div class="col">Title (German)</div>
+          </div>
+        </div>
       </div>
-      {% for item in categories[c_name] -%}
-        {% if not loop.first -%}
-        <div class="row p-1 {% if not loop.last -%}border-bottom {% endif %}">
-          <div class="col"></div>
-          <div class="col">{{item.name}}</div>
-        </div>
-        {% endif %}
-      {% endfor %}
-        </div>
+      <div class="card-body">
+        {% for c in categories[i['id']] -%}
+          <div class="row zebra p-1">
+            <div class="col">{{ c['parent_id'] }}</div>
+            <div class="col">{{ c['title_en'] }}</div>
+            <div class="col">{{ c['title_de'] }}</div>
+          </div>
+        {% endfor %}
+      <div>
     </div>
-    {% endfor %}
   </div>
+    </div>
+  {% endfor %}
 </div>
 {% endblock %}
-
 
 {% block script %}
 {% endblock %}

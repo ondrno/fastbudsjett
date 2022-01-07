@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 import calendar
 import requests
 from functools import lru_cache
@@ -180,14 +180,15 @@ class RestApiInterface:
         else:
             raise ApiException(f"Could not retrieve item with id={item_id}, {r.content}")
 
-    @lru_cache
-    def get_categories(self):
-        r = requests.get(self.BASE_CATEGORIES_URL, headers=self.auth_token)
+    # FIXME: if lru_cache is enabled fetching /categories will break
+    # @lru_cache
+    def get_categories(self, data=None):
+        r = requests.get(self.BASE_CATEGORIES_URL, headers=self.auth_token, params=data)
         if r.ok:
             categories = r.json()
             return categories
         else:
-            raise ApiException(f"Could not retrieve categories, {r.content}")
+            raise ApiException(f"Could not retrieve categories: {r.content}")
 
     @lru_cache
     def get_payments(self):

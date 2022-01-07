@@ -146,9 +146,6 @@ def show(year: int, month: int):
 
     payments = get_items_and_resolve(itemtypes, payments, categories)
 
-    other = rest.iface.get_categories()
-    print(f"categories json: {other}")
-
     return render_template('items/index.html', items=payments, form=form)
 
 
