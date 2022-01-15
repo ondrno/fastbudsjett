@@ -10,22 +10,62 @@ from freezegun import freeze_time
 # app.config['LOGIN_DISABLED'] = True
 
 
+def sample_callback(*args, **kwargs):
+    items = [{'id': '1', 'title_en': 'income', 'title_de': 'Einnahme'}]
+    for a in args:
+        items.append(a)
+    if kwargs:
+        for k, v in kwargs.items():
+            items.append(v)
+    return items
+
+
 class TestBaseTypes:
     @mock.patch('front.app.utils.BaseTypes.fetch')
     def test_init_calls_nothing(self, mock_fetch):
-        b = utils.BaseTypes(locale='en')
+        utils.BaseTypes(locale='en')
         mock_fetch.assert_not_called()
 
-    def callback(self):
-        pass
-
     @mock.patch('front.app.utils.BaseTypes.fetch')
-    def test_init_calls_callback(self, mock_fetch):
+    def test_init_calls_fetch(self, mock_fetch):
         items = {'1': 'a'}
         mock_fetch.return_value = items
-        b = utils.BaseTypes(callback=self.callback, locale='en')
+        b = utils.BaseTypes(callback=sample_callback, locale='en')
         assert b.entries == items
         mock_fetch.assert_called_once()
+
+    def test_init_calls_callback_without_args(self):
+        b = utils.BaseTypes(callback=sample_callback, locale='en')
+        assert b.entries == {'1': {'title_de': 'Einnahme', 'title_en': 'income'}}
+        assert b.kwargs == {}
+        assert b.args == ()
+
+    def test_init_calls_callback_with_single_kwargs(self):
+        data = {'id': 2, 'title_en': 'ice', 'title_de': 'eis'}
+        b = utils.BaseTypes(entries=None, locale='en', callback=sample_callback, data=data)
+        assert b.entries == {'1': {'title_de': 'Einnahme', 'title_en': 'income'},
+                             '2': {'title_en': 'ice', 'title_de': 'eis'}}
+        assert b.kwargs == {'data': data}
+        assert b.args == ()
+
+    def test_init_calls_callback_with_single_args(self):
+        data = {'id': 2, 'title_en': 'ice', 'title_de': 'eis'}
+        b = utils.BaseTypes(None, 'en', sample_callback, data)
+        assert b.entries == {'1': {'title_de': 'Einnahme', 'title_en': 'income'},
+                             '2': {'title_en': 'ice', 'title_de': 'eis'}}
+        assert b.kwargs == {}
+        assert b.args == (data,)
+
+    def test_init_calls_callback_with_args_and_kwargs(self):
+        data = {'id': 2, 'title_en': 'ice', 'title_de': 'eis'}
+        data3 = {'id': 3, 'title_en': 'ice', 'title_de': 'eis'}
+        b = utils.BaseTypes(None, 'en', sample_callback, data, data3=data3)
+        assert b.entries == {'1': {'title_de': 'Einnahme', 'title_en': 'income'},
+                             '2': {'title_en': 'ice', 'title_de': 'eis'},
+                             '3': {'title_en': 'ice', 'title_de': 'eis'}
+                             }
+        assert b.kwargs == {'data3': data3}
+        assert b.args == (data,)
 
     def test_get_id_for_title_returns_title(self):
         items = {'1': {'title_en': 'a'}}
@@ -81,6 +121,29 @@ class TestBaseTypes:
         assert b.get_tuples_as_list(locale="de") == [('1', 'de'), ('2', 'german')]
 
 
+class TestItemTypes:
+    @mock.patch('front.app.utils.ItemTypes.fetch')
+    def test_get_id_for_income_expense(self, mock_fetch):
+        items = {'1': {'title_en': 'income', 'title_de': 'Einnahme'},
+                 '2': {'title_en': 'expense', 'title_de': 'Ausgabe'}
+                 }
+        mock_fetch.return_value = items
+        b = utils.ItemTypes(callback=sample_callback, locale='en')
+        assert 1 == b.get_id_for_income()
+        assert 2 == b.get_id_for_expense()
+
+    def test_init_calls_callback_with_args_and_kwargs(self):
+        data = {'id': 2, 'title_en': 'ice', 'title_de': 'eis'}
+        data3 = {'id': 3, 'title_en': 'ice', 'title_de': 'eis'}
+        b = utils.ItemTypes(None, 'en', sample_callback, data, data3=data3)
+        assert b.entries == {'1': {'title_de': 'Einnahme', 'title_en': 'income'},
+                             '2': {'title_en': 'ice', 'title_de': 'eis'},
+                             '3': {'title_en': 'ice', 'title_de': 'eis'}
+                             }
+        assert b.kwargs == {'data3': data3}
+        assert b.args == (data,)
+
+
 @pytest.fixture(autouse=True)
 def clear_lru_cache():
     # this fixture is required to test functions with the @lru_cache decorator
@@ -96,19 +159,19 @@ def clear_lru_cache():
 @mock.patch('front.app.utils.BaseTypes.fetch')
 def test_init_category_types_class(mock_fetch):
     c = utils.CategoryTypes(locale="en")
-    assert c.rest_callback == iface.get_categories
+    assert c.callback == iface.get_categories
 
 
 @mock.patch('front.app.utils.BaseTypes.fetch')
 def test_init_payment_types_class(mock_fetch):
     c = utils.PaymentTypes(locale="en")
-    assert c.rest_callback == iface.get_payments
+    assert c.callback == iface.get_payments
 
 
 @mock.patch('front.app.utils.BaseTypes.fetch')
 def test_init_item_types_class(mock_fetch):
     c = utils.ItemTypes(locale="en")
-    assert c.rest_callback == iface.get_itemtypes
+    assert c.callback == iface.get_itemtypes
 
 
 @pytest.mark.parametrize("year, month, exp_day", [(2021, 1, 31), (2021, 2, 28), (2021, 4, 30)])

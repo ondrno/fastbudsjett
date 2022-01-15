@@ -9,7 +9,7 @@ from ..utils import rest
 
 
 class BaseTypes:
-    def __init__(self, callback=None, entries: dict = None, locale: str = None):
+    def __init__(self, entries: dict = None, locale: str = None, callback=None, *args, **kwargs):
         if entries is None:
             entries = {}
         if locale is None:
@@ -17,7 +17,9 @@ class BaseTypes:
         self.entries = entries
         self.locale = locale
         self.default_locale = 'en'
-        self.rest_callback = callback
+        self.callback = callback
+        self.args = args
+        self.kwargs = kwargs
         if not entries and callback:
             self.entries = self.fetch()
 
@@ -27,7 +29,7 @@ class BaseTypes:
         and return a dictionary, e.g. itemtypes = { '2': {title_en: 'income', title_de: 'Einnahme'},
                                                     '3': {title_en: 'expense', title_de: 'Ausgabe'} }
         """
-        raw = self.rest_callback()
+        raw = self.callback(*self.args, **self.kwargs)
         entries = {}
         for p in raw:
             id_ = str(p['id'])
@@ -71,24 +73,30 @@ class BaseTypes:
 
 class CategoryTypes(BaseTypes):
     """ """
-    def __init__(self, callback=None, entries: dict = None, locale: str = None):
+    def __init__(self, entries: dict = None, locale: str = None, callback=None, *args, **kwargs):
         if callback is None:
             callback = rest.iface.get_categories
-        super().__init__(callback, entries, locale)
+        super().__init__(entries, locale, callback, *args, **kwargs)
 
 
 class ItemTypes(BaseTypes):
-    def __init__(self, callback=None, entries: dict = None, locale: str = None):
+    def __init__(self, entries: dict = None, locale: str = None, callback=None, *args, **kwargs):
         if callback is None:
             callback = rest.iface.get_itemtypes
-        super().__init__(callback, entries, locale)
+        super().__init__(entries, locale, callback, *args, **kwargs)
+
+    def get_id_for_income(self):
+        return self.get_id_for_title(title='income')
+
+    def get_id_for_expense(self):
+        return self.get_id_for_title(title='expense')
 
 
 class PaymentTypes(BaseTypes):
-    def __init__(self, callback=None, entries: dict = None, locale: str = None):
+    def __init__(self, entries: dict = None, locale: str = None, callback=None, *args, **kwargs):
         if callback is None:
             callback = rest.iface.get_payments
-        super().__init__(callback, entries, locale)
+        super().__init__(entries, locale, callback, *args, **kwargs)
 
 
 def set_form_field_default(request, field, lookup: BaseTypes, default: str):
