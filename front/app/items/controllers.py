@@ -17,7 +17,8 @@ mod_items = Blueprint('items', __name__, url_prefix="/items")
 def resolve_items(raw,
                   itemtypes: utils.ItemTypes,
                   payment_types: utils.PaymentTypes,
-                  categories: utils.CategoryTypes):
+                  income_categories: utils.CategoryTypes,
+                  expense_categories: utils.CategoryTypes):
     payments = {}
     payments['sum_expenses'] = 0
     payments['sum_income'] = 0
@@ -33,7 +34,12 @@ def resolve_items(raw,
         # this is hard-coded stuff depending on title of the itemtype
         # better have a field in db indicating that this itemtype id is the income
         itemtype_title_en = itemtypes.get_title_for_id(itemtype_id, 'en')
-        payment['is_income'] = itemtype_title_en.lower() == 'income'
+        is_income = itemtype_title_en.lower() == 'income'
+        payment['is_income'] = is_income
+        if is_income:
+            categories = income_categories
+        else:
+            categories = expense_categories
 
         payment['payment'] = payment_types.get_title_for_id(payment_id)
         payment['category'] = categories.get_title_for_id(cat_id)
@@ -71,7 +77,8 @@ def resolve_items(raw,
 
 def get_items_and_resolve(itemtypes: utils.ItemTypes,
                           payment_types: utils.PaymentTypes,
-                          categories: utils.CategoryTypes):
+                          income_categories: utils.CategoryTypes,
+                          expense_categories: utils.CategoryTypes):
     """
     Get items using rest api and translate the payment_id, category_id
     into the names.
@@ -81,7 +88,7 @@ def get_items_and_resolve(itemtypes: utils.ItemTypes,
         g.curr_month = format_suburl(year, month)
 
     raw = rest.iface.get_items_for_month(year, month)
-    return resolve_items(raw, itemtypes, payment_types, categories)
+    return resolve_items(raw, itemtypes, payment_types, income_categories, expense_categories)
 
 
 def calc_next_and_prev_month(now: datetime.date):
@@ -134,19 +141,28 @@ def show(year: int, month: int):
     now = datetime.date(year, month, 1)
     calc_next_and_prev_month(now)
 
-    categories = utils.CategoryTypes()
-    payments = utils.PaymentTypes()
     itemtypes = utils.ItemTypes()
-    utils.types_to_session(categories, payments, itemtypes)
+    data = {}
+    data['itemtype_id'] = itemtypes.get_id_for_income()
+    income_categories = utils.CategoryTypes(data=data)
+    print(f"items/controller income_categories={income_categories.entries}")
+
+    data['itemtype_id'] = itemtypes.get_id_for_expense()
+    expense_categories = utils.CategoryTypes(data=data)
+    print(f"items/controller expense_categories={expense_categories.entries}")
+    payments = utils.PaymentTypes()
+
+    utils.types_to_session(income_categories, expense_categories, payments, itemtypes)
 
     form = ItemsForm()
     utils.set_form_field_default(request, form.payment_type, payments, 'cash')
-    utils.set_form_field_default(request, form.category, categories, 'food')
+    utils.set_form_field_default(request, form.category, expense_categories, 'food')
     utils.set_form_field_default(request, form.itemtype, itemtypes, 'expenditure')
 
-    payments = get_items_and_resolve(itemtypes, payments, categories)
+    payments = get_items_and_resolve(itemtypes, payments, income_categories, expense_categories)
 
     return render_template('items/index.html', items=payments, form=form)
+
 
 
 @mod_items.route('/edit/<int:item_id>', methods=['GET', 'POST'])
@@ -154,7 +170,8 @@ def show(year: int, month: int):
 def edit(item_id: int):
     form_only = is_form_only(request)
     t = utils.types_from_session()
-    categories = t["categories"]
+    income_categories = t["income_categories"]
+    expense_categories = t["expense_categories"]
     payments = t["payments"]
     itemtypes = t["itemtypes"]
 
@@ -195,8 +212,8 @@ def create():
 
     form = ItemsForm()
     utils.set_form_field_default(request, form.payment_type, t['payments'], 'cash')
-    utils.set_form_field_default(request, form.category, t['categories'], 'food')
-    utils.set_form_field_default(request, form.itemtype, t['itemtypes'], 'expenditure')
+    utils.set_form_field_default(request, form.category, t['expense_categories'], 'food')
+    utils.set_form_field_default(request, form.itemtype, t['itemtypes'], 'Ausgabe')
 
     if form.validate_on_submit():
         data = utils.prepare_data(request)

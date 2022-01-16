@@ -13,9 +13,11 @@ mod_search = Blueprint('search', __name__, url_prefix="/search")
 @mod_search.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    categories = utils.CategoryTypes()
-    payments = utils.PaymentTypes()
-    itemtypes = utils.ItemTypes()
+    t = utils.types_from_session()
+    income_categories = t["income_categories"]
+    expense_categories = t["expense_categories"]
+    payments = t["payments"]
+    itemtypes = t["itemtypes"]
 
     form = SearchForm()
     resolved_items = {}
@@ -33,7 +35,7 @@ def index():
         data['order_by'] = 'date'
 
         raw = rest.iface.get_items(data)
-        resolved_items = items.resolve_items(raw, itemtypes, payments, categories)
+        resolved_items = items.resolve_items(raw, itemtypes, payments, income_categories, expense_categories)
         print(f"resolved items={resolved_items}")
         redirect(url_for('search.index'))
 

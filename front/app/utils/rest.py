@@ -181,7 +181,7 @@ class RestApiInterface:
             raise ApiException(f"Could not retrieve item with id={item_id}, {r.content}")
 
     # FIXME: if lru_cache is enabled fetching /categories will break
-    # @lru_cache
+    #@lru_cache
     def get_categories(self, data=None):
         r = requests.get(self.BASE_CATEGORIES_URL, headers=self.auth_token, params=data)
         if r.ok:

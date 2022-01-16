@@ -147,11 +147,11 @@ class TestItemTypes:
 @pytest.fixture(autouse=True)
 def clear_lru_cache():
     # this fixture is required to test functions with the @lru_cache decorator
-    iface.get_categories.cache_clear()
+    # iface.get_categories.cache_clear()
     iface.get_payments.cache_clear()
     iface.get_itemtypes.cache_clear()
     yield
-    iface.get_categories.cache_clear()
+    # iface.get_categories.cache_clear()
     iface.get_payments.cache_clear()
     iface.get_itemtypes.cache_clear()
 

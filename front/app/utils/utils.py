@@ -29,7 +29,10 @@ class BaseTypes:
         and return a dictionary, e.g. itemtypes = { '2': {title_en: 'income', title_de: 'Einnahme'},
                                                     '3': {title_en: 'expense', title_de: 'Ausgabe'} }
         """
-        raw = self.callback(*self.args, **self.kwargs)
+        if 'data' in self.kwargs:
+            raw = self.callback(data=self.kwargs['data'])
+        else:
+            raw = self.callback(*self.args, **self.kwargs)
         entries = {}
         for p in raw:
             id_ = str(p['id'])
@@ -74,6 +77,7 @@ class BaseTypes:
 class CategoryTypes(BaseTypes):
     """ """
     def __init__(self, entries: dict = None, locale: str = None, callback=None, *args, **kwargs):
+        print(f"category types entries={entries} locale={locale}, callback={callback}, args={args}, kwargs={kwargs}")
         if callback is None:
             callback = rest.iface.get_categories
         super().__init__(entries, locale, callback, *args, **kwargs)
@@ -141,15 +145,17 @@ def prepare_data(r: request):
     return data
 
 
-def types_to_session(categories, payments, itemtypes):
-    session["categories"] = jsonpickle.encode(categories)
+def types_to_session(income_categories, expense_categories, payments, itemtypes):
+    session["income_categories"] = jsonpickle.encode(income_categories)
+    session["expense_categories"] = jsonpickle.encode(expense_categories)
     session["payments"] = jsonpickle.encode(payments)
     session["itemtypes"] = jsonpickle.encode(itemtypes)
 
 
 def types_from_session() -> dict:
     return {
-        'categories': jsonpickle.decode(session["categories"]),
+        'income_categories': jsonpickle.decode(session["income_categories"]),
+        'expense_categories': jsonpickle.decode(session["expense_categories"]),
         'payments': jsonpickle.decode(session["payments"]),
         'itemtypes': jsonpickle.decode(session["itemtypes"]),
     }
