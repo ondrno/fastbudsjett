@@ -5,6 +5,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 import json
 import jsonpickle
+from flask_babel import _, lazy_gettext
 
 from ..auth.controllers import login_required
 from ..utils import utils, rest
@@ -124,10 +125,6 @@ def format_suburl(year: int, month: int) -> str:
     return f"{year}/{month}"
 
 
-def is_form_only(r: request):
-    return 'form_only' in request.args and request.method == 'GET'
-
-
 @mod_items.route('/', methods=['GET'])
 @login_required
 def index():
@@ -155,20 +152,15 @@ def show(year: int, month: int):
     utils.types_to_session(income_categories, expense_categories, payments, itemtypes)
 
     form = ItemsForm()
-    utils.set_form_field_default(request, form.payment_type, payments, 'cash')
-    utils.set_form_field_default(request, form.category, expense_categories, 'food')
-    utils.set_form_field_default(request, form.itemtype, itemtypes, 'expenditure')
-
     payments = get_items_and_resolve(itemtypes, payments, income_categories, expense_categories)
 
     return render_template('items/index.html', items=payments, form=form)
 
 
-
 @mod_items.route('/edit/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def edit(item_id: int):
-    form_only = is_form_only(request)
+    form_only = utils.is_form_only(request)
     t = utils.types_from_session()
     income_categories = t["income_categories"]
     expense_categories = t["expense_categories"]
@@ -176,18 +168,21 @@ def edit(item_id: int):
     itemtypes = t["itemtypes"]
 
     current_item = rest.iface.get_item_by_id(item_id)
+    itemtype_title_en = itemtypes.get_title_for_id(current_item.get('itemtype_id'), 'en')
+    if itemtype_title_en.lower() == 'income':
+        categories = income_categories
+    else:
+        categories = expense_categories
+
     (year, month, day) = current_item.get('date').split("-")
 
     form = ItemsForm(amount=current_item.get('amount'),
                      description=current_item.get('description'),
-                     date=datetime.date(year=int(year), month=int(month), day=int(day))
+                     date=datetime.date(year=int(year), month=int(month), day=int(day)),
                      )
-    utils.set_form_field_default(request, form.payment_type, payments,
-                                 default=payments.get_id_for_title(current_item.get('payment_id')))
-    utils.set_form_field_default(request, form.category, categories,
-                                 default=categories.get_id_for_title(current_item.get('category_id')))
-    utils.set_form_field_default(request, form.itemtype, itemtypes,
-                                 default=itemtypes.get_id_for_title(current_item.get('itemtype_id')))
+    utils.set_form_default(request, form.payment_type, payments, default=current_item.get('payment_id'))
+    utils.set_form_default(request, form.category, categories, default=current_item.get('category_id'))
+    utils.set_form_default(request, form.itemtype, itemtypes, default=current_item.get('itemtype_id'))
 
     if form.validate_on_submit():
         data = utils.prepare_data(request)
@@ -207,13 +202,13 @@ def edit(item_id: int):
 @mod_items.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
-    form_only = is_form_only(request)
+    form_only = utils.is_form_only(request)
     t = utils.types_from_session()
 
     form = ItemsForm()
-    utils.set_form_field_default(request, form.payment_type, t['payments'], 'cash')
-    utils.set_form_field_default(request, form.category, t['expense_categories'], 'food')
-    utils.set_form_field_default(request, form.itemtype, t['itemtypes'], 'Ausgabe')
+    utils.set_form_default(request, form.payment_type, t['payments'])
+    utils.set_form_default(request, form.category, t['expense_categories'])
+    utils.set_form_default(request, form.itemtype, t['itemtypes'])
 
     if form.validate_on_submit():
         data = utils.prepare_data(request)
@@ -233,7 +228,7 @@ def create():
 @mod_items.route('/remove/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def remove(item_id: int):
-    form_only = is_form_only(request)
+    form_only = utils.is_form_only(request)
     categories = jsonpickle.decode(session["categories"])
     payments = jsonpickle.decode(session["payments"])
     itemtypes = jsonpickle.decode(session["itemtypes"])
@@ -246,12 +241,12 @@ def remove(item_id: int):
                      date=datetime.date(year=int(year), month=int(month), day=int(day))
                      )
 
-    utils.set_form_field_default(request, form.payment_type, payments,
-                                 default=payments.get_id_for_title(current_item.get('payment_id')))
-    utils.set_form_field_default(request, form.category, categories,
-                                 default=categories.get_id_for_title(current_item.get('category_id')))
-    utils.set_form_field_default(request, form.itemtype, itemtypes,
-                                 default=itemtypes.get_id_for_title(current_item.get('itemtype_id')))
+    utils.set_form_default(request, form.payment_type, payments,
+                           default=payments.get_id_for_title(current_item.get('payment_id')))
+    utils.set_form_default(request, form.category, categories,
+                           default=categories.get_id_for_title(current_item.get('category_id')))
+    utils.set_form_default(request, form.itemtype, itemtypes,
+                           default=itemtypes.get_id_for_title(current_item.get('itemtype_id')))
     for k in form.__dict__['_fields'].keys():
         if k == "submit" or k == "crsf_token":
             continue

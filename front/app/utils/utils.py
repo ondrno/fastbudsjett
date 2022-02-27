@@ -60,6 +60,7 @@ class BaseTypes:
         return result
 
     def get_id_for_title(self, title: str) -> int:
+        print(f"get_id_for_title: self={self} title={title}, entries={self.entries.items()}")
         for _id, _all_titles in self.entries.items():
             if title in _all_titles.values():
                 return int(_id)
@@ -103,21 +104,28 @@ class PaymentTypes(BaseTypes):
         super().__init__(entries, locale, callback, *args, **kwargs)
 
 
-def set_form_field_default(request, field, lookup: BaseTypes, default: str):
+def set_form_default(request, field, lookup: BaseTypes, default: int = 0):
     """
     set the default of a select/radio field dynamically,
     c.f. https://stackoverflow.com/questions/5519729/wtforms-how-to-select-options-in-selectmultiplefield/5519971#5519971
-
-    Example: set_form_field_default(form.payment_type, 'cash')
     """
     field.choices = lookup.get_tuples_as_list()
-    default_value = [k for (k, v) in field.choices if v == default]
-    if not default_value:
-        default_value = str(default)
-    # print(f"set_form_field_default={field} lu={lookup} default={default} choices={field.choices} -> default_value={default_value}")
-    if default_value:
-        field.default = default_value[0]
-        field.process(request.form)
+    if default == 0:
+        default = get_form_default_id(field.choices)
+    field.default = default
+    field.process(request.form)
+    # print(f"set_form_default: field={field} lu={lookup} default={default} choices={field.choices}")
+
+
+def get_form_default_id(choices: list) -> int:
+    # FIXME: nasty hack, better have a field 'is_default' in database
+    for i in choices:
+        default = i[0]
+        if i[1] in ['food', 'Essen'] or \
+           i[1] in ['salary', 'Gehalt'] or \
+           i[1] in ['expense', 'Ausgabe'] or \
+           i[1] in ['cash', 'Bar']:
+            return default
 
 
 def end_of_month(month: int = None):
@@ -190,3 +198,7 @@ def day_name(dow: int, abbr: bool = True, locale: str = None) -> str:
             return calendar.day_abbr[dow]
         else:
             return calendar.day_name[dow]
+
+
+def is_form_only(r: request):
+    return 'form_only' in request.args and request.method == 'GET'
