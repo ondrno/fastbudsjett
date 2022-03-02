@@ -15,15 +15,16 @@ def index():
     t = utils.types_from_session()
     itemtypes = t["itemtypes"]
 
-    if utils.is_form_only(request) and 'itemtype_id' in request.args:
-        # c.f. https://stackoverflow.com/questions/70474485/how-do-i-implement-dynamic-dependent-change-of-dropdown-select-options-using-py/70482570#70482570
+    if 'itemtype_id' in request.args:
         itemtype_id = int(request.args['itemtype_id'])
-        income_id = itemtypes.get_id_for_income()
         if itemtypes.get_id_for_income() == itemtype_id:
             categories = t["income_categories"]
         else:
             categories = t["expense_categories"]
-        return jsonify(categories.get_tuples_as_list())
+        selected = utils.get_form_default_id(categories.get_tuples_as_list())
+        print(f"{categories}")
+        print(f"{selected}")
+        return jsonify([categories.get_tuples_as_dict(), selected])
 
     all_categories = {}
     income_id = itemtypes.get_id_for_income()

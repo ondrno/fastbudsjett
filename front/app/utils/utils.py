@@ -59,8 +59,16 @@ class BaseTypes:
             result.append((_id, title))
         return result
 
+    def get_tuples_as_dict(self, locale: str = None):
+        """ return a dict {id: title}, e.g. {1: 'income', 2: 'expense'} """
+        result = {}
+        for _id, _all_titles in self.entries.items():
+            title = self._get_title(_all_titles, locale)
+            result[_id] = title
+        return result
+
     def get_id_for_title(self, title: str) -> int:
-        print(f"get_id_for_title: self={self} title={title}, entries={self.entries.items()}")
+        # print(f"get_id_for_title: self={self} title={title}, entries={self.entries.items()}")
         for _id, _all_titles in self.entries.items():
             if title in _all_titles.values():
                 return int(_id)
@@ -78,7 +86,7 @@ class BaseTypes:
 class CategoryTypes(BaseTypes):
     """ """
     def __init__(self, entries: dict = None, locale: str = None, callback=None, *args, **kwargs):
-        print(f"category types entries={entries} locale={locale}, callback={callback}, args={args}, kwargs={kwargs}")
+        # print(f"category types entries={entries} locale={locale}, callback={callback}, args={args}, kwargs={kwargs}")
         if callback is None:
             callback = rest.iface.get_categories
         super().__init__(entries, locale, callback, *args, **kwargs)
@@ -119,12 +127,15 @@ def set_form_default(request, field, lookup: BaseTypes, default: int = 0):
 
 def get_form_default_id(choices: list) -> int:
     # FIXME: nasty hack, better have a field 'is_default' in database
+    # print("--------------------------------")
     for i in choices:
+        # print(f"get_form_default_id: {i}")
         default = i[0]
         if i[1] in ['food', 'Essen'] or \
            i[1] in ['salary', 'Gehalt'] or \
            i[1] in ['expense', 'Ausgabe'] or \
-           i[1] in ['cash', 'Bar']:
+           i[1] in ['cash', 'bar']:
+            # print(f"get_form_default: {i[1]} -> {i[0]}")
             return default
 
 
@@ -202,3 +213,11 @@ def day_name(dow: int, abbr: bool = True, locale: str = None) -> str:
 
 def is_form_only(r: request):
     return 'form_only' in request.args and request.method == 'GET'
+
+
+def is_get_request(r: request):
+    return request.method == 'GET'
+
+
+def is_post_request(r: request):
+    return request.method == 'POST'

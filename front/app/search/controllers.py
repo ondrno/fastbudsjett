@@ -36,7 +36,7 @@ def index():
 
         raw = rest.iface.get_items(data)
         resolved_items = items.resolve_items(raw, itemtypes, payments, income_categories, expense_categories)
-        print(f"resolved items={resolved_items}")
+        # print(f"resolved items={resolved_items}")
         redirect(url_for('search.index'))
 
     return render_template('search/search.html', items=resolved_items, form=form)

@@ -57,3 +57,38 @@
     {{ field }} {{ ', '.join(errors) }}
   </small>
 {% endfor %}
+
+<script>
+      // this function dynamically updates the categories depending on
+      // the selected itemtype, i.e. income or expense
+      // query /categories?itemtype_id=39 -> returns [{1: 'foo', 2: 'bar'}, 2] as json
+      // which is used to update the #category textbox
+      $('#itemtype').change(function() {
+          $.ajax({
+              type: "GET",
+              url: '/categories',
+              data: {itemtype_id: $('#itemtype').val()},
+              dataType: 'json',
+              success: function (data) {
+                  // data is something like [[{id, name}, {...}], [default_id]]
+                  let options = data[0];
+                  let selected_option = data[1];
+                  // console.table(data);
+
+                  let category_select = document.getElementById("category");
+                  let optionHtml = '';
+                  $.each(options, function(_id, _name) {
+                      let selected = '';
+                      if (parseInt(_id) == parseInt(selected_option)) {
+                          selected = 'selected';
+                      }
+                      optionHtml += '<option value="' + _id + '" ' + selected + '>' + _name + "</option>";
+                  });
+                  category_select.innerHTML = optionHtml;
+              },
+              error: function (request, status, error) {
+                  console.log("ajax call went wrong:" + request.responseText + " error:" + error);
+              }
+          });
+      });
+</script>

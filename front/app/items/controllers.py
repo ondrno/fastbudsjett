@@ -142,11 +142,11 @@ def show(year: int, month: int):
     data = {}
     data['itemtype_id'] = itemtypes.get_id_for_income()
     income_categories = utils.CategoryTypes(data=data)
-    print(f"items/controller income_categories={income_categories.entries}")
+    # print(f"items/controller income_categories={income_categories.entries}")
 
     data['itemtype_id'] = itemtypes.get_id_for_expense()
     expense_categories = utils.CategoryTypes(data=data)
-    print(f"items/controller expense_categories={expense_categories.entries}")
+    # print(f"items/controller expense_categories={expense_categories.entries}")
     payments = utils.PaymentTypes()
 
     utils.types_to_session(income_categories, expense_categories, payments, itemtypes)
@@ -203,12 +203,25 @@ def edit(item_id: int):
 @login_required
 def create():
     form_only = utils.is_form_only(request)
+    # print("items->create: ", request.form.to_dict())
     t = utils.types_from_session()
 
     form = ItemsForm()
-    utils.set_form_default(request, form.payment_type, t['payments'])
-    utils.set_form_default(request, form.category, t['expense_categories'])
-    utils.set_form_default(request, form.itemtype, t['itemtypes'])
+    category_default = 0
+    payment_default = 0
+    itemtype_default = 0
+    category = t['expense_categories']
+    if utils.is_post_request(request):
+        category_default = request.form.get('category', type=int)
+        payment_default = request.form.get('payment_type', type=int)
+        itemtype_default = request.form.get('itemtype', type=int)
+        if itemtype_default == t['itemtypes'].get_id_for_income():
+            category = t['income_categories']
+
+    # print(f"items->create: cat_def={category_default}, pay_def={payment_default}, i_def={itemtype_default} c={category}")
+    utils.set_form_default(request, form.payment_type, t['payments'], payment_default)
+    utils.set_form_default(request, form.category, category, category_default)
+    utils.set_form_default(request, form.itemtype, t['itemtypes'], itemtype_default)
 
     if form.validate_on_submit():
         data = utils.prepare_data(request)
@@ -229,24 +242,28 @@ def create():
 @login_required
 def remove(item_id: int):
     form_only = utils.is_form_only(request)
-    categories = jsonpickle.decode(session["categories"])
-    payments = jsonpickle.decode(session["payments"])
-    itemtypes = jsonpickle.decode(session["itemtypes"])
+    t = utils.types_from_session()
+    payments = t["payments"]
+    itemtypes = t["itemtypes"]
+
 
     current_item = rest.iface.get_item_by_id(item_id)
     (year, month, day) = current_item.get('date').split("-")
+
+    print(current_item)
+    if int(current_item.get('itemtype_id')) == t['itemtypes'].get_id_for_income():
+        category = t['income_categories']
+    else:
+        category = t['expense_categories']
 
     form = ItemsForm(amount=current_item.get('amount'),
                      description=current_item.get('description'),
                      date=datetime.date(year=int(year), month=int(month), day=int(day))
                      )
 
-    utils.set_form_default(request, form.payment_type, payments,
-                           default=payments.get_id_for_title(current_item.get('payment_id')))
-    utils.set_form_default(request, form.category, categories,
-                           default=categories.get_id_for_title(current_item.get('category_id')))
-    utils.set_form_default(request, form.itemtype, itemtypes,
-                           default=itemtypes.get_id_for_title(current_item.get('itemtype_id')))
+    utils.set_form_default(request, form.payment_type, payments, default=current_item.get('payment_id'))
+    utils.set_form_default(request, form.category, category, default=current_item.get('category_id'))
+    utils.set_form_default(request, form.itemtype, itemtypes, default=current_item.get('itemtype_id'))
     for k in form.__dict__['_fields'].keys():
         if k == "submit" or k == "crsf_token":
             continue
