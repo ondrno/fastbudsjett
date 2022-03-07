@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+{% block title %} Users {%endblock%}
 {% block header %}
 {% endblock %}
 
@@ -7,10 +8,36 @@
 <div class="container-sm mt-3">
     <div class="card p-1">
       <div class="card-body">
-        {% for u in known_users -%}
-        <div class="row p-1">
+        {% for u in users -%}
+        {% if u.is_active %}
+          <div class="row zebra p-1">
+        {% else %}
+          <div class="row zebra p-1 ">
+        {% endif %}
           <div class="col"><a href="{{ url_for('users.edit', user_id=u.id) }}">{{ u.email }}</a></div>
-          <div class="col">{{u.default_locale}}</div>
+          <div class="col text-center">
+            {{ u.default_locale }}
+            {%if u.is_active %}
+              <i data-feather="check-square" style="stroke-width: 1px; size: 10px;"></i>
+            {% else %}
+              <i data-feather="x-square" style="stroke-width: 1px; size: 10px;"></i>
+            {% endif %}
+            {%if u.is_superuser %}
+              <i data-feather="shield" style="stroke-width: 1px; size: 10px;"></i>
+            {% else %}
+              <i data-feather="shield-off" style="stroke-width: 1px; size: 10px;"></i>
+            {% endif %}
+          </div>
+          <div class="col text-end">
+            {% if (u.id != current_user.id) %}
+            <button class="btn btn-action" style="padding: 0px;" data-bs-toggle="modal"
+                    data-url="{{ url_for('users.remove',user_id=u.id) }}?form_only"
+                    data-bs-target="#deleteItemModal" data-title="{{_('Confirm deletion')}}"
+                    data-submit-button-title="{{_('Yes')}}">
+              <i data-feather="trash-2" style="stroke-width: 1px; size: 10px;"></i>
+            </button>
+            {% endif %}
+          </div>
         </div>
         {% endfor %}
       </div>

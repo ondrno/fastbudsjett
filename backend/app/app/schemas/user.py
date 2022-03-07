@@ -1,5 +1,4 @@
 from typing import Optional
-
 from pydantic import BaseModel, EmailStr, constr
 
 
@@ -17,11 +16,16 @@ class UserCreate(UserBase):
     email: EmailStr
     password: constr(min_length=5, max_length=50)
     default_locale: constr(min_length=2, max_length=2, to_lower=True)
+    is_active: bool
+    is_superuser: bool
 
 
 # Properties to receive via API on update
 class UserUpdate(UserBase):
     password: Optional[str] = None
+    is_active: Optional[bool] = None
+    is_superuser: Optional[bool] = None
+    default_locale: Optional[str] = None
 
 
 class UserInDBBase(UserBase):

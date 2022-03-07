@@ -108,6 +108,14 @@ class RestApiInterface:
 
         return self.auth_token
 
+    def get_users(self, data: dict = None):
+        r = requests.get(self.BASE_USERS_URL, headers=self.auth_token, params=data)
+        if r.ok:
+            users = r.json()
+            return users
+        else:
+            raise ApiException(f"Could not retrieve users, {r.content}")
+
     @lru_cache
     def get_user(self, id: Union[int, str]) -> User:
         url = self.BASE_USERS_URL

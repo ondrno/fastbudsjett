@@ -21,6 +21,24 @@
         </span>
         {{ form.default_locale(class_="form-control") }}
       </div>
+      <div class="mb-3 input-group">
+        <span class="input-group-text">
+          <i class="bi bi-activity me-2"></i>
+          <span class="mx-1">active</span>
+        </span>
+        <span class="form-control">
+          <span class="mx-1">{{ form.is_active(class_="form-check-input") }}</span>
+        </span>
+      </div>
+      <div class="mb-3 input-group">
+        <span class="input-group-text">
+          <i class="bi bi-shield me-2"></i>
+          <span class="mx-1">super user</span>
+        </span>
+        <span class="form-control">
+          <span class="mx-1">{{ form.is_superuser(class_="form-check-input") }}</span>
+        </span>
+      </div>
       {{ form.submit(class_="btn btn-outline-success") }}
     </div>
   </form>
