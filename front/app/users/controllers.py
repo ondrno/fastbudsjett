@@ -13,8 +13,8 @@ mod_users = Blueprint('users', __name__, url_prefix="/users")
 def prepare_data(r: request):
     data = {'email': r.form['email'],
             'default_locale': r.form['default_locale'],
-            'is_active': r.form['is_active'],
-            'is_superuser': r.form['is_superuser'],
+            'is_active': r.form.get('is_active', True),
+            'is_superuser': r.form.get('is_superuser', False),
             }
     return data
 
@@ -22,9 +22,12 @@ def prepare_data(r: request):
 @mod_users.route('/', methods=['GET'])
 @login_required
 def index():
-    users = rest.iface.get_users()
-    current_user = rest.iface.whoami()
-    me = {'id': current_user._user_id, 'email': current_user._email, 'locale': current_user._locale}
+    me = rest.iface.whoami()
+    if me.is_superuser:
+        users = rest.iface.get_users()
+    else:
+        users = me
+
     print(f"users->index(): users={users}")
     print(f"users->index(): me={me}")
     return render_template('users/index.html', users=users, current_user=me)
@@ -34,16 +37,19 @@ def index():
 @login_required
 def edit(user_id: int):
     me = rest.iface.whoami()
+    user = rest.iface.get_user(user_id)
 
-    if is_get_request(request):
-        form = UsersForm(default_locale=me._locale, email=me._email)
+    form = UsersForm(default_locale=user._locale, email=user.email,
+                     is_active=user.is_active, is_superuser=user.is_superuser)
+
+    if me._user_id == user_id:
+        form.is_active.render_kw = {'disabled': 'disabled'}
+        form.is_superuser.render_kw = {'disabled': 'disabled'}
 
     if form.validate_on_submit():
         data = prepare_data(request)
-        if me.id == user_id:
+        if me.get_id() == user_id:
             data.remove('email')
-            data.remove('is_superuser')
-            data.remove('is_active')
 
         rest.iface.update_user(user_id, data)
 
@@ -58,5 +64,5 @@ def edit(user_id: int):
 @login_required
 def remove(user_id: int):
     me = rest.iface.whoami()
-    if me.get_id() == user_id:
+    if me._user_id == user_id:
         return render_template('500.html')

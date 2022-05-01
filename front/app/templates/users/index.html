@@ -16,16 +16,20 @@
         {% endif %}
           <div class="col"><a href="{{ url_for('users.edit', user_id=u.id) }}">{{ u.email }}</a></div>
           <div class="col text-center">
-            {{ u.default_locale }}
-            {%if u.is_active %}
+            {{_('language')}}: {{ u.default_locale }}
+          </div>
+          <div class="col text-center">
+            {{_('active')}}: {%if u.is_active %}
               <i data-feather="check-square" style="stroke-width: 1px; size: 10px;"></i>
             {% else %}
               <i data-feather="x-square" style="stroke-width: 1px; size: 10px;"></i>
             {% endif %}
-            {%if u.is_superuser %}
-              <i data-feather="shield" style="stroke-width: 1px; size: 10px;"></i>
+          </div>
+          <div class="col text-center">
+            {{_('superuser')}}: {%if u.is_superuser %}
+              <i data-feather="check-square" style="stroke-width: 1px; size: 10px;"></i>
             {% else %}
-              <i data-feather="shield-off" style="stroke-width: 1px; size: 10px;"></i>
+              <i data-feather="x-square" style="stroke-width: 1px; size: 10px;"></i>
             {% endif %}
           </div>
           <div class="col text-end">
@@ -42,9 +46,9 @@
         {% endfor %}
       </div>
     </div>
+  </div>
 </div>
 {% endblock %}
-
 
 {% block script %}
 {% endblock %}
